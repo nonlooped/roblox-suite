@@ -55,8 +55,8 @@ This gives a very high-production "magical text" or "holographic" feel without h
 
 ## Integration with the Rest of the Toolset
 
-- Drive UI particle bursts from AnimationTrack markers (see animation-and-tweening skill). A "FootStep" or "AbilityCast" marker can call a function that spawns the appropriate 2D reward burst or ViewportFrame effect.
-- Combine with visual-effects-and-particles best practices (flipbooks, proper transparency sequences, low rate + clever size, WindAffectsDrag where relevant) when driving effects from animation markers. Remember that real ParticleEmitters/Beams/Trails do not render inside ViewportFrame.
+- Drive UI particle bursts from AnimationTrack markers (see roblox-animation skill). A "FootStep" or "AbilityCast" marker can call a function that spawns the appropriate 2D reward burst or ViewportFrame effect.
+- Combine with roblox-vfx best practices (flipbooks, proper transparency sequences, low rate + clever size, WindAffectsDrag where relevant) when driving effects from animation markers. Remember that real ParticleEmitters/Beams/Trails do not render inside ViewportFrame.
 - Respect the performance guidance in the fundamentals skill (fill rate, overdraw, mobile caps).
 
 ## Concrete Starter Pattern (2D pool)

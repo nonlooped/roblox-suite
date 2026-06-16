@@ -32,18 +32,18 @@ Twelve deep, battle-tested skills. Each has a decision-tree overview, focused te
 
 | Skill                                                                                                        | What it covers                                                                      |
 | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| 🗺️ **[roblox-suite](roblox-suite/SKILL.md)** *(hub)*                                                        | Architecture principles, cross-skill workflows, quick-reference patterns            |
-| ⚙️ **[roblox-fundamentals-and-services](roblox-fundamentals-and-services/SKILL.md)**                         | Services, Luau types, serialization, script locations, `RunContext`, the data model |
-| 💾 **[roblox-data-persistence](roblox-data-persistence/SKILL.md)**                                           | DataStores, versioning, metadata, quotas, throttling, safe save/load patterns       |
-| 🔒 **[roblox-client-server-networking-and-security](roblox-client-server-networking-and-security/SKILL.md)** | Remotes, server authority, network ownership, exploit defenses, capabilities        |
+| 🗺️ **[roblox](roblox/SKILL.md)** *(hub)*                                                        | Architecture principles, cross-skill workflows, quick-reference patterns            |
+| ⚙️ **[roblox-core](roblox-core/SKILL.md)**                         | Services, Luau types, serialization, script locations, `RunContext`, the data model |
+| 💾 **[roblox-datastores](roblox-datastores/SKILL.md)**                                           | DataStores, versioning, metadata, quotas, throttling, safe save/load patterns       |
+| 🔒 **[roblox-networking](roblox-networking/SKILL.md)** | Remotes, server authority, network ownership, exploit defenses, capabilities        |
 | 🖼️ **[roblox-user-interfaces](roblox-user-interfaces/SKILL.md)**                                            | GUI containers, responsive layouts, interaction, particles-in-UI techniques         |
-| 🎬 **[roblox-animation-and-tweening](roblox-animation-and-tweening/SKILL.md)**                               | `Animator`, tracks, IK, `TweenService`, UI tweens, animation markers                |
-| ✨ **[roblox-visual-effects-and-particles](roblox-visual-effects-and-particles/SKILL.md)**                    | `ParticleEmitter`, shapes, flipbooks, beams, trails, highlights, performance        |
-| 💰 **[roblox-monetization-gamepasses](roblox-monetization-gamepasses/SKILL.md)**                             | Game passes, dev products, purchase flow, policy, Robux transfers, analytics        |
-| 🤖 **[roblox-studio-mcp-server](roblox-studio-mcp-server/SKILL.md)**                                          | Connect AI agents to Roblox Studio via MCP: setup, tools, Script Sync, playtesting  |
-| ⚙️ **[roblox-physics-and-constraints](roblox-physics-and-constraints/SKILL.md)**                                | Rigid bodies, assemblies, mechanical/mover constraints, network ownership, vehicles |
-| 🧭 **[roblox-pathfinding-and-npcs](roblox-pathfinding-and-npcs/SKILL.md)**                                      | PathfindingService, modifiers/links, waypoint following, patrol/chase AI patterns   |
-| 🐛 **[roblox-testing-and-debugging](roblox-testing-and-debugging/SKILL.md)**                                    | Developer Console, MicroProfiler, Scene Analysis, tests, logging, common bug fixes  |
+| 🎬 **[roblox-animation](roblox-animation/SKILL.md)**                               | `Animator`, tracks, IK, `TweenService`, UI tweens, animation markers                |
+| ✨ **[roblox-vfx](roblox-vfx/SKILL.md)**                    | `ParticleEmitter`, shapes, flipbooks, beams, trails, highlights, performance        |
+| 💰 **[roblox-gamepasses](roblox-gamepasses/SKILL.md)**                             | Game passes, dev products, purchase flow, policy, Robux transfers, analytics        |
+| 🤖 **[roblox-mcp](roblox-mcp/SKILL.md)**                                          | Connect AI agents to Roblox Studio via MCP: setup, tools, Script Sync, playtesting  |
+| ⚙️ **[roblox-physics](roblox-physics/SKILL.md)**                                | Rigid bodies, assemblies, mechanical/mover constraints, network ownership, vehicles |
+| 🧭 **[roblox-npcs](roblox-npcs/SKILL.md)**                                      | PathfindingService, modifiers/links, waypoint following, patrol/chase AI patterns   |
+| 🐛 **[roblox-testing](roblox-testing/SKILL.md)**                                    | Developer Console, MicroProfiler, Scene Analysis, tests, logging, common bug fixes  |
 
 
 Every skill follows the same structure so you always know where to look:
@@ -85,9 +85,9 @@ skill-name/
 
 ## Quick Start
 
-1. Add the suite with `npx skills add nonlooped/roblox-suite` (or `npx skills add https://github.com/nonlooped/roblox-suite`).
-2. To install a single skill instead, add `--skill <name>` — for example: `npx skills add nonlooped/roblox-suite --skill roblox-data-persistence`.
-3. Open **[roblox-suite/SKILL.md](roblox-suite/SKILL.md)** to orient yourself.
+1. Add the suite with `npx skills add nonlooped/roblox` (or `npx skills add https://github.com/nonlooped/roblox`).
+2. To install a single skill instead, add `--skill <name>` — for example: `npx skills add nonlooped/roblox --skill roblox-datastores`.
+3. Open **[roblox/SKILL.md](roblox/SKILL.md)** to orient yourself.
 4. Pick the skill that matches what you're building from the table above.
 5. Follow its `→ read references/...` pointers for depth on specific problems.
 6. Grab code from `scripts/` and adapt it to your experience.

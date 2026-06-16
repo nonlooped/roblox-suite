@@ -12,7 +12,7 @@ Roblox UI is one of the most powerful and also one of the most commonly poorly-i
 - https://create.roblox.com/docs/en-us/ui/on-screen-containers
 - https://create.roblox.com/docs/en-us/ui/in-experience-containers
 - Sub guides for frames, labels, buttons, text-input, position-and-size, list-flex-layouts, grid-table-layouts, appearance-modifiers, styling, proximity-prompts, ui-drag-detectors, etc.
-- animation-and-tweening skill (for motion on these objects)
+- roblox-animation skill (for motion on these objects)
 - Engine classes: ScreenGui, SurfaceGui, BillboardGui, GuiObject and all descendants, the various UI*Layout and UI*Constraint classes, CanvasGroup, ViewportFrame, etc.
 
 **How this skill is organized:**
@@ -20,7 +20,7 @@ Roblox UI is one of the most powerful and also one of the most commonly poorly-i
 - references/: deep files for containers (gui-containers.md covers building blocks, layouts, positioning) and particles-in-ui.md.
 - scripts/: UIParticlePool.lua for 2D HUD/reward particle bursts. Add other client utilities as needed.
 
-Always cross-reference the animation-and-tweening skill for motion on these objects and visual-effects-and-particles when embedding 3D effects.
+Always cross-reference the roblox-animation skill for motion on these objects and roblox-vfx when embedding 3D effects.
 
 ## Container Types — When to Use Each
 
@@ -125,6 +125,6 @@ See the dedicated references/particles-in-ui.md for concrete pool implementation
 - [ ] Tested at lowest graphics quality.
 - [ ] Tied to meaningful gameplay moments (via markers from the animation skill or UI events).
 
-This skill + animation-and-tweening + visual-effects-and-particles will let you build interfaces that feel alive and integrated with the 3D world rather than bolted-on 2D afterthoughts.
+This skill + roblox-animation + roblox-vfx will let you build interfaces that feel alive and integrated with the 3D world rather than bolted-on 2D afterthoughts.
 
 For the definitive list of every property and the latest additions (new layouts, drag detectors, styling features), consult the Engine API reference at https://create.roblox.com/docs/reference/engine.
