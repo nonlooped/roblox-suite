@@ -1,6 +1,6 @@
 # Testing Patterns
 
-Official guide: https://create.roblox.com/docs/en-us/studio/testez
+Official guide: https://roblox.github.io/testez/
 
 ## TestEZ
 

@@ -32,7 +32,7 @@ Roblox Studio implements a **Model Context Protocol (MCP)** server using `stdio`
 
 ## Prerequisites
 
-1. **Latest Roblox Studio** — update through the launcher or download from https://create.roblox.com/download.
+1. **Latest Roblox Studio** — update through the launcher or download from the [Creator Hub](https://create.roblox.com/docs/studio/setup).
 2. **An MCP-capable AI client** — Cursor, VS Code with Claude Code, Claude Desktop, Codex CLI, Gemini CLI, Antigravity, or any client that supports `stdio` transport.
 3. **A Roblox account** signed into Studio.
 4. **Git** (recommended) for the file-based workflow.

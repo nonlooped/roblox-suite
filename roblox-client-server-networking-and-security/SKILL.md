@@ -5,7 +5,7 @@ description: Complete coverage of the Roblox client-server model, replication be
 
 # roblox-client-server-networking-and-security
 
-**Core sources:** https://create.roblox.com/docs/projects/client-server , https://create.roblox.com/docs/scripting/security/server-authority (server-authority techniques), the entire scripting/security/ section (security-tactics, defensive-design, client-server-boundary, network-ownership, access-control, etc.), events/remote and bindable, plus the relevant Engine classes (RemoteEvent, RemoteFunction, Bindable*, RunService, etc.).
+**Core sources:** https://create.roblox.com/docs/projects/client-server , https://create.roblox.com/docs/scripting/security/security-tactics (server-authority techniques), the entire scripting/security/ section (security-tactics, defensive-design, client-server-boundary, network-ownership, access-control, etc.), events/remote and bindable, plus the relevant Engine classes (RemoteEvent, RemoteFunction, Bindable*, RunService, etc.).
 
 ## The Model in One Sentence
 
