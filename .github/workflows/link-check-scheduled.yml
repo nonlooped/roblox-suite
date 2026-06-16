@@ -1,0 +1,32 @@
+name: Scheduled Link Check
+
+on:
+  schedule:
+    # Run every Monday at ~09:00 UTC
+    - cron: "0 9 * * 1"
+  workflow_dispatch:   # Allow manual trigger from the Actions tab
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check all Markdown links (deep scan)
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: |
+            --verbose
+            --no-progress
+            --exclude "rbxassetid://.*"
+            --exclude "mailto:.*"
+            --exclude "https://github.com/nonlooped/roblox-suite/tree/.*"  # avoid self-referential tree links that change
+            "**/*.md"
+          fail: false   # Don't fail the scheduled run; just report
+
+      - name: Upload lychee report (if issues found)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lychee-report
+          path: lychee/out.md

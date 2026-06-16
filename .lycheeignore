@@ -1,0 +1,15 @@
+# Common exclusions for Roblox Suite
+# Example Roblox asset IDs (they are not real http links)
+rbxassetid://
+
+# Mail links (if any appear)
+mailto:
+
+# GitHub tree/blob links that include commit SHAs or branches (they rot quickly but are not "broken")
+https://github.com/nonlooped/roblox-suite/(blob|tree)/
+
+# Any links that require being logged into Creator Hub or are intentionally non-public
+# Add more as needed, one pattern per line. lychee supports globs and regex.
+
+# Roblox sometimes serves docs under slightly different paths during deprecation windows
+# You can temporarily exclude problematic ones here instead of disabling the whole check.

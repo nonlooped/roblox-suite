@@ -1,0 +1,49 @@
+# Typos configuration for Roblox Suite
+# https://github.com/crate-ci/typos
+
+[default]
+# Words that are correct in this project but might look like typos
+extend-ignore-words = [
+    "Luau",        # The language
+    "luau", 
+    "Datastore",   # Common Roblox term (and the service name)
+    "DataStore",
+    "MicroProfiler",
+    "RunContext",
+    "PreSimulation",
+    "PreRender",
+    "IKControl",
+    "Animator",
+    "AnimationTrack",
+    "TweenService",
+    "ContentProvider",
+    "MarketplaceService",
+    "PathfindingService",
+    "MemoryStore",
+    "BindToClose",
+    "PromptGamePassPurchaseFinished",
+    "UserOwnsGamePassAsync",
+    "GetProductInfoAsync",
+    "UpdateAsync",
+    "SetAsync",
+    "GetAsync",
+    "ListKeysAsync",
+    "ListVersionsAsync",
+    "OrderedDataStore",
+    "GlobalDataStore",
+    "Roblox",      # Brand
+    "roblox",
+    "Studio",
+    "MCP",         # Model Context Protocol (correct acronym)
+    "npx",
+    "skills.sh",
+]
+
+[files]
+# Only check the files we care about (avoid generated or binary noise)
+extend-exclude = [
+    "node_modules/",
+    "dist/",
+    "*.rbxl",
+    "*.rbxlx",
+]

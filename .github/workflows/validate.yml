@@ -1,0 +1,66 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Markdown links (internal + external)
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: |
+            --verbose
+            --no-progress
+            --exclude "rbxassetid://.*"
+            --exclude "mailto:.*"
+            "**/*.md"
+          fail: true
+
+      - name: Validate skills.sh.json against official schema
+        run: |
+          npm install -g ajv-cli ajv-formats 2>&1 | tail -1
+          curl -sL https://skills.sh/schemas/skills.sh.schema.json -o /tmp/skills.schema.json
+          ajv validate \
+            -s /tmp/skills.schema.json \
+            -d skills.sh.json \
+            --strict=false \
+            --spec=draft2020 \
+            --errors=text
+
+      - name: Spell check (typos)
+        uses: crate-ci/typos@master
+        # Add a _typos.toml at repo root later if you need custom dictionary
+
+      # ------------------------------------------------------------------
+      # Optional: Luau checking (uncomment and tune as needed)
+      # The scripts are illustrative ModuleScripts and reference Roblox
+      # globals. luau-lsp analyze is the best tool for real Roblox-style
+      # checking in CI.
+      # ------------------------------------------------------------------
+      # - name: Install luau-lsp (for analyze)
+      #   run: |
+      #     curl -sL https://github.com/JohnnyMorganz/luau-lsp/releases/latest/download/luau-lsp-linux.zip -o /tmp/luau-lsp.zip
+      #     unzip -o /tmp/luau-lsp.zip -d /tmp
+      #     chmod +x /tmp/luau-lsp
+      #     sudo mv /tmp/luau-lsp /usr/local/bin/
+      #
+      # - name: Luau analysis (examples)
+      #   run: |
+      #     luau-lsp analyze \
+      #       --platform roblox \
+      #       --no-strict \
+      #       roblox-*/scripts/*.lua || true   # start non-fatal while tuning
+
+      # Optional formatting check (uncomment if you adopt StyLua)
+      # - name: Check Lua formatting with StyLua
+      #   uses: JohnnyMorganz/stylua-action@v4
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     version: latest
+      #     # args: --check .
