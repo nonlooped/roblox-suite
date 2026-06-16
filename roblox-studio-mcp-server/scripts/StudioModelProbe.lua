@@ -1,0 +1,163 @@
+--[[
+    StudioModelProbe.lua
+    A reusable utility for summarizing the Roblox data model.
+
+    Usage with MCP execute_luau:
+        local probe = require(game.ReplicatedStorage.StudioModelProbe)
+        print(probe.summarize(game.Workspace, { maxDepth = 2 }))
+
+    This is a pattern you can adapt when asking an agent to explore a large place.
+]]
+
+local HttpService = game:GetService("HttpService")
+
+local StudioModelProbe = {}
+
+local DEFAULT_OPTIONS = {
+    maxDepth = 2,
+    includeProperties = false,
+    propertyNames = { "Archivable", "Locked", "Enabled", "Visible", "Transparency", "Reflectance", "Value", "Text" },
+    includeAttributes = true,
+    maxChildren = 50,
+}
+
+-- Merge user options with defaults.
+local function getOption(options, key)
+    if options[key] ~= nil then
+        return options[key]
+    end
+    return DEFAULT_OPTIONS[key]
+end
+
+local function mergeOptions(options)
+    options = options or {}
+    return {
+        maxDepth = getOption(options, "maxDepth"),
+        includeProperties = getOption(options, "includeProperties"),
+        propertyNames = getOption(options, "propertyNames"),
+        includeAttributes = getOption(options, "includeAttributes"),
+        maxChildren = getOption(options, "maxChildren"),
+    }
+end
+
+-- Recursively summarize an instance tree.
+function StudioModelProbe.summarize(instance, options, currentDepth)
+    options = mergeOptions(options)
+    currentDepth = currentDepth or 0
+
+    local maxDepth = options.maxDepth or DEFAULT_OPTIONS.maxDepth
+    local maxChildren = options.maxChildren or DEFAULT_OPTIONS.maxChildren
+
+    local entry = {
+        name = instance.Name,
+        className = instance.ClassName,
+        path = instance:GetFullName(),
+    }
+
+    if options.includeAttributes then
+        local attributes = {}
+        for name, value in pairs(instance:GetAttributes()) do
+            local valueType = typeof(value)
+            if valueType == "string" or valueType == "number" or valueType == "boolean" or value == nil then
+                attributes[name] = value
+            else
+                attributes[name] = tostring(value)
+            end
+        end
+        if next(attributes) then
+            entry.attributes = attributes
+        end
+    end
+
+    if options.includeProperties then
+        local props = {
+            Parent = instance.Parent and instance.Parent.Name or nil,
+        }
+        for _, propName in ipairs(options.propertyNames or {}) do
+            local propOk, propValue = pcall(function()
+                return instance[propName]
+            end)
+            if propOk then
+                local valueType = typeof(propValue)
+                if valueType == "string" or valueType == "number" or valueType == "boolean" or propValue == nil then
+                    props[propName] = propValue
+                elseif valueType ~= "Instance" then
+                    props[propName] = tostring(propValue)
+                end
+            end
+        end
+        if next(props) then
+            entry.properties = props
+        end
+    end
+
+    if currentDepth < maxDepth then
+        local children = instance:GetChildren()
+        local childSummaries = {}
+        for i = 1, math.min(#children, maxChildren) do
+            table.insert(childSummaries, StudioModelProbe.summarize(children[i], options, currentDepth + 1))
+        end
+        entry.children = childSummaries
+        entry.childCount = #children
+        entry.truncated = #children > maxChildren
+    else
+        entry.childCount = #instance:GetChildren()
+    end
+
+    return entry
+end
+
+-- Summarize multiple top-level services at once.
+function StudioModelProbe.summarizeServices(serviceNames, options)
+    serviceNames = serviceNames or {
+        "Workspace",
+        "ServerScriptService",
+        "ReplicatedStorage",
+        "StarterGui",
+        "StarterPack",
+        "Lighting",
+    }
+
+    local result = {
+        placeName = workspace.Name,
+    }
+    for _, name in ipairs(serviceNames) do
+        local ok, service = pcall(function()
+            return game:GetService(name)
+        end)
+        if ok then
+            result[name] = StudioModelProbe.summarize(service, options)
+        else
+            result[name] = { error = tostring(service) }
+        end
+    end
+    return result
+end
+
+-- Encode a summary as JSON for easy MCP consumption.
+function StudioModelProbe.summarizeAsJson(instance, options)
+    local summary = StudioModelProbe.summarize(instance, options)
+    local ok, encoded = pcall(function()
+        return HttpService:JSONEncode(summary)
+    end)
+    if ok then
+        return encoded
+    end
+    warn("StudioModelProbe JSON encoding failed: " .. tostring(encoded))
+    return "Error encoding summary: " .. tostring(encoded)
+end
+
+-- Encode multiple service summaries as JSON.
+function StudioModelProbe.summarizeServicesAsJson(serviceNames, options)
+    local summary = StudioModelProbe.summarizeServices(serviceNames, options)
+    local ok, encoded = pcall(function()
+        return HttpService:JSONEncode(summary)
+    end)
+    if ok then
+        return encoded
+    end
+    warn("StudioModelProbe JSON encoding failed: " .. tostring(encoded))
+    return "Error encoding summary: " .. tostring(encoded)
+end
+
+return StudioModelProbe

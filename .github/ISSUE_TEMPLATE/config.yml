@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions & Questions
+    url: https://github.com/nonlooped/roblox-suite/discussions
+    about: For usage questions, ideas, or general discussion about the skills, please start a Discussion instead of an Issue.
+  - name: 📖 Roblox Documentation
+    url: https://create.roblox.com/docs
+    about: Always cross-check the official Roblox docs for the latest behavior.

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Core",
+      "description": "Foundational Roblox development skills every agent should start with.",
+      "skills": [
+        "roblox-suite",
+        "roblox-fundamentals-and-services",
+        "roblox-client-server-networking-and-security"
+      ]
+    },
+    {
+      "title": "Gameplay",
+      "description": "Skills for building characters, physics, AI, and world mechanics.",
+      "skills": [
+        "roblox-physics-and-constraints",
+        "roblox-pathfinding-and-npcs"
+      ]
+    },
+    {
+      "title": "Presentation",
+      "description": "Skills for user interfaces, animation, visual effects, and polish.",
+      "skills": [
+        "roblox-user-interfaces",
+        "roblox-animation-and-tweening",
+        "roblox-visual-effects-and-particles"
+      ]
+    },
+    {
+      "title": "Systems",
+      "description": "Skills for data persistence, monetization, and live ops.",
+      "skills": [
+        "roblox-data-persistence",
+        "roblox-monetization-gamepasses"
+      ]
+    },
+    {
+      "title": "Quality",
+      "description": "Skills for testing, debugging, and profiling experiences.",
+      "skills": [
+        "roblox-testing-and-debugging"
+      ]
+    },
+    {
+      "title": "Agent Workflows",
+      "description": "Skills for connecting AI agents directly to Roblox Studio.",
+      "skills": [
+        "roblox-studio-mcp-server"
+      ]
+    }
+  ]
+}

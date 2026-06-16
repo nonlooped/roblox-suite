@@ -1,0 +1,20 @@
+.DS_Store
+*.log
+node_modules/
+.tmp/
+
+# Roblox place files (binaries, sensitive local places - never commit)
+*.rbxl
+*.rbxlx
+
+# Common OS / editor artifacts
+Thumbs.db
+*.swp
+*~
+
+# Luau / Roblox local config (uncomment if you want to share .luarc.json)
+# .luarc.json
+
+# Temp / build artifacts
+dist/
+build/
