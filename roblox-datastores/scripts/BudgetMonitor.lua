@@ -1,3 +1,4 @@
+--!strict
 --[[
 BudgetMonitor.lua
 Utilities for inspecting and configuring DataStore request budgets at server startup.
@@ -66,6 +67,8 @@ function BudgetMonitor.configureForBusyServer()
 
     safeSet("OrderedRead", 1500, 40)
     safeSet("OrderedWrite", 1000, 20)
+    -- OrderedList: SetRateLimitForRequestType accepts the enum, but GetRequestBudgetForRequestType
+    -- always returns 0 for it, so the limit cannot be inspected at runtime (see NO_BUDGET_INSPECTION above).
     safeSet("OrderedList", 150, 3)
     safeSet("OrderedRemove", 800, 15)
 end

@@ -1,3 +1,4 @@
+--!strict
 --[[
 SafeDataStore.lua
 A production-oriented, server-only wrapper around DataStoreService that handles:

@@ -1,3 +1,4 @@
+--!strict
 --[[
     TestRunner.lua
     A minimal in-Studio test runner shim.

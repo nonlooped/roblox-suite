@@ -1,3 +1,4 @@
+--!strict
 --[[
     VehicleController.lua
     A client-authoritative vehicle chassis with server-side validation.

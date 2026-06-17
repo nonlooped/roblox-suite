@@ -1,3 +1,4 @@
+--!strict
 --[[
     Logger.lua
     A simple structured logger with level filtering.

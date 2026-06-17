@@ -1,3 +1,4 @@
+--!strict
 --[[
     PathfindingUtility.lua
     Helpers for throttled recomputation and waypoint formatting.

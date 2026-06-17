@@ -1,3 +1,4 @@
+--!strict
 --[[
     PatrolBehavior.lua
     A simple state machine: Idle → Patrol → Chase → Attack → Return.

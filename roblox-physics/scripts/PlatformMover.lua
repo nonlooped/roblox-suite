@@ -1,3 +1,4 @@
+--!strict
 --[[
     PlatformMover.lua
     A moving platform using AlignPosition + AlignOrientation.

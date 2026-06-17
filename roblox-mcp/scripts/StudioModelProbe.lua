@@ -1,3 +1,4 @@
+--!strict
 --[[
     StudioModelProbe.lua
     A reusable utility for summarizing the Roblox data model.

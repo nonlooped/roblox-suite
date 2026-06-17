@@ -1,3 +1,4 @@
+--!strict
 --[[
     Suspension.lua
     Simple spring-damper suspension using SpringConstraint.

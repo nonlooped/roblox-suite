@@ -1,3 +1,4 @@
+--!strict
 --[[
     DoorHinge.lua
     A servo-powered door with open/close state.

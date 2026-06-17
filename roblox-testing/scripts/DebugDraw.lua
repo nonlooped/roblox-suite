@@ -1,3 +1,4 @@
+--!strict
 --[[
     DebugDraw.lua
     Utility for drawing temporary debug visuals in the 3D world.

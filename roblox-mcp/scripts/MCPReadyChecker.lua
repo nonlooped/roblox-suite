@@ -1,3 +1,4 @@
+--!strict
 --[[
     MCPReadyChecker.lua
     Diagnostic utilities for verifying Roblox Studio MCP + Script Sync readiness.
