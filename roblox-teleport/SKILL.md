@@ -29,7 +29,7 @@ description: >
 - https://create.roblox.com/docs/en-us/projects/teleport
 - https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportOptions
 - https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportAsyncResult
-- https://create.roblox.com/docs/en-us/projects/multi-place (place architecture)
+- https://create.roblox.com/docs/projects/teleport (multi-place architecture)
 
 TeleportService moves players between places and servers. The modern entry point is `TeleportAsync`; the older `Teleport`/`TeleportPartyAsync`/`TeleportToPlaceInstance`/`TeleportToPrivateServer`/`TeleportToSpawnByName` methods are deprecated and should not be used for new work.
 

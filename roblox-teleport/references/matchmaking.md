@@ -6,7 +6,7 @@ last_reviewed: 2026-06-17
 
 **Official sources:**
 - https://create.roblox.com/docs/en-us/projects/teleport
-- https://create.roblox.com/docs/en-us/cloud-services/messaging-service
+- https://create.roblox.com/docs/reference/engine/classes/MessagingService
 - https://create.roblox.com/docs/en-us/cloud-services/memory-stores
 
 Matchmaking in Roblox is build-it-yourself — there's no built-in matchmaker. You compose `TeleportService:TeleportAsync` with a coordination layer (`MessagingService`, `MemoryStoreService`, or an external HTTP service) to route players into the right servers.
@@ -182,6 +182,6 @@ For skill-based matchmaking, party queues, or anything too complex for in-engine
 ## Sources
 
 - https://create.roblox.com/docs/en-us/projects/teleport
-- https://create.roblox.com/docs/en-us/cloud-services/messaging-service
+- https://create.roblox.com/docs/reference/engine/classes/MessagingService
 - https://create.roblox.com/docs/en-us/cloud-services/memory-stores
 - https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportService
