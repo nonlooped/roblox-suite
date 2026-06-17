@@ -27,7 +27,7 @@ The official docs now state that `Sound`, `SoundGroup`, and `SoundEffect` are **
 | Microphone capture | Not directly | `AudioDeviceInput` |
 | Acoustic occlusion/diffraction | Not available | `AudioEmitter`/`AudioListener` `AcousticSimulationEnabled` |
 | Routing multiple sources through one effect | Hard (per-group effects only) | Native (many wires → one effect → one output) |
-| Tweenable parameter | `Sound.Volume` (number) | `AudioParam` (e.g. `AudioPlayer.TimeVolume`) plus plain number props |
+| Tweenable parameter | `Sound.Volume` (number) | `AudioPlayer.TimeVolume` and other number props |
 
 ## When to keep using `Sound`
 

@@ -92,24 +92,22 @@ These sound different. There's no "correct" order — choose by ear and by inten
 
 For a simpler approach, use `AudioFader` to tween music volume down when SFX fire and back up after — see `scripts/AudioBus.lua`.
 
-## Tweening AudioParam
+## Tweening volume and effect parameters
 
-Several `AudioPlayer` and effect properties are exposed as `AudioParam` (e.g. `AudioPlayer.TimeVolume`, effect wet/dry mixes). `AudioParam` has a `Value` you can tween with `TweenService` for smooth fades and parameter sweeps:
+Several `AudioPlayer` and effect properties (e.g. `AudioPlayer.TimeVolume`, effect wet/dry mixes) are plain `number` properties you can tween with `TweenService` for smooth fades and parameter sweeps:
 
 ```lua
 --!strict
 local TweenService = game:GetService("TweenService")
 local audioPlayer = workspace.MusicPlayer.AudioPlayer :: AudioPlayer
 
--- Fade out over 2 seconds (AudioPlayer.TimeVolume is an AudioParam; tween its Value)
+-- Fade out over 2 seconds
 local tween = TweenService:Create(audioPlayer.TimeVolume, TweenInfo.new(2), { Value = 0 })
 tween:Play()
 tween.Completed:Connect(function()
     audioPlayer:Stop()
 end)
 ```
-
-Not every property is an `AudioParam`; check the class reference. Plain `number` properties (like `AudioPlayer.Volume`) tween directly.
 
 ## Reverb: graph vs legacy
 
@@ -131,5 +129,4 @@ Not every property is an `AudioParam`; check the class reference. Plain `number`
 - https://create.roblox.com/docs/en-us/reference/engine/classes/AudioCompressor
 - https://create.roblox.com/docs/en-us/reference/engine/classes/AudioReverb
 - https://create.roblox.com/docs/en-us/reference/engine/classes/AudioFader
-- https://create.roblox.com/docs/en-us/reference/engine/classes/AudioParam
 - https://create.roblox.com/docs/en-us/reference/engine/classes/SoundService (`AcousticSimulationEnabled`, `AmbientReverb`)

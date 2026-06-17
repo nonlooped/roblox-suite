@@ -22,7 +22,7 @@ description: >
 - https://create.roblox.com/docs/en-us/audio/effects (audio effects)
 - https://create.roblox.com/docs/en-us/reference/engine/classes/Sound (legacy `Sound`)
 - https://create.roblox.com/docs/en-us/reference/engine/classes/SoundService
-- Engine classes: `AudioPlayer`, `AudioEmitter`, `AudioListener`, `AudioDeviceOutput`, `AudioDeviceInput`, `AudioTextToSpeech`, `AudioSpeechToText`, `Wire`, `AudioEqualizer`, `AudioCompressor`, `AudioReverb`, `AudioChorus`, `AudioDistortion`, `AudioEcho`, `AudioFlanger`, `AudioPitchShifter`, `AudioTremolo`, `AudioFader`, `AudioAnalyzer`, `AudioParam`
+- Engine classes: `AudioPlayer`, `AudioEmitter`, `AudioListener`, `AudioDeviceOutput`, `AudioDeviceInput`, `AudioTextToSpeech`, `AudioSpeechToText`, `Wire`, `AudioEqualizer`, `AudioCompressor`, `AudioReverb`, `AudioChorus`, `AudioDistortion`, `AudioEcho`, `AudioFlanger`, `AudioPitchShifter`, `AudioTremolo`, `AudioFader`, `AudioAnalyzer`
 - Full reference: https://create.roblox.com/docs/en-us/reference/engine
 
 This skill covers both the modern **modular audio graph** (the recommended system) and the legacy `Sound`/`SoundGroup`/`SoundEffect` system. The official docs now state that `Sound`, `SoundGroup`, and `SoundEffect` are **discouraged in favor of the more robust functionality of audio objects**. New work should use the graph; legacy code can keep using `Sound` where the graph offers no advantage.
@@ -162,7 +162,7 @@ someEvent:Connect(function()
 end)
 ```
 
-`AudioPlayer:Play()`, `:Pause()`, `:Stop()`, `:SeekTime(...)`. `AudioParam` (exposed on `AudioPlayer.TimeVolume`, etc.) is tweenable — see [references/audio-effects.md](references/audio-effects.md) for tweening volume and effect parameters.
+`AudioPlayer:Play()`, `:Pause()`, `:Stop()`, `:SeekTime(...)`. `AudioPlayer.TimeVolume` is tweenable — see [references/audio-effects.md](references/audio-effects.md) for tweening volume and effect parameters.
 
 ## Preloading audio
 
