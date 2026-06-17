@@ -24,10 +24,10 @@ description: >
 **Official sources (always check these for the latest):**
 - https://create.roblox.com/docs/en-us/cloud (API reference index)
 - https://create.roblox.com/docs/en-us/cloud/auth/api-keys (API key management)
-- https://create.roblox.com/docs/en-us/auth/oauth2-overview (OAuth 2.0)
+- https://create.roblox.com/docs/cloud/auth/oauth2-overview (OAuth 2.0)
 - https://create.roblox.com/docs/en-us/cloud-services/http-service (in-experience calls)
 - https://create.roblox.com/docs/en-us/cloud/reference/rate-limits
-- https://create.roblox.com/docs/en-us/webhooks/webhook-notifications
+- https://create.roblox.com/docs/en-us/cloud/webhooks/webhook-notifications
 
 Open Cloud is the REST API surface for Roblox resources. It lets you build command-line tools, web apps, CI/CD pipelines, scheduled jobs, and external automation that read and write the same resources your live game servers use — without spinning up a game server.
 
@@ -64,12 +64,12 @@ All Open Cloud APIs accept an `x-api-key` header containing an API key string. C
   - Select the **minimum permissions** needed; restrict scope to specific experiences where possible.
   - Use **IP restrictions** (CIDR notation) — but **not** when calling from Roblox game servers (Roblox server IPs aren't known/predictable).
   - Set **expiration dates** for short-term keys; avoid them for long-term use without a rotation process.
-  - **Never** store keys in source control, scripts, or public channels. Use a secrets manager; in Roblox places use a [Secrets Store](https://create.roblox.com/docs/en-us/cloud/auth/cloud-services/secrets).
+  - **Never** store keys in source control, scripts, or public channels. Use a secrets manager; in Roblox places use a [Secrets Store](https://create.roblox.com/docs/en-us/cloud-services/secrets).
   - For **group-owned resources**, create a dedicated alternate account with only the target group access and generate the key there — don't use your personal account's key for group automation.
 
 ### 2. OAuth 2.0 (for apps acting on behalf of other users)
 
-Use OAuth 2.0 when your app needs to act on behalf of a Roblox user who isn't you (e.g. a third-party tool a creator logs into). See https://create.roblox.com/docs/en-us/auth/oauth2-overview. Has stronger stability guarantees and regular updates.
+Use OAuth 2.0 when your app needs to act on behalf of a Roblox user who isn't you (e.g. a third-party tool a creator logs into). See https://create.roblox.com/docs/cloud/auth/oauth2-overview. Has stronger stability guarantees and regular updates.
 
 ### 3. Legacy cookie auth (avoid)
 
@@ -223,7 +223,7 @@ end
 
 ## Webhooks
 
-Open Cloud emits webhooks for certain events, including **subscription** events (`cancelled`, `purchased`, `refunded`, `renewed`). Set up a webhook endpoint in your app, register it via the Cloud API, and Roblox will POST event payloads to it. This is the real-time path for subscription analytics without polling `GetUserSubscriptionPaymentHistoryAsync`. See https://create.roblox.com/docs/en-us/webhooks/webhook-notifications.
+Open Cloud emits webhooks for certain events, including **subscription** events (`cancelled`, `purchased`, `refunded`, `renewed`). Set up a webhook endpoint in your app, register it via the Cloud API, and Roblox will POST event payloads to it. This is the real-time path for subscription analytics without polling `GetUserSubscriptionPaymentHistoryAsync`. See https://create.roblox.com/docs/en-us/cloud/webhooks/webhook-notifications.
 
 ## Decision tree: in-engine vs Open Cloud
 
@@ -279,8 +279,8 @@ Open Cloud emits webhooks for certain events, including **subscription** events 
 
 - https://create.roblox.com/docs/en-us/cloud
 - https://create.roblox.com/docs/en-us/cloud/auth/api-keys
-- https://create.roblox.com/docs/en-us/auth/oauth2-overview
+- https://create.roblox.com/docs/cloud/auth/oauth2-overview
 - https://create.roblox.com/docs/en-us/cloud-services/http-service
 - https://create.roblox.com/docs/en-us/cloud/reference/rate-limits
-- https://create.roblox.com/docs/en-us/webhooks/webhook-notifications
+- https://create.roblox.com/docs/en-us/cloud/webhooks/webhook-notifications
 - https://create.roblox.com/docs/en-us/cloud-services/secrets
