@@ -5,7 +5,7 @@
 
 *An opinionated skill set for AI agents and developers who want accurate, current Roblox guidance.*
 
-[![skills.sh](https://skills.sh/b/nonlooped/roblox)](https://skills.sh/nonlooped/roblox)
+[![skills.sh](https://skills.sh/b/nonlooped/roblox-suite/roblox)](https://www.skills.sh/nonlooped/roblox-suite/roblox)
 [Luau](https://create.roblox.com/docs/luau)
 [Grounded in Official Docs](https://create.roblox.com/docs/reference/engine)
 [License: MIT](LICENSE)
