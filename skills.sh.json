@@ -13,27 +13,30 @@
     },
     {
       "title": "Gameplay",
-      "description": "Skills for building characters, physics, AI, and world mechanics.",
+      "description": "Skills for building characters, physics, AI, world mechanics, and moving players between places.",
       "skills": [
         "roblox-physics",
-        "roblox-npcs"
+        "roblox-npcs",
+        "roblox-teleport"
       ]
     },
     {
       "title": "Presentation",
-      "description": "Skills for user interfaces, animation, visual effects, and polish.",
+      "description": "Skills for user interfaces, animation, visual effects, audio, and polish.",
       "skills": [
         "roblox-user-interfaces",
         "roblox-animation",
-        "roblox-vfx"
+        "roblox-vfx",
+        "roblox-audio"
       ]
     },
     {
       "title": "Systems",
-      "description": "Skills for data persistence, monetization, and live ops.",
+      "description": "Skills for data persistence, monetization, external automation, and live ops.",
       "skills": [
         "roblox-datastores",
-        "roblox-gamepasses"
+        "roblox-gamepasses",
+        "roblox-open-cloud"
       ]
     },
     {

@@ -5,6 +5,7 @@
 
 *An opinionated skill set for AI agents and developers who want accurate, current Roblox guidance.*
 
+[![skills.sh](https://skills.sh/b/nonlooped/roblox)](https://skills.sh/nonlooped/roblox)
 [Luau](https://create.roblox.com/docs/luau)
 [Grounded in Official Docs](https://create.roblox.com/docs/reference/engine)
 [License: MIT](LICENSE)
@@ -27,7 +28,7 @@ LLMs are worse, they are trained on the same stale content, they confidently gen
 
 ## What's Inside
 
-Twelve deep, battle-tested skills. Each has a decision-tree overview, focused technical references, and copy-ready Luau scripts.
+Fifteen deep, battle-tested skills. Each has a decision-tree overview, focused technical references, and copy-ready Luau scripts.
 
 
 | Skill                                                                                                        | What it covers                                                                      |
@@ -39,7 +40,10 @@ Twelve deep, battle-tested skills. Each has a decision-tree overview, focused te
 | 🖼️ **[roblox-user-interfaces](roblox-user-interfaces/SKILL.md)**                                            | GUI containers, responsive layouts, interaction, particles-in-UI techniques         |
 | 🎬 **[roblox-animation](roblox-animation/SKILL.md)**                               | `Animator`, tracks, IK, `TweenService`, UI tweens, animation markers                |
 | ✨ **[roblox-vfx](roblox-vfx/SKILL.md)**                    | `ParticleEmitter`, shapes, flipbooks, beams, trails, highlights, performance        |
-| 💰 **[roblox-gamepasses](roblox-gamepasses/SKILL.md)**                             | Game passes, dev products, purchase flow, policy, Robux transfers, analytics        |
+| 🔊 **[roblox-audio](roblox-audio/SKILL.md)**                                | Modern audio graph (`AudioPlayer`/`AudioEmitter`/`Wire`/TTS/STT), legacy `Sound`, 3D audio, effects, performance |
+| 💰 **[roblox-gamepasses](roblox-gamepasses/SKILL.md)**                             | Game passes, dev products, subscriptions, purchase flow, policy, Robux transfers, analytics |
+| 🌐 **[roblox-open-cloud](roblox-open-cloud/SKILL.md)**                             | Open Cloud REST APIs: API keys/OAuth2, data/memory stores, assets, universes, webhooks, in-experience calling |
+| 🚪 **[roblox-teleport](roblox-teleport/SKILL.md)**                             | `TeleportAsync`, `TeleportOptions`, reserved servers, multi-place, matchmaking, DataStore handoff |
 | 🤖 **[roblox-mcp](roblox-mcp/SKILL.md)**                                          | Connect AI agents to Roblox Studio via MCP: setup, tools, Script Sync, playtesting  |
 | ⚙️ **[roblox-physics](roblox-physics/SKILL.md)**                                | Rigid bodies, assemblies, mechanical/mover constraints, network ownership, vehicles |
 | 🧭 **[roblox-npcs](roblox-npcs/SKILL.md)**                                      | PathfindingService, modifiers/links, waypoint following, patrol/chase AI patterns   |
@@ -62,7 +66,7 @@ skill-name/
 > Every claim links back to the [Roblox Engine API Reference](https://create.roblox.com/docs/reference/engine) or an official guide.
 
 - **Production-first** — patterns built to survive real players: server authority, rate limits, caching, input validation, secure monetization.
-- **Actually current** — covers modern APIs: `Animator`, `IKControl`, DataStore v2 listing/versioning, `PreSimulation`/`PreRender`, `GetProductInfoAsync`, Robux transfers, script capabilities.
+- **Actually current** — covers modern APIs: `Animator`, `IKControl`, DataStore v2 listing/versioning, `PreSimulation`/`PreRender`, `GetProductInfoAsync`, subscriptions API, Robux transfers, script capabilities, the modular audio graph (`AudioPlayer`/`AudioEmitter`/`Wire`/TTS/STT), `TeleportAsync`, Open Cloud REST APIs with API keys/OAuth2, and the Creator Rewards program that replaced Premium Payouts.
 - **Progressive depth** — start at the hub, drop into a specific skill, then into a specific reference. You only read what you need.
 - **AI-ready** — structured for agents. Decision trees point you to the right file. Scripts are commented for adaptation, not just blind copy-paste.
 
@@ -79,6 +83,10 @@ skill-name/
 | Pixel-offset UI that breaks on mobile                 | Scale + offset responsive layouts that survive every screen size |
 | Particle emitters tanking FPS on low-end devices      | LOD-aware emitter patterns that degrade gracefully               |
 | Monetization flows that violate current Roblox policy | ToS-compliant purchase handling with proper receipts             |
+| Legacy `Sound`/`SoundGroup` for new audio work                 | Modern audio graph (`AudioPlayer` + `AudioEmitter` + `Wire` + effects) |
+| Deprecated `Teleport`/`TeleportPartyAsync` variants            | Unified `TeleportAsync` with `TeleportOptions` and `TeleportAsyncResult` |
+| Premium Payouts integration (program discontinued July 2025)   | Awareness that Creator Rewards replaced Engagement-Based Payouts |
+| Hardcoded Open Cloud keys in scripts                          | Secrets Store + `HttpService:GetSecret` with least-privilege API keys |
 
 
 ---
