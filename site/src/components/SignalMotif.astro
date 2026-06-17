@@ -1,0 +1,83 @@
+---
+// The bespoke "calibrated signal" hero visual. A crimson trace is damped onto
+// a dashed reference line and locks at a cursor — the brand's north star made
+// structural. No stock photo, no glass, no second hue.
+---
+
+<figure class="signal">
+  <svg
+    class="signal__svg"
+    viewBox="0 0 600 440"
+    role="img"
+    aria-label="A crimson signal trace damped onto a dashed reference line, with a cursor locked at the steady state."
+  >
+    <defs>
+      <pattern id="sg-grid" width="50" height="50" patternUnits="userSpaceOnUse">
+        <path d="M50 0 H0 V50" fill="none" stroke="var(--border)" stroke-width="1" />
+      </pattern>
+    </defs>
+
+    <rect x="0" y="0" width="600" height="440" fill="url(#sg-grid)" />
+
+    <!-- calibration reference -->
+    <line
+      x1="0"
+      y1="220"
+      x2="600"
+      y2="220"
+      stroke="var(--ink-soft)"
+      stroke-opacity="0.22"
+      stroke-width="1"
+      stroke-dasharray="3 5"
+    />
+
+    <!-- the signal: oscillating, decaying, locking flat -->
+    <path
+      d="M0 220 Q 70 70 140 220 Q 210 370 280 220 Q 350 145 420 220 Q 485 285 540 220 L 600 220"
+      fill="none"
+      stroke="var(--crimson)"
+      stroke-width="2.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <!-- cursor at the locked steady state -->
+    <line
+      x1="560"
+      y1="22"
+      x2="560"
+      y2="418"
+      stroke="var(--crimson-line)"
+      stroke-width="1"
+      stroke-dasharray="3 5"
+    />
+    <circle cx="560" cy="220" r="13" fill="none" stroke="var(--crimson)" stroke-width="1.5" opacity="0.4" />
+    <circle cx="560" cy="220" r="6" fill="var(--crimson)" />
+  </svg>
+
+  <figcaption class="signal__caption">
+    Every claim traces back to the Engine API Reference.
+  </figcaption>
+</figure>
+
+<style>
+  .signal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: 0;
+  }
+  .signal__svg {
+    width: 100%;
+    height: auto;
+    background: color-mix(in oklch, var(--bg) 80%, var(--surface));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    aspect-ratio: 600 / 440;
+  }
+  .signal__caption {
+    font-size: 0.875rem;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>

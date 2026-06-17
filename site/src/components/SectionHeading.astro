@@ -1,0 +1,35 @@
+---
+// Section title + optional lead. Sentence-case, no eyebrow, no number.
+const {
+  title,
+  lead,
+  id,
+  as: Tag = "h2",
+  className = "",
+} = Astro.props as {
+  title: string;
+  lead?: string;
+  id?: string;
+  as?: "h2" | "h3";
+  className?: string;
+};
+---
+
+<div class:list={["section-heading", className]} id={id}>
+  <Tag class="section-heading__title">{title}</Tag>
+  {lead && <p class="section-heading__lead">{lead}</p>}
+</div>
+
+<style>
+  .section-heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 62ch;
+  }
+  .section-heading__lead {
+    color: var(--ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+  }
+</style>

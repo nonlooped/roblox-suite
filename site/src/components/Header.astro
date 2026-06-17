@@ -1,0 +1,217 @@
+---
+import { repoUrl } from "../data/trust";
+
+const base = import.meta.env.BASE_URL;
+const here = Astro.url.pathname.replace(/\/+$/, "");
+const skillsPath = `${base}skills`.replace(/\/+$/, "");
+
+const nav = [
+  { label: "Skills", href: `${base}skills`, active: here === skillsPath },
+  { label: "Why", href: `${base}#why`, active: false },
+  { label: "Install", href: `${base}#install`, active: false },
+];
+
+const ghIcon =
+  "M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z";
+---
+
+<header class="site-header" data-site-header>
+  <div class="wrap site-header__inner">
+    <a class="wordmark" href={base}>
+      <svg class="wordmark__mark" width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M5 22 L12 15 L17 19 L27 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="27" cy="9" r="2.8" fill="currentColor" />
+      </svg>
+      <span class="wordmark__text">Roblox Suite</span>
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      {
+        nav.map((item) => (
+          <a
+            class="site-nav__link"
+            href={item.href}
+            aria-current={item.active ? "page" : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="site-header__actions">
+      <a class="gh-link" href={repoUrl} aria-label="Roblox Suite on GitHub">
+        <svg class="gh-link__icon" viewBox="0 0 16 16" width="17" height="17" aria-hidden="true">
+          <path fill="currentColor" d={ghIcon} />
+        </svg>
+        <span>Star</span>
+      </a>
+      <a class="button button--primary" href={`${base}#install`}>Add the suite</a>
+    </div>
+
+    <details class="menu">
+      <summary class="menu__btn" aria-label="Toggle navigation menu">
+        <span class="menu__bar"></span>
+        <span class="menu__bar"></span>
+        <span class="menu__bar"></span>
+      </summary>
+      <div class="menu__panel">
+        {
+          nav.map((item) => (
+            <a class="menu__link" href={item.href}>
+              {item.label}
+            </a>
+          ))
+        }
+        <a class="menu__link" href={repoUrl}>GitHub ↗</a>
+        <a class="button button--primary menu__cta" href={`${base}#install`}>Add the suite</a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    background: var(--bg);
+    border-bottom: 1px solid transparent;
+    transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  }
+  .site-header[data-scrolled] {
+    background: color-mix(in oklch, var(--bg) 85%, transparent);
+    border-bottom-color: var(--border);
+    -webkit-backdrop-filter: saturate(125%) blur(12px);
+    backdrop-filter: saturate(125%) blur(12px);
+  }
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    min-height: 66px;
+    padding-block: 0.6rem;
+  }
+
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    margin-right: auto;
+    font-weight: 700;
+    font-size: 1.0625rem;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .wordmark__mark { color: var(--crimson); transition: color var(--dur) var(--ease); }
+  .wordmark:hover .wordmark__mark { color: var(--crimson-hover); }
+  .wordmark__text { white-space: nowrap; }
+
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.25rem, 2vw, 2rem);
+  }
+  .site-nav__link {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    padding: 0.4em 0;
+    transition: color var(--dur) var(--ease);
+  }
+  .site-nav__link:hover { color: var(--ink); }
+  .site-nav__link[aria-current="page"] {
+    color: var(--ink);
+    box-shadow: inset 0 -2px 0 var(--crimson);
+  }
+
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .gh-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    padding: 0.55em 0.9em;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease),
+      background var(--dur) var(--ease);
+  }
+  .gh-link:hover {
+    color: var(--ink);
+    border-color: var(--border-strong);
+    background: var(--surface);
+  }
+
+  .menu { display: none; }
+  .menu__btn {
+    list-style: none;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .menu__btn::-webkit-details-marker { display: none; }
+  .menu__bar { width: 18px; height: 2px; background: var(--ink); border-radius: 2px; }
+  .menu__panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.6rem var(--gutter) 1rem;
+    background: color-mix(in oklch, var(--bg) 92%, transparent);
+    border-bottom: 1px solid var(--border-strong);
+    -webkit-backdrop-filter: saturate(125%) blur(12px);
+    backdrop-filter: saturate(125%) blur(12px);
+    box-shadow: var(--shadow-lift);
+  }
+  .menu__link {
+    padding: 0.75rem 0.5rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    border-radius: var(--radius-sm);
+  }
+  .menu__link:hover { color: var(--ink); background: var(--surface); }
+  .menu__cta { margin-top: 0.4rem; }
+
+  @media (max-width: 860px) {
+    .site-nav,
+    .site-header__actions {
+      display: none;
+    }
+    .menu { display: block; }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const h = document.querySelector("[data-site-header]");
+    if (!h) return;
+    const onScroll = () => h.toggleAttribute("data-scrolled", window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    // close the mobile menu after a link is followed
+    h.querySelectorAll(".menu__link, .menu__cta").forEach((a) =>
+      a.addEventListener("click", () => {
+        const d = h.querySelector("details.menu");
+        if (d) d.open = false;
+      })
+    );
+  })();
+</script>

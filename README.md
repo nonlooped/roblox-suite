@@ -5,6 +5,8 @@
 
 *An opinionated skill set for AI agents and developers who want accurate, current Roblox guidance.*
 
+> ⚠️ **Work in Progress** — The companion website in [`site/`](site/) is under active development and is not yet ready for release.
+
 [![installs](https://shieldcn.dev/skills/installs/nonlooped/roblox-suite/roblox.svg?variant=branded)](https://www.skills.sh/nonlooped/roblox-suite/roblox)
 [![Luau](https://shieldcn.dev/badge/Luau-Official-00A2FF.svg?logo=luau&variant=branded)](https://create.roblox.com/docs/luau)
 [![Docs](https://shieldcn.dev/badge/Docs-Engine_Reference-10B981.svg?logo=ri:GoBook&variant=branded)](https://create.roblox.com/docs/reference/engine)

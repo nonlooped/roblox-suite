@@ -1,0 +1,74 @@
+/* ─────────────────────────────────────────────────────────────
+   Roblox Suite — design tokens
+   "The Calibrated Signal": pure near-black + one campari-crimson.
+   All color in OKLCH. The base carries zero chroma; crimson carries
+   100% of the color personality (The One Signal Rule).
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* Neutral ramp — pure dark, no hue tint; a faint crimson warmth
+     only in the ink ramp so text never reads as cold gray. */
+  --bg:            oklch(0.145 0 0);
+  --surface:       oklch(0.190 0 0);
+  --surface-2:     oklch(0.240 0 0);
+  --ink:           oklch(0.945 0.006 22);
+  --ink-soft:      oklch(0.820 0.006 22);
+  --muted:         oklch(0.660 0.006 22);
+  --faint:         oklch(0.460 0.004 22);
+
+  --border:        oklch(0.945 0.006 22 / 0.12);
+  --border-strong: oklch(0.945 0.006 22 / 0.24);
+
+  /* The one signal — campari crimson, hue ~22°. Same hue, lightness
+     variants only (oxblood for depth). Never a second hue. */
+  --crimson:       oklch(0.53 0.19 22);
+  --crimson-hover: oklch(0.46 0.17 22);
+  --crimson-tint:  oklch(0.53 0.19 22 / 0.14);
+  --crimson-line:  oklch(0.53 0.19 22 / 0.55);
+
+  /* near-white that sits on crimson fills */
+  --on-crimson:    oklch(0.97 0 0);
+
+  /* Type */
+  --font-sans: "Switzer", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Spline Sans Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Spacing rhythm */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 7rem;
+
+  /* Layout */
+  --maxw: 72rem;
+  --maxw-prose: 46rem;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+
+  --radius: 12px;
+  --radius-sm: 7px;
+
+  /* Elevation — state response only; surfaces flat at rest */
+  --shadow-lift: 0 1px 0 0 oklch(1 0 0 / 0.035) inset,
+                 0 14px 36px -18px oklch(0 0 0 / 0.75);
+
+  /* Focus rings — crimson signal, offset so it reads on any field */
+  --ring:           0 0 0 2px var(--bg), 0 0 0 4px var(--crimson);
+  --ring-on-crimson: 0 0 0 2px var(--crimson), 0 0 0 4px var(--on-crimson);
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out-quart */
+  --dur: 180ms;
+
+  /* z-index scale */
+  --z-header: 100;
+  --z-overlay: 200;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0ms; }
+}

@@ -1,0 +1,55 @@
+---
+import Base from "../layouts/Base.astro";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Base title="Not found">
+  <section class="section nf">
+    <div class="wrap nf__inner">
+      <p class="nf__code mono" aria-hidden="true">404</p>
+      <h1 class="nf__title">This page isn't in the suite.</h1>
+      <p class="lede">
+        The link may be stale — a little like a deprecated API. Try one of
+        these instead.
+      </p>
+      <div class="nf__actions">
+        <a class="button button--primary" href={base}>Back to home</a>
+        <a class="button button--ghost" href={`${base}skills`}>
+          Browse skills
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    min-height: 62vh;
+    display: flex;
+    align-items: center;
+  }
+  .nf__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    align-items: flex-start;
+    max-width: 40rem;
+  }
+  .nf__code {
+    font-size: clamp(3rem, 1rem + 6vw, 5rem);
+    font-weight: 600;
+    color: var(--ink-soft);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+  .nf__title {
+    font-size: clamp(1.75rem, 1rem + 2.5vw, 2.5rem);
+  }
+  .nf__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+</style>

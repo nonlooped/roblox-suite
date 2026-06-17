@@ -1,0 +1,83 @@
+---
+import SignalMotif from "./SignalMotif.astro";
+import CodeChip from "./CodeChip.astro";
+import { repoUrl, freshness } from "../data/trust";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section class="hero">
+  <div class="wrap hero__grid">
+    <div class="hero__copy">
+      <p class="pill">
+        <span class="pill__dot" aria-hidden="true"></span>
+        Current as of {freshness.lastReviewed}
+      </p>
+      <h1 class="hero__title">Ship current Luau with confidence.</h1>
+      <p class="hero__sub lede">
+        An opinionated set of fifteen battle-tested Roblox skills — each
+        accountable to the official Engine API Reference. The current, sourced
+        alternative to stale wiki posts and confidently-wrong LLM output.
+      </p>
+      <div class="hero__ctas">
+        <a class="button button--primary" href={`${base}#install`}>Add the suite</a>
+        <a class="button button--ghost" href={repoUrl}>Star on GitHub</a>
+      </div>
+      <div class="hero__install">
+        <CodeChip />
+        <p class="hero__chip-note muted">
+          Runs once. Adds all fifteen skills to your agent.
+        </p>
+      </div>
+    </div>
+    <div class="hero__visual">
+      <SignalMotif />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(3.5rem, 8vw, 6rem);
+  }
+  .hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+  .hero__copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    align-items: flex-start;
+    min-width: 0;
+  }
+  .hero__title { max-width: 15ch; }
+  .hero__sub { max-width: 46ch; }
+  .hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+  }
+  .hero__install {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-1);
+    align-self: stretch; /* fill hero__copy's definite track so the
+       codechip's `width: min(100%, 30rem)` resolves instead of falling
+       back to its nowrap intrinsic width and overflowing. */
+  }
+  .hero__chip-note { font-size: 0.8125rem; }
+  .hero__visual { min-width: 0; }
+
+  @media (max-width: 920px) {
+    .hero__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(2.5rem, 6vw, 4rem);
+    }
+    .hero__visual { max-width: 32rem; }
+  }
+</style>

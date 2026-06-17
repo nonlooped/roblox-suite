@@ -1,0 +1,84 @@
+---
+import "../styles/tokens.css";
+import "../styles/fonts.css";
+import "../styles/global.css";
+import "@fontsource/spline-sans-mono/latin-400.css";
+import "@fontsource/spline-sans-mono/latin-500.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const siteName = "Roblox Suite";
+const { title, description } = Astro.props;
+const fullTitle = title
+  ? `${title} — ${siteName}`
+  : `${siteName} — current, sourced Roblox Luau skills`;
+const desc =
+  description ??
+  "An opinionated set of fifteen battle-tested Roblox skills, each accountable to the official Engine API Reference. The current, sourced alternative to stale wiki posts and confidently-wrong LLM output.";
+const base = import.meta.env.BASE_URL;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://nonlooped.github.io").toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={desc} />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <script is:inline>
+      // Single delegated copy handler for every [data-copy] button.
+      (() => {
+        const revert = (btn) => {
+          const label = btn.querySelector("[data-copy-label]");
+          btn.classList.remove("is-copied");
+          if (label && btn.dataset.copyLabel) label.textContent = btn.dataset.copyLabel;
+        };
+        document.addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-copy]");
+          if (!btn) return;
+          const sel = btn.getAttribute("data-copy");
+          const el = sel ? document.querySelector(sel) : null;
+          const text = el ? (el.textContent || "").trim() : "";
+          if (!text) return;
+          const label = btn.querySelector("[data-copy-label]");
+          if (label && !btn.dataset.copyLabel) btn.dataset.copyLabel = label.textContent;
+          const after = () => {
+            if (label) label.textContent = "Copied";
+            btn.classList.add("is-copied");
+            window.setTimeout(() => revert(btn), 1600);
+          };
+          const w = navigator.clipboard?.writeText?.bind(navigator.clipboard);
+          if (w) w(text).then(after, after);
+          else after();
+        });
+      })();
+    </script>
+  </body>
+</html>

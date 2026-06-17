@@ -1,0 +1,152 @@
+---
+import { repoUrl, freshness, skillsShUrl } from "../data/trust";
+
+const base = import.meta.env.BASE_URL;
+
+const cols = [
+  {
+    label: "Explore",
+    links: [
+      { label: "All skills", href: `${base}skills` },
+      { label: "Why trust it", href: `${base}#why` },
+      { label: "What you stop doing", href: `${base}#stop` },
+      { label: "Install", href: `${base}#install` },
+    ],
+  },
+  {
+    label: "Sources",
+    links: [
+      { label: "Engine API Reference", href: "https://create.roblox.com/docs/reference/engine" },
+      { label: "Docs for agents", href: "https://create.roblox.com/docs/llms.txt" },
+      { label: "Engine API for agents", href: "https://create.roblox.com/docs/reference/engine/llms.txt" },
+    ],
+  },
+  {
+    label: "Project",
+    links: [
+      { label: "GitHub", href: repoUrl },
+      { label: "skills.sh listing", href: skillsShUrl },
+      { label: "Luau docs", href: "https://create.roblox.com/docs/luau" },
+    ],
+  },
+];
+---
+
+<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <div class="site-footer__brand">
+      <a class="wordmark" href={base}>
+        <svg class="wordmark__mark" width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M5 22 L12 15 L17 19 L27 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="27" cy="9" r="2.8" fill="currentColor" />
+        </svg>
+        <span>Roblox Suite</span>
+      </a>
+      <p class="site-footer__tagline">
+        An opinionated, current skill set for Roblox Luau — accountable to the
+        Engine API Reference.
+      </p>
+      <p class="site-footer__meta">Last reviewed {freshness.lastReviewed} · MIT</p>
+    </div>
+
+    <nav class="site-footer__cols" aria-label="Footer">
+      {
+        cols.map((col) => (
+          <div class="site-footer__col">
+            <h2 class="site-footer__label">{col.label}</h2>
+            <ul>
+              {col.links.map((l) => (
+                <li>
+                  <a class="site-footer__link" href={l.href}>
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </nav>
+  </div>
+
+  <div class="wrap site-footer__bar">
+    <p class="site-footer__fine">
+      © 2026 nonlooped · MIT License. Roblox Suite is an independent project,
+      not affiliated with or endorsed by Roblox Corporation.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    background: color-mix(in oklch, var(--bg) 96%, var(--surface));
+  }
+  .site-footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    padding-block: clamp(3rem, 6vw, 4.5rem);
+  }
+  .site-footer__brand {
+    flex: 1 1 22rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    font-weight: 700;
+    font-size: 1.0625rem;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .wordmark__mark { color: var(--crimson); }
+  .site-footer__tagline {
+    color: var(--ink-soft);
+    max-width: 36ch;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+  .site-footer__meta {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+  .site-footer__cols {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(2rem, 5vw, 3.5rem);
+    flex: 2 1 30rem;
+  }
+  .site-footer__col { min-width: 9rem; }
+  .site-footer__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: var(--space-3);
+  }
+  .site-footer__col ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .site-footer__link {
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+    transition: color var(--dur) var(--ease);
+  }
+  .site-footer__link:hover { color: var(--ink); }
+  .site-footer__bar {
+    border-top: 1px solid var(--border);
+    padding-block: 1.5rem;
+  }
+  .site-footer__fine {
+    font-size: 0.8125rem;
+    color: var(--muted);
+    max-width: 80ch;
+  }
+</style>

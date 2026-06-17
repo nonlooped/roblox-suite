@@ -1,0 +1,119 @@
+---
+import { groups } from "../data/groups";
+import { skillsForGroup } from "../data/skills-meta";
+import Inline from "./Inline.astro";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<div class="skills-index">
+  {
+    groups.map((group) => {
+      const list = skillsForGroup(group.skills);
+      if (!list.length) return null;
+      return (
+        <section class="si__group" aria-labelledby={`g-${group.id}`}>
+          <header class="si__group-head">
+            <h3 class="si__group-title" id={`g-${group.id}`}>
+              {group.title}
+            </h3>
+            <p class="si__group-desc muted">{group.description}</p>
+          </header>
+          <ul class="si__list">
+            {list.map((s) => (
+              <li>
+                <a class="si__row" href={`${base}skills/${s.slug}`}>
+                  <span class="si__title">{s.title}</span>
+                  <span class="si__liner">
+                    <Inline text={s.oneLiner} />
+                  </span>
+                  <span class="si__slug mono">{s.slug}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      );
+    })
+  }
+</div>
+
+<style>
+  .skills-index {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+    gap: clamp(2rem, 4vw, 3rem);
+    align-items: start;
+  }
+  /* Phones: force a single fluid column so the 22rem track min never
+     overflows viewports narrower than ~372px (e.g. 320px Android). */
+  @media (max-width: 540px) {
+    .skills-index { grid-template-columns: minmax(0, 1fr); }
+  }
+  .si__group-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border);
+  }
+  .si__group-title { font-size: 1.1rem; }
+  .si__group-desc {
+    font-size: 0.875rem;
+    line-height: 1.45;
+    max-width: 40ch;
+  }
+  .si__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .si__row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "title slug" "liner slug";
+    gap: 0.15em var(--space-4);
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    transition: background var(--dur) var(--ease),
+      border-color var(--dur) var(--ease);
+  }
+  .si__row:hover {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+  .si__title {
+    grid-area: title;
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 1rem;
+  }
+  .si__liner {
+    grid-area: liner;
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+  .si__slug {
+    grid-area: slug;
+    align-self: center;
+    color: var(--muted);
+    font-size: 0.75rem;
+    white-space: nowrap;
+    transition: color var(--dur) var(--ease);
+  }
+  .si__row:hover .si__slug {
+    color: var(--crimson);
+  }
+
+  @media (max-width: 420px) {
+    .si__row {
+      grid-template-columns: 1fr;
+      grid-template-areas: "title" "liner" "slug";
+    }
+    .si__slug { align-self: start; }
+  }
+</style>

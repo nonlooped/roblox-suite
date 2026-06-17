@@ -1,0 +1,48 @@
+---
+import Base from "../layouts/Base.astro";
+import Hero from "../components/Hero.astro";
+import Problem from "../components/Problem.astro";
+import OldVsNew from "../components/OldVsNew.astro";
+import SkillsIndex from "../components/SkillsIndex.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import TrustEvidence from "../components/TrustEvidence.astro";
+import InstallCTA from "../components/InstallCTA.astro";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Base>
+  <Hero />
+  <Problem />
+  <OldVsNew />
+
+  <section class="section skills-section">
+    <div class="wrap">
+      <SectionHeading
+        title="Fifteen skills, six domains."
+        lead="Scannable in a glance, then drill down. Every row links to a full page with the skill's real sources."
+      />
+      <div class="skills-section__index">
+        <SkillsIndex />
+      </div>
+      <p class="skills-section__after">
+        <a class="link link--arrow" href={`${base}skills`}>
+          Browse the full explorer
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <TrustEvidence />
+  <InstallCTA />
+</Base>
+
+<style>
+  .skills-section__index {
+    margin-top: var(--space-7);
+  }
+  .skills-section__after {
+    margin-top: var(--space-7);
+  }
+</style>

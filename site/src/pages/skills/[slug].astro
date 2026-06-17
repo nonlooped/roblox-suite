@@ -1,0 +1,306 @@
+---
+import Base from "../../layouts/Base.astro";
+import Inline from "../../components/Inline.astro";
+import CodeChip from "../../components/CodeChip.astro";
+import { skills, skillsBySlug } from "../../data/skills-meta";
+import { oldVsNew } from "../../data/old-vs-new";
+import {
+  freshness,
+  skillGithubUrl,
+  skillRefsGithubUrl,
+  installSingleSkill,
+} from "../../data/trust";
+
+export function getStaticPaths() {
+  return skills.map((s) => ({ params: { slug: s.slug } }));
+}
+
+const { slug } = Astro.params;
+const skill = skillsBySlug.get(slug)!;
+const pairs = oldVsNew.filter((r) => r.slug === slug);
+const base = import.meta.env.BASE_URL;
+const plainLiner = skill.oneLiner.replace(/`/g, "");
+---
+
+<Base title={skill.title} description={plainLiner}>
+  <article class="section skill">
+    <div class="wrap">
+      <a class="skill__back link" href={`${base}skills`}>
+        <span aria-hidden="true">←</span> All skills
+      </a>
+
+      <div class="skill__grid">
+        <div class="skill__main">
+          <header class="skill__head">
+            <h1 class="skill__title">{skill.title}</h1>
+            <div class="skill__tags">
+              <span class="skill__slugtag mono">{skill.slug}</span>
+              {skill.hub && <span class="skill__hubtag">hub · entry point</span>}
+            </div>
+          </header>
+          <p class="skill__liner lede">
+            <Inline text={skill.oneLiner} />
+          </p>
+
+          <section class="skill__block">
+            <h2 class="skill__block-title">What it covers</h2>
+            <ul class="skill__covers">
+              {
+                skill.covers.map((c) => (
+                  <li class="skill__cover">
+                    <span class="skill__dash" aria-hidden="true">—</span>
+                    <span><Inline text={c} /></span>
+                  </li>
+                ))
+              }
+            </ul>
+          </section>
+
+          {
+            pairs.length > 0 && (
+              <section class="skill__block">
+                <h2 class="skill__block-title">What you stop doing</h2>
+                <ul class="skill__pairs">
+                  {pairs.map((p) => (
+                    <li class="skill__pair">
+                      <div class="skill__pair-old">
+                        <span class="skill__mark skill__mark--x" aria-hidden="true">✕</span>
+                        <p>{p.old}</p>
+                      </div>
+                      <div class="skill__pair-new">
+                        <span class="skill__mark skill__mark--check" aria-hidden="true">✓</span>
+                        <div>
+                          <p>{p.new}</p>
+                          {p.note && <p class="muted skill__pair-note">{p.note}</p>}
+                          {p.current && <span class="skill__current">current</span>}
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )
+          }
+
+          <section class="skill__block">
+            <h2 class="skill__block-title">Key sources</h2>
+            <ul class="skill__sources">
+              {
+                skill.sources.map((s) => (
+                  <li>
+                    <a class="link" href={s.url}>
+                      {s.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+            <p class="muted skill__sources-note">
+              Taken verbatim from this skill's "Official sources" block. The full
+              reference set lives in{" "}
+              <a class="link" href={skillRefsGithubUrl(skill.slug)}>
+                references/ on GitHub
+              </a>
+              .
+            </p>
+          </section>
+        </div>
+
+        <aside class="skill__side">
+          <p class="pill">
+            <span class="pill__dot" aria-hidden="true"></span>
+            Last reviewed {freshness.lastReviewed}
+          </p>
+          <div class="skill__actions">
+            <a class="button button--primary" href={`${base}#install`}>
+              Add the suite
+            </a>
+            <a class="button button--ghost" href={skillGithubUrl(skill.slug)}>
+              SKILL.md on GitHub
+            </a>
+          </div>
+          <div class="skill__single">
+            <p class="skill__single-label">Install just this skill</p>
+            <CodeChip command={installSingleSkill(skill.slug)} />
+          </div>
+        </aside>
+      </div>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .skill__back {
+    display: inline-flex;
+    gap: 0.4em;
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+    margin-bottom: var(--space-6);
+  }
+  .skill__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19rem;
+    grid-template-areas: "main side";
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+  .skill__main { grid-area: main; min-width: 0; }
+  .skill__side {
+    grid-area: side;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    position: sticky;
+    top: calc(66px + var(--space-5));
+    min-width: 0;
+  }
+
+  .skill__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
+  .skill__title {
+    font-size: clamp(2rem, 1rem + 3vw, 2.75rem);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .skill__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .skill__slugtag {
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+  .skill__hubtag {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: var(--crimson);
+    background: var(--crimson-tint);
+    border: 1px solid var(--crimson-line);
+    padding: 0.15em 0.55em;
+    border-radius: 999px;
+  }
+  .skill__liner {
+    margin-bottom: var(--space-7);
+    max-width: 52ch;
+  }
+
+  .skill__block { margin-bottom: var(--space-7); }
+  .skill__block:last-child { margin-bottom: 0; }
+  .skill__block-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .skill__covers {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .skill__cover {
+    display: grid;
+    grid-template-columns: 1.5em 1fr;
+    gap: var(--space-3);
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .skill__dash { color: var(--muted); text-align: center; }
+
+  .skill__pairs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .skill__pair {
+    display: grid;
+    grid-template-rows: auto auto;
+    gap: var(--space-2);
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--border);
+  }
+  .skill__pair:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .skill__pair-old,
+  .skill__pair-new {
+    display: grid;
+    grid-template-columns: 1.3em 1fr;
+    gap: var(--space-3);
+    align-items: start;
+  }
+  .skill__pair-old p { color: var(--muted); }
+  .skill__pair-new p { color: var(--ink); }
+  .skill__mark {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .skill__mark--x { color: var(--muted); }
+  .skill__mark--check {
+    color: var(--crimson);
+    font-weight: 700;
+  }
+  .skill__pair-note {
+    font-size: 0.875rem;
+    margin-top: 0.3em;
+  }
+  .skill__current {
+    display: inline-block;
+    margin-top: 0.5em;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: var(--crimson);
+    background: var(--crimson-tint);
+    border: 1px solid var(--crimson-line);
+    padding: 0.15em 0.55em;
+    border-radius: 999px;
+  }
+
+  .skill__sources {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .skill__sources .link { font-size: 0.9375rem; }
+  .skill__sources-note { font-size: 0.875rem; max-width: 52ch; }
+
+  .skill__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .skill__single {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+  }
+  .skill__single-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  @media (max-width: 860px) {
+    .skill__grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "main" "side";
+    }
+    .skill__side {
+      position: static;
+      flex-direction: column;
+      gap: var(--space-4);
+      padding-top: var(--space-6);
+      border-top: 1px solid var(--border);
+    }
+  }
+</style>

@@ -18,3 +18,8 @@ Thumbs.db
 # Temp / build artifacts
 dist/
 build/
+
+# Local AI Tooling
+.agents
+.claude
+skills-lock.json

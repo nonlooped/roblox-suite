@@ -1,0 +1,28 @@
+---
+import Base from "../../layouts/Base.astro";
+import SkillsIndex from "../../components/SkillsIndex.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
+---
+
+<Base
+  title="Skills"
+  description="All fifteen Roblox Suite skills, grouped by domain. Each links to a full page with the official Engine API Reference sources behind it."
+>
+  <section class="section skills-page">
+    <div class="wrap">
+      <SectionHeading
+        title="All fifteen skills."
+        lead="Grouped by domain, the same way the suite publishes them to the skills.sh registry. Every skill links to a full page with the official sources behind it."
+      />
+      <div class="skills-page__index">
+        <SkillsIndex />
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .skills-page__index {
+    margin-top: var(--space-7);
+  }
+</style>
