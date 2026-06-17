@@ -147,7 +147,7 @@ For complex data you often serialize tables to JSON strings for storage or trans
 - CollectionService tags + Attributes for lightweight grouping and data without heavy Instance hierarchies.
 - Parallel Luau + Actors when you need CPU-bound work off the main thread.
 
-This fundamentals skill is the base. Load the specialized skills (datastores, UI, animation, vfx, gamepasses, networking) on top of it.
+This skill is the base. Load the specialized skills (datastores, UI, animation, vfx, gamepasses, networking, audio, open-cloud, teleport) on top of it.
 
 ## Scripts
 

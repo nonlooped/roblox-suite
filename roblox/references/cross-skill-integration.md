@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Cross-Skill Integration Patterns
 
 The power of this toolset comes from combining the skills rather than using them in isolation.
@@ -16,15 +20,15 @@ The power of this toolset comes from combining the skills rather than using them
 - Same handler or a follow-up tween starts a UI cooldown ring or floating text using CanvasGroup + tweens (roblox-user-interfaces + roblox-animation skills).
 - For 3D previews in a shop UI, use a ViewportFrame containing a rig model (note that ViewportFrame does not render ParticleEmitter, Beam, Trail, or most 3D effects; use 2D UI particles for overlay effects instead) (user-interfaces particles-in-ui reference).
 
-## Fundamentals + Everything
+## roblox-core + Everything
 
-Fundamentals is the base layer. Every other skill assumes you:
+`roblox-core` is the base layer. Every other skill assumes you:
 - Acquire services correctly with `GetService`.
 - Know which code runs on client vs server.
 - Understand what data can actually be stored in DataStores.
 - Use proper module loading and initialization patterns.
 
-Load fundamentals first when the task is broad.
+Load `roblox-core` first when the task is broad.
 
 ## Performance Across Skills
 

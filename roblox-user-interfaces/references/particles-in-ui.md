@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Particles and Effects Inside UI ("Particles in the UI")
 
 Direct `ParticleEmitter` instances live in the 3D world (parented to BasePart or Attachment) and do not render inside ScreenGui hierarchies. This file covers the practical techniques used in real high-quality Roblox experiences to achieve particle-like, VFX, or animated visual effects *within* 2D UI.
@@ -57,7 +61,7 @@ This gives a very high-production "magical text" or "holographic" feel without h
 
 - Drive UI particle bursts from AnimationTrack markers (see roblox-animation skill). A "FootStep" or "AbilityCast" marker can call a function that spawns the appropriate 2D reward burst or ViewportFrame effect.
 - Combine with roblox-vfx best practices (flipbooks, proper transparency sequences, low rate + clever size, WindAffectsDrag where relevant) when driving effects from animation markers. Remember that real ParticleEmitters/Beams/Trails do not render inside ViewportFrame.
-- Respect the performance guidance in the fundamentals skill (fill rate, overdraw, mobile caps).
+- Respect the performance guidance in the roblox-core skill (fill rate, overdraw, mobile caps).
 
 ## Concrete Starter Pattern (2D pool)
 
