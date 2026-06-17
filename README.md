@@ -6,9 +6,9 @@
 *An opinionated skill set for AI agents and developers who want accurate, current Roblox guidance.*
 
 [![installs](https://shieldcn.dev/skills/installs/nonlooped/roblox-suite/roblox.svg?variant=branded)](https://www.skills.sh/nonlooped/roblox-suite/roblox)
-[Luau](https://create.roblox.com/docs/luau)
-[Grounded in Official Docs](https://create.roblox.com/docs/reference/engine)
-[License: MIT](LICENSE)
+[![Luau](https://shieldcn.dev/badge/Luau-Official-00A2FF.svg?logo=luau&variant=branded)](https://create.roblox.com/docs/luau)
+[![Docs](https://shieldcn.dev/badge/Docs-Engine_Reference-10B981.svg?logo=ri:GoBook&variant=branded)](https://create.roblox.com/docs/reference/engine)
+[![License](https://shieldcn.dev/badge/License-MIT-6366F1.svg?logo=ri:GoLaw&variant=branded)](LICENSE)
 
 
 
