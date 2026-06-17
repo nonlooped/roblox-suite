@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Creation and Setup of Game Passes
 
 **Official guide:** https://create.roblox.com/docs/en-us/production/monetization/passes

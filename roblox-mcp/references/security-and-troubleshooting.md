@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Security and Troubleshooting
 
 ## Security checklist

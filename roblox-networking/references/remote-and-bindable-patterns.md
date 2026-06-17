@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Remote and Bindable Patterns
 
 ## RemoteEvent (Fire-and-Forget)

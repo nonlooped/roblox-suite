@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Modifiers, Links, and Streaming
 
 Official guide: https://create.roblox.com/docs/en-us/characters/pathfinding

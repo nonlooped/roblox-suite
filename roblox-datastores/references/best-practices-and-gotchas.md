@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Best Practices and Common Gotchas
 
 Synthesized from the official "Best practices for data stores" page + all the error codes, limits, versioning, caching, and class reference material.

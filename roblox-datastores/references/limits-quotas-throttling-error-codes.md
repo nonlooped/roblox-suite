@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Limits, Quotas, Throttling, and Error Codes
 
 **Primary source:** https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits (contains the exhaustive tables this document summarizes and expands with usage advice).

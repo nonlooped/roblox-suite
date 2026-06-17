@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Versioning, Metadata, and Recovery
 
 Detailed coverage of the versioning system, DataStoreKeyInfo, user-defined metadata, recovery workflows, snapshots, and the Data Stores Manager.

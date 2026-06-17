@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Setup and Connection
 
 Official guide: https://create.roblox.com/docs/en-us/studio/mcp

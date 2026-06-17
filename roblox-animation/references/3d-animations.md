@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # 3D Animations (Rigs, Animator, Tracks, IK, Editor)
 
 **Core docs:** https://create.roblox.com/docs/animation + editor + inverse-kinematics + events

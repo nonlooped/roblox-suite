@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Overarching Roblox Architecture & Development Principles
 
 This reference collects the cross-cutting principles that apply no matter which specialized skill (data, UI, animation, etc.) you are using.

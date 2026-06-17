@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Script Locations, Execution Contexts, and Architecture
 
 **Main source:** https://create.roblox.com/docs/en-us/scripting/locations

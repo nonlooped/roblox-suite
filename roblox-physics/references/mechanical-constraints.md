@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Mechanical Constraints
 
 Official guide: https://create.roblox.com/docs/physics/mechanical-constraints

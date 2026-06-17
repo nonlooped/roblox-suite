@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Testing Patterns
 
 Official guide: https://roblox.github.io/testez/

@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Performance Profiling
 
 Official guide: https://create.roblox.com/docs/en-us/performance-optimization/identify

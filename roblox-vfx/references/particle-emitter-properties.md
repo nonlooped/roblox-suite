@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Particle Emitter Properties Reference
 
 **Main source:** https://create.roblox.com/docs/en-us/effects/particle-emitters

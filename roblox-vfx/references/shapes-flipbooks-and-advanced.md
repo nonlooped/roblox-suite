@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Shapes, Flipbooks, and Advanced Particle Techniques
 
 ## Shape System Deep Dive

@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Types of Data Stores
 
 **Official starting point:** https://create.roblox.com/docs/cloud-services/data-stores and https://create.roblox.com/docs/cloud-services/data-stores-vs-memory-stores

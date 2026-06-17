@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Core Operations and Patterns
 
 Covers GetAsync, SetAsync, UpdateAsync, IncrementAsync, RemoveAsync in depth, with decision guidance, serialization rules, pcall discipline, transform function constraints, and production patterns.

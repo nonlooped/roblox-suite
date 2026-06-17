@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Network Ownership
 
 Official guide: https://create.roblox.com/docs/physics/network-ownership

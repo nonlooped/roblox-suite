@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Collisions and Filtering
 
 Official guide: https://create.roblox.com/docs/workspace/collisions

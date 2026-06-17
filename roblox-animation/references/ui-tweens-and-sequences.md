@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # UI Tweens and Animation Sequences
 
 **Primary source:** https://create.roblox.com/docs/ui/animation

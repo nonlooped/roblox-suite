@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # MCP Tool Reference
 
 Official source: https://create.roblox.com/docs/en-us/studio/mcp

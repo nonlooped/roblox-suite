@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Rules, Policies, and Security for Game Passes
 
 ## Important Policy Changes (2026)

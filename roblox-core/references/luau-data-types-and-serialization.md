@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Luau Data Types and Serialization Rules
 
 **Main sources:** https://create.roblox.com/docs/en-us/luau, https://create.roblox.com/docs/en-us/luau/tables, https://create.roblox.com/docs/en-us/luau/type-checking, https://create.roblox.com/docs/en-us/scripting/attributes

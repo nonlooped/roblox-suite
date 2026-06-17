@@ -1,3 +1,7 @@
+---
+last_reviewed: 2026-06-17
+---
+
 # Integration, Events, Priorities, and Cross-System Patterns
 
 ## Marker-Driven Gameplay (the killer feature)
