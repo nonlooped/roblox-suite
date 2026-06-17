@@ -2,18 +2,24 @@
 name: roblox-gamepasses
 description: >
   Complete, rule-accurate, production implementation guide for Roblox game passes
-  (one-time Robux purchases that grant permanent per-experience privileges) and
-  the surrounding monetization ecosystem via MarketplaceService. Covers pass
+  (one-time Robux purchases that grant permanent per-experience privileges),
+  developer products (repeatable/consumable via ProcessReceipt), and
+  subscriptions (auto-renewing monthly benefits via GetUserSubscriptionStatusAsync,
+  PromptSubscriptionPurchase, UserSubscriptionStatusChanged). Covers pass
   creation workflow and icon guidelines, asset ID retrieval, inside-experience
   selling (GetProductInfoAsync with InfoType.GamePass, PromptGamePassPurchase,
   UserOwnsGamePassAsync, PromptGamePassPurchaseFinished), server-authoritative
   granting on PlayerAdded and purchase completion, distinction from developer
-  products (repeatable/consumable), policy (cross-experience sales disabled as of
-  May 30 2026, randomized items, community standards), personalization
-  (RankProductsAsync, RecommendTopProductsAsync), promotions via Buy Robux page,
-  analytics, regional pricing, and integration with persistent data
-  (re-verification, perks application, RTBF). Includes full code patterns,
-  gotchas, security (never grant on client signal alone), and checklists.
+  products and subscriptions, policy (cross-experience sales disabled as of
+  May 30 2026; Engagement-Based Payouts/Premium Payouts replaced by Creator
+  Rewards as of July 24 2025; randomized items, community standards),
+  PolicyService gating (ArePaidRandomItemsRestricted, IsPaidItemTradingAllowed,
+  IsEligibleToPurchaseSubscription, IsSubjectToChinaPolicies, etc.),
+  personalization (RankProductsAsync, RecommendTopProductsAsync), promotions
+  via Buy Robux page, analytics, regional pricing, and integration with
+  persistent data (re-verification, perks application, RTBF). Includes full
+  code patterns, gotchas, security (never grant on client signal alone), and
+  checklists.
 ---
 
 # roblox-gamepasses
@@ -158,11 +164,38 @@ Use this data to decide pricing, which perks are compelling, and when to run pro
 - For developer products, `MarketplaceService.ProcessReceipt` can only be assigned **once** globally; assign it once in a single server script. The callback must return `Enum.ProductPurchaseDecision.PurchaseGranted` after successful fulfillment, or `Enum.ProductPurchaseDecision.NotProcessedYet` if fulfillment fails, because Roblox may redeliver the receipt until `PurchaseGranted` is returned.
 - Donation / tipping games using `PromptRobuxTransferAsync` are high-risk for abuse; implement rate limits, alt-account detection, moderation pipelines, and avoid granting in-experience advantages in exchange for transfers.
 
+## Subscriptions (recurring benefits)
+
+Subscriptions offer users recurring benefits for a monthly fee, auto-renewing in Robux or local currency. Unlike passes (permanent), subscription benefits persist only while the user keeps paying. Up to 50 per experience; single-tiered (no mutually exclusive Bronze/Silver/Gold); regional pricing enabled by default for Robux-priced subs.
+
+**API surface** (subscription IDs are **strings** like `"EXP-11111111"`):
+- `MarketplaceService:GetUserSubscriptionStatusAsync(player, subscriptionId)` — **server-only**, returns `{IsSubscribed: boolean}`.
+- `MarketplaceService:PromptSubscriptionPurchase(player, subscriptionId)` — client prompt.
+- `MarketplaceService.PromptSubscriptionPurchaseFinished(player, subscriptionId, didTryPurchasing)` — note `didTryPurchasing` is an *attempt* signal, not success; re-check status after a delay.
+- `Players.UserSubscriptionStatusChanged(player, subscriptionId)` — **server-only**, fires on purchase/renewal/cancellation.
+- `MarketplaceService:GetSubscriptionProductInfoAsync(subscriptionId)` and `GetUserSubscriptionPaymentHistoryAsync(player, subscriptionId)`.
+
+**Security (same posture as passes):** prompt on client, check status and grant/revoke on server only, pcall everything, re-check on every join (subscriptions lapse), respect `PolicyService:IsEligibleToPurchaseSubscription` per player, persist nothing sensitive on the client.
+
+**Payouts:** Robux-priced subs pay 70% each month. Local-currency subs pay 70% first month, 100% thereafter, with a 30-day hold. Robux subs are not refundable; local-currency subs are refundable within the hold window.
+
+See [references/subscriptions.md](references/subscriptions.md) for the complete flow, client/server code, migration from passes, and gotchas.
+
+## Creator Rewards (replaces Premium Payouts)
+
+As of **July 24, 2025**, Engagement-Based Payouts (formerly "Premium Payouts") and the Creator Affiliate program were **discontinued and replaced by Creator Rewards**. There is no longer a per-Premium-play-minute payout to integrate against.
+
+Creator Rewards pays creators in two ways (no in-experience integration required — it's a platform-side program, but you should know it exists):
+- **Daily Engagement Rewards** — 5 Robux per day per Active Spender who spends 10+ minutes in your experience, provided it's one of the first three experiences they visit that day.
+- **Audience Expansion Rewards** — 35% revenue share on a new/reactivated user's first $100 of qualifying purchases in their first 60 days, attributed via Share Links, direct experience links, or experience-name search.
+
+Official source: https://create.roblox.com/docs/en-us/creator-rewards
+
 ## When to Use Game Passes vs Other Monetization
 
 - One-time permanent unlock or access → Game Pass.
 - Repeatable purchase (currency, consumables, temporary power) → Developer Product (with proper ProcessReceipt).
-- Subscriptions / Premium benefits → separate systems.
+- Recurring monthly benefit → Subscription (see references/subscriptions.md; `MarketplaceService:GetUserSubscriptionStatusAsync` etc.).
 
 See the developer-products doc for the repeatable flow.
 
