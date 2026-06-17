@@ -57,47 +57,47 @@ See references/3d-animations.md and references/ui-tweens-and-sequences.md for de
 3. **Events/Markers** — Show Animation Events track. Add named markers (with optional parameter string). These are the cleanest way to synchronize gameplay (sounds, particles, hitboxes, VFX) to animation without polling TimePosition.
 4. **Priorities** — Set via editor or at runtime on the track. Core < Idle < Movement < Action < Action2/3/4. Higher priority wins blending.
 5. **Looping & export** — Enable looping in editor (duplicate first keyframe to end for seamless loop if needed). For default replacement animations, name the final keyframe exactly "End" (case-sensitive). Publish to Roblox (gives asset ID). Save locally to ServerStorage during iteration.
-   6. **Runtime loading & playback (modern API)**:
-      ```lua
-      local ContentProvider = game:GetService("ContentProvider")
-      local ReplicatedStorage = game:GetService("ReplicatedStorage")
+6. **Runtime loading & playback (modern API)**:
+   ```lua
+   local ContentProvider = game:GetService("ContentProvider")
+   local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-      -- Player characters already have an Animator created by the engine on the server.
-      -- Custom rigs / NPCs may need fallback creation.
-      local animator = humanoid:FindFirstChildOfClass("Animator")
-          or humanoid:WaitForChild("Animator", 1)
-      if not animator then
-          animator = Instance.new("Animator")
-          animator.Parent = humanoid
-      end
+   -- Player characters already have an Animator created by the engine on the server.
+   -- Custom rigs / NPCs may need fallback creation.
+   local animator = humanoid:FindFirstChildOfClass("Animator")
+       or humanoid:WaitForChild("Animator", 1)
+   if not animator then
+       animator = Instance.new("Animator")
+       animator.Parent = humanoid
+   end
 
-      -- Cache the Animation instance; Animator:LoadAnimation caches the returned track
-      -- when called with the same Animation object on the same Animator.
-      local anim = ReplicatedStorage:FindFirstChild("MyAnimation") or Instance.new("Animation")
-      if not anim.AnimationId then
-          anim.AnimationId = "rbxassetid://YOUR_ID"
-          anim.Name = "MyAnimation"
-          anim.Parent = ReplicatedStorage
-      end
+   -- Cache the Animation instance; Animator:LoadAnimation caches the returned track
+   -- when called with the same Animation object on the same Animator.
+   local anim = ReplicatedStorage:FindFirstChild("MyAnimation") or Instance.new("Animation")
+   if not anim.AnimationId then
+       anim.AnimationId = "rbxassetid://YOUR_ID"
+       anim.Name = "MyAnimation"
+       anim.Parent = ReplicatedStorage
+   end
 
-      -- Preload asset instances, not AnimationTracks.
-      ContentProvider:PreloadAsync({anim})
+   -- Preload asset instances, not AnimationTracks.
+   ContentProvider:PreloadAsync({anim})
 
-      local track = animator:LoadAnimation(anim)
-      track.Priority = Enum.AnimationPriority.Action
-      track:Play(fadeTime, weight, speed)
+   local track = animator:LoadAnimation(anim)
+   track.Priority = Enum.AnimationPriority.Action
+   track:Play(fadeTime, weight, speed)
 
-      -- Store and disconnect connections when the rig/GUI is destroyed.
-      local markerConn = track:GetMarkerReachedSignal("FootStep"):Connect(function(param)
-          -- spawn dust, play sound, etc. Param can be parsed.
-          task.defer(function() ... end) -- defer gameplay side-effects
-      end)
-      local stoppedConn = track.Stopped:Connect(function() end)  -- cleanup / state tracking
-      local endedConn = track.Ended:Connect(function() end)   -- animation has finished moving the rig
-      ```
-      **Warning:** `KeyframeReached` is the older event; prefer `GetMarkerReachedSignal` for all new work.
-   7. **Ownership & replication** — For a client-played animation on the player's own character to replicate to the server, the animation asset must be owned by the player or by the experience. Group/creator-owned experiences must own the asset. This is separate from the Animator's authority.
-   8. **Track caching & cleanup** — `Animator:LoadAnimation` returns the same track if called again with the same Animation instance on the same Animator. Stop tracks on `Humanoid.Died` / `Player.CharacterRemoving` and disconnect event connections.
+   -- Store and disconnect connections when the rig/GUI is destroyed.
+   local markerConn = track:GetMarkerReachedSignal("FootStep"):Connect(function(param)
+       -- spawn dust, play sound, etc. Param can be parsed.
+       task.defer(function() ... end) -- defer gameplay side-effects
+   end)
+   local stoppedConn = track.Stopped:Connect(function() end)  -- cleanup / state tracking
+   local endedConn = track.Ended:Connect(function() end)   -- animation has finished moving the rig
+   ```
+   **Warning:** `KeyframeReached` is the older event; prefer `GetMarkerReachedSignal` for all new work.
+7. **Ownership & replication** — For a client-played animation on the player's own character to replicate to the server, the animation asset must be owned by the player or by the experience. Group/creator-owned experiences must own the asset. This is separate from the Animator's authority.
+8. **Track caching & cleanup** — `Animator:LoadAnimation` returns the same track if called again with the same Animation instance on the same Animator. Stop tracks on `Humanoid.Died` / `Player.CharacterRemoving` and disconnect event connections.
 
 **IK for procedural enhancement** (covered in references/3d-animations.md):
 - Add IKControl under Humanoid or AnimationController.
