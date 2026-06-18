@@ -2,13 +2,14 @@
 import Base from "../../layouts/Base.astro";
 import Inline from "../../components/Inline.astro";
 import CodeChip from "../../components/CodeChip.astro";
-import { skills, skillsBySlug } from "../../data/skills-meta";
+import { skills, loadSkillsBySlug } from "../../data/skills-meta";
 import { oldVsNew } from "../../data/old-vs-new";
+import { groups } from "../../data/groups";
 import {
-  freshness,
   skillGithubUrl,
   skillRefsGithubUrl,
   installSingleSkill,
+  repoUrl,
 } from "../../data/trust";
 
 export function getStaticPaths() {
@@ -16,14 +17,115 @@ export function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const skill = skillsBySlug.get(slug)!;
+// Use the enriched map so lastReviewed comes from the skill's own
+// SKILL.md `last_reviewed` frontmatter — a single-skill update flows
+// through to this page's schema and badge without a manual bump.
+const enriched = await loadSkillsBySlug();
+const skill = enriched.get(slug)!;
 const pairs = oldVsNew.filter((r) => r.slug === slug);
 const base = import.meta.env.BASE_URL;
 const plainLiner = skill.oneLiner.replace(/`/g, "");
+
+// Find the group (domain) this skill belongs to — used for article:section.
+const group = groups.find((g) => g.skills.includes(slug));
+const section = group?.title ?? "Skills";
+
+// Tags: derive from the skill's source labels + covers keywords.
+const tags = [
+  skill.title,
+  "Roblox",
+  "Roblox Luau",
+  "Roblox Engine API",
+  "AI coding agent skill",
+  ...skill.sources.map((s) => s.label),
+];
+
+// Per-skill OG image path (we reuse the branded default; could be per-skill later).
+const skillOgImage = "og.png";
+
+const siteOrigin = (Astro.site ?? "https://nonlooped.github.io").toString().replace(/\/$/, "");
+const skillUrl = new URL(Astro.url.pathname, siteOrigin).toString();
+const refsGithub = skillRefsGithubUrl(skill.slug);
+
+// SEO title: use the keyword-leading displayTitle, not the raw slug.
+const seoTitle = skill.displayTitle;
+
+// BreadcrumbList JSON-LD: Home › Skills › {Section} › {Skill}
+const breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Roblox Suite", item: `${siteOrigin}${base}`.replace(/\/+$/, "/") },
+    { "@type": "ListItem", position: 2, name: "Skills", item: `${siteOrigin}${base}skills/` },
+    ...(group ? [{ "@type": "ListItem", position: 3, name: group.title, item: `${siteOrigin}${base}skills/#${group.id}` }] : []),
+    { "@type": "ListItem", position: group ? 4 : 3, name: skill.displayTitle, item: skillUrl },
+  ],
+};
+
+// TechArticle JSON-LD — signals "this is a reference doc" to search engines.
+// Uses the per-skill lastReviewed for datePublished/dateModified so a
+// single-skill update propagates without a site-wide freshness bump.
+const techArticle = {
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  headline: `${skill.displayTitle} — ${plainLiner}`,
+  description: skill.overview,
+  author: { "@type": "Person", name: "nonlooped", url: repoUrl },
+  publisher: {
+    "@type": "Organization",
+    name: "Roblox Suite",
+    url: repoUrl,
+    logo: { "@type": "ImageObject", url: `${siteOrigin}${base}favicon.svg` },
+  },
+  datePublished: `${skill.lastReviewed}T00:00:00Z`,
+  dateModified: `${skill.lastReviewed}T00:00:00Z`,
+  inLanguage: "en",
+  mainEntityOfPage: skillUrl,
+  image: `${siteOrigin}${base}${skillOgImage}`,
+  isPartOf: { "@type": "CreativeWork", name: "Roblox Suite" },
+  about: {
+    "@type": "SoftwareApplication",
+    name: "Roblox Studio",
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: "Windows, macOS",
+  },
+  citation: skill.sources.map((s) => ({ "@type": "CreativeWork", name: s.label, url: s.url })),
+};
+
+// A compact text version of "what you stop doing" for the article body —
+// helps search engines see real, substantive content vs. a thin page.
+const pairsText = pairs.length
+  ? pairs.map((p) => `Stop: ${p.old}. Use: ${p.new}${p.note ? ` (${p.note})` : ""}.`).join(" ")
+  : "";
+
+// ISO datetime for article:published_time (schema uses T00:00:00Z above).
+const publishedIso = `${skill.lastReviewed}T00:00:00Z`;
 ---
 
-<Base title={skill.title} description={plainLiner}>
-  <article class="section">
+<Base
+  title={seoTitle}
+  description={skill.overview}
+  article
+  section={section}
+  tags={tags}
+  publishedAt={publishedIso}
+>
+  <article class="section" aria-labelledby="skill-title">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumb)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(techArticle)} />
+
+    {/* Visually-hidden, crawlable SEO abstract: gives each skill page
+        unique, substantive prose for indexers without affecting the
+        visual layout. Supplements (not replaces) the visible overview. */}
+    <p class="sr-only">
+      {skill.displayTitle} is a Roblox Suite skill — {plainLiner}. It belongs to the
+      {section} domain. What it covers: {skill.covers.map((c, i) => (i === 0 ? c : `. ${c}`)).join("")}.
+      {pairsText ? ` Current-vs-deprecated guidance: ${pairsText}` : ""}. The
+      official sources for this skill are taken verbatim from its SKILL.md and
+      point to the Roblox Engine API Reference and related create.roblox.com
+      documentation. The full reference set is available in the references/
+      directory on GitHub ({refsGithub}).
+    </p>
     <div class="wrap">
       <a
         class="link inline-flex gap-1.5 text-[0.9375rem] text-ink-soft mb-10 group"
@@ -33,13 +135,14 @@ const plainLiner = skill.oneLiner.replace(/`/g, "");
         All skills
       </a>
 
-      <div class="grid grid-cols-[minmax(0,1fr)_19rem] gap-[clamp(2rem,5vw,4.5rem)] items-start max-[860px]:grid-cols-1 max-[860px]:gap-6">
+      <div class="grid grid-cols-[minmax(0,1fr)_19rem] gap-[clamp(2rem,5vw,4.5rem)] items-start max-[860px]:grid-cols-1 max-[860px]:gap-6 max-[860px]:pt-0">
         <div class="min-w-0">
           <header class="flex flex-col gap-3 mb-8">
             <h1
+              id="skill-title"
               class="text-[clamp(2rem,1rem+3vw,2.75rem)] font-mono font-semibold tracking-[-0.02em]"
             >
-              {skill.title}
+              {skill.displayTitle}
             </h1>
             <div class="flex flex-wrap gap-2">
               <span class="font-mono text-[0.8125rem] text-muted">{skill.slug}</span>
@@ -51,10 +154,14 @@ const plainLiner = skill.oneLiner.replace(/`/g, "");
             </div>
           </header>
 
+          {/* Visible overview prose — substantive intro paragraph that
+              improves helpful-content signals and gives users a real
+              reason to read the page. Sourced from the skill's SKILL.md
+              description, paraphrased. */}
           <p
-            class="lede mb-12 max-w-[52ch] text-[clamp(1.125rem,0.5rem+0.9vw,1.375rem)] leading-[1.5] text-ink-soft font-normal"
+            class="lede overview mb-12 max-w-[58ch] text-[clamp(1.0625rem,0.4rem+0.85vw,1.25rem)] leading-[1.6] text-ink-soft font-normal"
           >
-            <Inline text={skill.oneLiner} />
+            <Inline text={skill.overview} />
           </p>
 
           <section class="mb-12 last:mb-0">
@@ -140,7 +247,7 @@ const plainLiner = skill.oneLiner.replace(/`/g, "");
             class="inline-flex items-center gap-2 text-xs font-semibold text-ink-soft bg-surface border border-border px-[0.85em] py-[0.45em] rounded-full tracking-[-0.005em] self-start"
           >
             <span class="w-[7px] h-[7px] rounded-full bg-crimson flex-none" aria-hidden="true"></span>
-            Last reviewed {freshness.lastReviewed}
+            Last reviewed {skill.lastReviewed}
           </p>
           <div class="flex flex-col gap-3">
             <a class="btn-primary" href={`${base}#install`}>Add the suite</a>

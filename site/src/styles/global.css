@@ -146,6 +146,25 @@
   html { scroll-behavior: auto; }
 }
 
+/* ── Reveal animation JS-gate ──
+   Initial hidden state is applied ONLY when <html class="js"> is present
+   (set by the inline head script in Base.astro). No-JS users and
+   reduced-motion users see content immediately — LCP/CLS-safe.
+   The Motion script in Base.astro animates [data-reveal] into view and
+   adds .is-visible, which restores opacity for any element that never
+   triggered (defensive). */
+.js [data-reveal],
+.js [data-reveal-stagger] > * {
+  opacity: 0;
+  transform: translateY(18px);
+  will-change: opacity, transform;
+}
+.js [data-reveal].is-visible,
+.js [data-reveal-stagger].is-visible > * {
+  opacity: 1;
+  transform: none;
+}
+
 /* ── Components: the link signal underline ── */
 @layer components {
   .link {

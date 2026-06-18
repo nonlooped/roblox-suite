@@ -5,15 +5,16 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/og-image.mjs && astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "og:image": "node scripts/og-image.mjs"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "@fontsource/spline-sans-mono": "^5.1.0",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^5.13.0",
-    "motion": "^12.40.0",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
