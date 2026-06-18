@@ -80,19 +80,6 @@ const svg = `
     </text>
   </g>
 
-  <!-- Bottom row: evidence chips -->
-  <g transform="translate(80, 580)" font-family="'Spline Sans Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="500">
-    <g>
-      <rect x="0" y="0" width="220" height="30" rx="999" fill="${SURFACE}" stroke="${BORDER}" stroke-width="1"/>
-      <circle cx="18" cy="15" r="4" fill="${CRIMSON}"/>
-      <text x="32" y="20" fill="${INK_SOFT}">15 skills · MIT licensed</text>
-    </g>
-    <g transform="translate(240, 0)">
-      <rect x="0" y="0" width="260" height="30" rx="999" fill="${SURFACE}" stroke="${BORDER}" stroke-width="1"/>
-      <circle cx="18" cy="15" r="4" fill="${CRIMSON}"/>
-      <text x="32" y="20" fill="${INK_SOFT}">Accountable to the Engine API</text>
-    </g>
-  </g>
 </svg>
 `;
 
