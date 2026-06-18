@@ -41,5 +41,12 @@ jobs:
             --spec=draft2020 \
             --errors=text
 
+      - name: Hub-vs-disk reference consistency
+        # Enforces that every skill's references/*.md is linked from the hub
+        # (roblox/SKILL.md) and vice versa. lychee catches broken links; this
+        # catches the inverse — a reference file that exists but is invisible
+        # to agents following the hub's routing. Pure Node, no deps.
+        run: node scripts/check-hub-refs.mjs
+
       - name: Spell check (typos)
         uses: crate-ci/typos@master

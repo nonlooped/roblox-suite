@@ -99,5 +99,6 @@ Roblox moves fast. The suite's value depends on staying current.
 - **Links:** `lychee --max-retries 3 --retry-wait-time 5 --accept 200,429,503 --exclude 'rbxassetid://.*' --exclude 'mailto:.*' '**/*.md'` (or rely on CI).
 - **Manifest:** `ajv validate -s https://skills.sh/schemas/skills.sh.schema.json -d skills.sh.json --strict=false --spec=draft2020`.
 - **Spelling:** `typos` (install via your package manager or `cargo install typos-cli`).
+- **Hub references:** `node scripts/check-hub-refs.mjs` — every `references/*.md` must be linked from the hub (`roblox/SKILL.md`) and vice versa. CI runs this.
 - **Site:** `cd site && npm run build` (build) or `npm run dev` (dev server).
 - **Luau syntax/types:** `luau-lsp analyze --platform roblox <file>` for ad-hoc checks (not yet wired into CI).
