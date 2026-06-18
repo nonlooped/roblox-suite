@@ -22,7 +22,8 @@ jobs:
           args: |
             --verbose
             --no-progress
-            --retry
+            --max-retries 3
+            --retry-wait-time 5
             --accept 200,429,503
             --exclude "rbxassetid://.*"
             --exclude "mailto:.*"
