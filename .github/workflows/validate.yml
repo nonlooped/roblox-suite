@@ -15,9 +15,15 @@ jobs:
       - name: Check Markdown links (internal + external)
         uses: lycheeverse/lychee-action@v2
         with:
+          # Roblox's Creator Hub (create.roblox.com) intermittently returns
+          # 503/429 at check time — these are transient server-side errors,
+          # not broken doc links. Retrying + tolerating them avoids false
+          # failures on a flaky upstream.
           args: |
             --verbose
             --no-progress
+            --retry
+            --accept 200,429,503
             --exclude "rbxassetid://.*"
             --exclude "mailto:.*"
             "**/*.md"
