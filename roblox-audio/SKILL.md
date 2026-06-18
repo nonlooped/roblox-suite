@@ -1,18 +1,6 @@
 ---
 name: roblox-audio
-description: >
-  Complete coverage of Roblox audio for experiences: the modern modular audio
-  graph (AudioPlayer, AudioEmitter, AudioListener, AudioDeviceOutput,
-  AudioDeviceInput, Wire, AudioTextToSpeech, AudioSpeechToText) and the legacy
-  Sound/SoundGroup/SoundEffect system it replaces. Covers 2D vs 3D audio,
-  spatial attenuation and the AudioListener, audio effects (Equalizer,
-  Compressor, Reverb, Chorus, Distortion, Echo, Flanger, PitchShifter, Tremolo,
-  Fader, Analyzer) and how to chain them, text-to-speech and speech-to-text,
-  acoustic simulation (occlusion, diffraction, reverberation), asset
-  permissions and the 2022 audio privacy changes, performance limits (concurrent
-  voices, mobile caps), preloading, looping, fade in/out, music vs SFX, and
-  script context rules (client vs server). Use whenever implementing any sound,
-  music, voice, or audio-driven feedback in a Roblox experience.
+description: Roblox audio — the modern modular audio graph (AudioPlayer, AudioEmitter, AudioListener, Wire, AudioTextToSpeech) and the legacy Sound/SoundGroup system. Covers 2D vs 3D audio, spatial attenuation, effects (Equalizer, Compressor, Reverb, Echo, Distortion), TTS/STT, acoustic simulation, asset permissions and the 2022 privacy changes, concurrent-voice limits, preloading, and looping. Use for any sound, music, voice, or audio-driven feedback.
 ---
 
 # roblox-audio

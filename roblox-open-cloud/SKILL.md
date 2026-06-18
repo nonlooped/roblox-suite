@@ -1,22 +1,6 @@
 ---
 name: roblox-open-cloud
-description: >
-  Complete coverage of Roblox Open Cloud — the REST API surface for accessing
-  Roblox resources (data stores, memory stores, ordered data stores, assets,
-  universes, places, users, groups, inventories, subscriptions, notifications,
-  bans, Luau execution, configs) from outside the engine or from in-experience
-  via HttpService. Covers authentication (API keys with x-api-key header, OAuth
-  2.0, legacy cookie auth and why to avoid it), the apis.roblox.com/cloud/v2
-  base URL, scopes and least-privilege, IP allowlists (CIDR), key rotation and
-  the 60-day auto-expiry rule, group-owned resources and the dedicated-automation-
-  account pattern, Secrets stores for in-experience key storage, the subset of
-  endpoints callable from HttpService and its rate limits (2500/min/server, no
-  ".." in paths, lowercase HTTP/2 headers), webhooks for subscriptions and other
-  events, decision tree for in-engine vs Open Cloud, security best practices,
-  and integration with the datastores, gamepasses, and networking skills. Use
-  when building external automation, CI/CD, bulk data operations, scheduled
-  snapshots, cross-experience tooling, or any server-side workflow that needs to
-  touch Roblox resources without a live game server.
+description: Roblox Open Cloud REST API for accessing data stores, assets, universes, places, users, groups, subscriptions, and Luau execution from outside the engine or via HttpService. Covers authentication (API keys, OAuth 2.0, avoiding legacy cookie auth), scopes and least-privilege, IP allowlists, key rotation and the 60-day auto-expiry rule, Secrets stores, the HttpService-callable subset and its rate limits, webhooks, and in-engine vs Open Cloud decision tree. Use for external automation, CI/CD, bulk data, scheduled snapshots, and cross-experience tooling.
 ---
 
 # roblox-open-cloud

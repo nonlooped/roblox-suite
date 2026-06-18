@@ -1,6 +1,6 @@
 ---
 name: roblox-datastores
-description: Comprehensive, production-grade expertise on all Roblox DataStore types (DataStore extends GlobalDataStore; OrderedDataStore), their differences, scopes, options, full operations (Get/Set/Update/Increment/Remove), versioning, metadata, listing, caching control, experience/server limits and quotas, throttling, every error code and handling strategy, Data Stores Manager, observability, best practices, player profile patterns, leaderboards, migration, RTBF, and integration with Open Cloud. Use for any task involving saving/loading persistent player data, stats, inventory, settings, leaderboards, cross-server state, or bulk data management. This skill provides deep, accurate, up-to-date patterns that avoid data loss, throttling, races, and quota issues common in outdated or shallow implementations. Always combine with roblox-networking for validation and roblox-core for pcall/service patterns.
+description: Production-grade Roblox DataStore patterns that prevent data loss, throttling, races, and quota exhaustion. Covers DataStore vs OrderedDataStore, UpdateAsync for atomic writes, versioning and metadata for recovery, budgets and rate limits, player profile and session-locking patterns, leaderboards, RTBF, and integration with Open Cloud. Use for any persistent player data, stats, inventory, settings, or cross-server state.
 ---
 
 # roblox-datastores

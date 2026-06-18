@@ -1,6 +1,6 @@
 ---
 name: roblox-vfx
-description: Deep dive into Roblox ParticleEmitter and related effects (Beam, Trail, Highlight, lights). Covers properties, sequences, shapes, flipbooks, performance, one-shot vs continuous emission, animation markers, and practical patterns.
+description: Roblox ParticleEmitter, Beam, Trail, and Highlight effects with production-grade performance discipline. Covers sequences, shapes, flipbooks, one-shot vs continuous emission, marker-driven bursts, lighting interaction, and fill-rate budgets. Use for any visual effect — never set Rate and Size blindly. Pairs with roblox-animation for marker-driven bursts.
 ---
 
 # roblox-vfx

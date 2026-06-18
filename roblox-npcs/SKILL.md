@@ -1,6 +1,6 @@
 ---
 name: roblox-npcs
-description: Complete coverage of Roblox pathfinding and NPC AI. Covers PathfindingService, agent parameters (radius, height, jump, climb), waypoint actions, blocked-path handling, PathfindingModifier and PathfindingLink, material/region costs, streaming compatibility, limitations, plus NPC design patterns (state machines, behavior trees, simple follow/patrol/chase), humanoid movement, obstacle avoidance, and performance at scale. Use when building NPCs, enemy AI, companion characters, patrols, or any agent that navigates the 3D world. Combine with roblox-networking for server-authoritative NPCs and roblox-physics for custom movement rigs.
+description: Roblox pathfinding and NPC AI — PathfindingService, agent parameters, waypoint actions, blocked-path handling, PathfindingModifier/Link, material and region costs, and streaming compatibility. Covers NPC design patterns: state machines, behavior trees, follow/patrol/chase, humanoid movement, obstacle avoidance, and performance at scale. Use for NPCs, enemy AI, companions, patrols, or any agent that navigates the 3D world.
 ---
 
 # roblox-npcs

@@ -1,6 +1,6 @@
 ---
 name: roblox-animation
-description: Deep, production-oriented expertise on the full Roblox animation stack (3D rig/character animation with Animator, AnimationTrack, KeyframeSequence/CurveAnimation, priorities, markers/events, IKControl) and all forms of tweening (TweenService for GuiObjects/UI, 3D properties, CFrames, colors, sequences, easing, CanvasGroup, animation sequences and chaining). Covers the Animation Editor workflow, exporting/publishing, IK for procedural posing, event-driven effects, UI-specific tween patterns (position/size/rotation/transparency/color/stroke with scale+AnchorPoint best practices), typewriter effects, style transitions, performance, and integration with particles and UI. Use whenever implementing character locomotion/emotes/actions, object motion, smooth UI transitions, health bars, menus, or any property interpolation. This skill corrects outdated legacy patterns (Humanoid:LoadAnimation) and provides efficient, polished, cross-platform results.
+description: Modern Roblox animation and tweening — Animator/AnimationTrack over deprecated Humanoid:LoadAnimation, IKControl for procedural posing, marker-driven events, and TweenService for UI and 3D properties. Covers priorities, caching, the Animation Editor workflow, UI scale/AnchorPoint best practices, typewriter effects, and performance. Use for character locomotion, emotes, object motion, and any animated UI.
 ---
 
 # roblox-animation

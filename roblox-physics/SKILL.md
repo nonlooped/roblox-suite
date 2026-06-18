@@ -1,6 +1,6 @@
 ---
 name: roblox-physics
-description: Complete coverage of Roblox rigid-body physics for building vehicles, mechanisms, doors, platforms, and dynamic objects. Covers assemblies, root parts, anchoring, WeldConstraint vs RigidConstraint, mechanical constraints (hinge, spring, prismatic, rope, etc.), mover constraints (AlignPosition, LinearVelocity, VectorForce, etc.), network ownership, collision filtering, sleep system, adaptive timestepping, units/conversions, and performance/debugging. Use when building anything that moves or connects under physics simulation. Always combine with roblox-networking for authority/validation and roblox-core for service patterns.
+description: Roblox rigid-body physics for vehicles, mechanisms, doors, platforms, and dynamic objects. Covers assemblies, root parts, anchoring, WeldConstraint vs RigidConstraint, mechanical constraints (hinge, spring, prismatic, rope), mover constraints (AlignPosition, LinearVelocity, VectorForce), network ownership, collision filtering, the sleep system, adaptive timestepping, and units. Use for anything that moves or connects under physics simulation.
 ---
 
 # roblox-physics

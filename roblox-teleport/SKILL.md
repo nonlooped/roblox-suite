@@ -1,25 +1,6 @@
 ---
 name: roblox-teleport
-description: >
-  Complete coverage of Roblox TeleportService, multi-place architecture, reserved
-  servers, and matchmaking. Covers the modern TeleportAsync API (the unified
-  method that replaces deprecated Teleport/TeleportPartyAsync/TeleportToPlaceInstance/
-  TeleportToPrivateServer/TeleportToSpawnByName), TeleportOptions
-  (ReservedServerAccessCode, ShouldReserveServer, ServerInstanceId),
-  TeleportAsyncResult and TeleportInitFailed error handling, the 50-player group
-  teleport limit, ReserveServerAsync for reserved/private servers, multi-place
-  universe architecture (universe ID vs place ID, primary place, publishing
-  additional places), cross-experience teleport restrictions, GetLocalPlayerTeleportData
-  and SetTeleportSetting/GetTeleportSetting for passing data across teleports
-  (with the security caveat that teleport data is client-spoofable),
-  GetArrivingTeleportGui/SetTeleportGui for custom loading screens, the Studio
-  limitation (teleports can't be playtested in Studio — must publish and test in
-  the Roblox app), DataStore handoff patterns across teleports, matchmaking
-  patterns with MessagingService/MemoryStoreService/external services, security
-  (server-only TeleportAsync, rate limiting, validating teleport requests), and
-  gotchas (character state loss, BindToClose interactions, follow-friend flow).
-  Use whenever moving players between places, servers, or reserved servers, or
-  building a multi-place experience with lobbies, dungeons, or matchmaking.
+description: Roblox TeleportService and multi-place architecture — the modern TeleportAsync API that replaces deprecated Teleport/TeleportPartyAsync/TeleportToPrivateServer variants. Covers TeleportOptions, reserved servers via ReserveServerAsync, the 50-player group limit, cross-experience restrictions, teleport data (and its client-spoofable security caveat), custom loading screens, DataStore handoff, and matchmaking with MessagingService/MemoryStoreService. Use whenever moving players between places, servers, or reserved servers.
 ---
 
 # roblox-teleport

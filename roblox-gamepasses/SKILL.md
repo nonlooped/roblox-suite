@@ -1,25 +1,6 @@
 ---
 name: roblox-gamepasses
-description: >
-  Complete, rule-accurate, production implementation guide for Roblox game passes
-  (one-time Robux purchases that grant permanent per-experience privileges),
-  developer products (repeatable/consumable via ProcessReceipt), and
-  subscriptions (auto-renewing monthly benefits via GetUserSubscriptionStatusAsync,
-  PromptSubscriptionPurchase, UserSubscriptionStatusChanged). Covers pass
-  creation workflow and icon guidelines, asset ID retrieval, inside-experience
-  selling (GetProductInfoAsync with InfoType.GamePass, PromptGamePassPurchase,
-  UserOwnsGamePassAsync, PromptGamePassPurchaseFinished), server-authoritative
-  granting on PlayerAdded and purchase completion, distinction from developer
-  products and subscriptions, policy (cross-experience sales disabled as of
-  May 30 2026; Engagement-Based Payouts/Premium Payouts replaced by Creator
-  Rewards as of July 24 2025; randomized items, community standards),
-  PolicyService gating (ArePaidRandomItemsRestricted, IsPaidItemTradingAllowed,
-  IsEligibleToPurchaseSubscription, IsSubjectToChinaPolicies, etc.),
-  personalization (RankProductsAsync, RecommendTopProductsAsync), promotions
-  via Buy Robux page, analytics, regional pricing, and integration with
-  persistent data (re-verification, perks application, RTBF). Includes full
-  code patterns, gotchas, security (never grant on client signal alone), and
-  checklists.
+description: Rule-accurate Roblox monetization — game passes, developer products (ProcessReceipt), and subscriptions (GetUserSubscriptionStatusAsync, PromptSubscriptionPurchase). Covers the selling flow, server-authoritative granting on PlayerAdded and purchase completion, PolicyService gating (ArePaidRandomItemsRestricted, IsEligibleToPurchaseSubscription, China policies), personalization, and integration with persistent data. Use for any purchase, perk, or recurring benefit.
 ---
 
 # roblox-gamepasses

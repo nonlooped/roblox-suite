@@ -1,6 +1,6 @@
 ---
 name: roblox-testing
-description: Practical guidance for testing, debugging, and profiling Roblox experiences. Covers the Developer Console, Output window, logging discipline, pcall and assertion patterns, TestEZ unit tests, the MicroProfiler (client and server), Scene Analysis, Script Profiler, memory diagnostics, network debugging, Luau type checking, connection cleanup, common bug categories, and a methodology for isolating issues. Use when something is broken, slow, or unreliable in a Roblox experience, or when setting up automated/manual test workflows.
+description: Testing, debugging, and profiling Roblox experiences — Developer Console, Output, logging discipline, pcall and assertion patterns, TestEZ unit tests, the MicroProfiler (client and server), Scene Analysis, Script Profiler, memory diagnostics, network debugging, Luau type checking, and connection cleanup. Use when something is broken, slow, or unreliable, or when setting up test workflows.
 ---
 
 # roblox-testing

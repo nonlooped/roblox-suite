@@ -1,6 +1,6 @@
 ---
 name: roblox-networking
-description: Complete coverage of the Roblox client-server model, replication behavior, RemoteEvent/RemoteFunction vs BindableEvent/BindableFunction, RunService contexts for deciding execution location, network ownership of assemblies, server authority as the foundation for secure experiences, common exploit vectors and defensive design patterns (validation, rate limiting, source-of-truth tables, capabilities), access control (what clients can see), and secure flows for data and monetization. This skill ensures that code written with the data, UI, animation, or monetization skills is placed on the correct side of the boundary and hardened against the hostile client.
+description: Server-authoritative Roblox client-server code that resists the hostile client. Covers RemoteEvent/RemoteFunction vs BindableEvent/BindableFunction, replication, network ownership, validation, rate limiting, exploit vectors, and secure flows for data and monetization. Use to place code on the correct side of the boundary and harden any datastore, UI, animation, or monetization logic.
 ---
 
 # roblox-networking

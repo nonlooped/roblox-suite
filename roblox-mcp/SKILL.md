@@ -1,6 +1,6 @@
 ---
 name: roblox-mcp
-description: How to set up, connect, and effectively use the official Roblox Studio MCP (Model Context Protocol) server so an AI agent can read and write scripts, explore the data model, execute Luau, run playtests, capture the viewport, and control Studio directly. Covers prerequisites, enabling Studio as an MCP server, quick-connect vs JSON/CLI configuration for Cursor/VS Code/Claude/Codex/etc., every available MCP tool, combining MCP with Script Sync for a file-based workflow, multi-instance handling, security/trust boundaries, and troubleshooting. Use when the user wants to connect an AI coding tool to Roblox Studio or is asking about MCP, Script Sync, agent-driven Studio workflows, or coding harnesses.
+description: Roblox Studio MCP server for connecting AI agents directly to Studio — read and write scripts, explore the data model, execute Luau, run playtests, capture the viewport, and control Studio. Covers prerequisites, enabling Studio as an MCP server, quick-connect vs JSON/CLI configuration for Cursor/VS Code/Claude/Codex, every available MCP tool, combining MCP with Script Sync for a file-based workflow, multi-instance handling, and security boundaries. Use when connecting an AI coding tool to Roblox Studio.
 ---
 
 # roblox-mcp

@@ -1,12 +1,6 @@
 ---
 name: roblox-core
-description: >
-  The foundational layer for all Roblox + Luau development: the complete catalog of important
-  services accessed via game:GetService, Luau data types and serialization rules, common data
-  structures, type checking, script locations and execution contexts, the client-server and data
-  model architecture, and the reality that there is no traditional filesystem I/O at runtime inside
-  experiences. This is the skill to load first so that higher-level skills (data, UI, animation,
-  monetization, etc.) rest on correct assumptions.
+description: Luau fundamentals and the complete Roblox service catalog — game:GetService patterns, data types, serialization rules, script locations, execution contexts, and the client-server data model. Load first so higher-level skills rest on correct assumptions about types, authority, and where code can run.
 ---
 
 # roblox-core
