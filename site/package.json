@@ -15,7 +15,7 @@
     "@fontsource/spline-sans-mono": "^5.1.0",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^5.13.0",
-    "tailwindcss": "^4.3.0"
+    "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
