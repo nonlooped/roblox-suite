@@ -4,9 +4,9 @@
 export const repoUrl = "https://github.com/nonlooped/roblox-suite";
 export const skillsShUrl = "https://www.skills.sh/nonlooped/roblox-suite/roblox";
 
-export const installCommand = "npx skills add nonlooped/roblox";
+export const installCommand = "npx skills add nonlooped/roblox-suite";
 export const installSingleSkill = (slug: string) =>
-  `npx skills add nonlooped/roblox --skill ${slug}`;
+  `npx skills add nonlooped/roblox-suite --skill ${slug}`;
 
 export const skillGithubUrl = (slug: string) =>
   `${repoUrl}/tree/main/${slug}/SKILL.md`;

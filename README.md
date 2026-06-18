@@ -16,13 +16,13 @@ An opinionated set of fifteen battle-tested skills for AI agents writing Roblox 
 ## Install
 
 ```sh
-npx skills add nonlooped/roblox
+npx skills add nonlooped/roblox-suite
 ```
 
 That drops all fifteen skills into your agent. Start with [`roblox/SKILL.md`](roblox/SKILL.md) — it's the hub that routes you to the right specialist. For a single skill, add `--skill <name>`:
 
 ```sh
-npx skills add nonlooped/roblox --skill roblox-datastores
+npx skills add nonlooped/roblox-suite --skill roblox-datastores
 ```
 
 ## Why
