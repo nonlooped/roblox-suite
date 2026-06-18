@@ -14,7 +14,7 @@
     "@astrojs/sitemap": "^3.7.3",
     "@fontsource/spline-sans-mono": "^5.1.0",
     "@tailwindcss/vite": "^4.3.0",
-    "astro": "^5.13.0",
+    "astro": "^6.4.6",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
