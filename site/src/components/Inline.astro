@@ -21,5 +21,13 @@ nodes.push({ code: inCode, t: buf });
 ---
 
 {
-  nodes.map((n) => (n.code ? <code>{n.t}</code> : n.t))
+  nodes.map((n) =>
+    n.code ? (
+      <code class="font-mono text-[0.85em] font-medium bg-surface text-ink px-[0.4em] py-[0.12em] rounded-[5px] border border-border whitespace-nowrap">
+        {n.t}
+      </code>
+    ) : (
+      n.t
+    )
+  )
 }

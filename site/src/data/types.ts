@@ -16,7 +16,6 @@ export type OldVsNewRow = {
   new: string;
   note?: string;
   current?: boolean;
-  featured?: boolean;
 };
 
 export type Skill = {

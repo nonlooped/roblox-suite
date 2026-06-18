@@ -10,8 +10,11 @@
     "check": "astro check"
   },
   "dependencies": {
+    "@fontsource/spline-sans-mono": "^5.1.0",
+    "@tailwindcss/vite": "^4.3.0",
     "astro": "^5.13.0",
-    "@fontsource/spline-sans-mono": "^5.1.0"
+    "motion": "^12.40.0",
+    "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",

@@ -4,30 +4,80 @@ import { skillsForGroup } from "../data/skills-meta";
 import Inline from "./Inline.astro";
 
 const base = import.meta.env.BASE_URL;
+
+// Alternate surface treatments so each domain section reads as composed,
+// not as six identical dark-on-dark blocks.
+const treatments = ["flat", "tinted", "lined"] as const;
+const treatmentClass: Record<(typeof treatments)[number], string> = {
+  flat: "bg-transparent border border-transparent",
+  tinted: "bg-surface border border-border p-8",
+  lined: "border-l-2 border-l-crimson-line pl-8",
+};
 ---
 
-<div class="skills-index">
+<div class="flex flex-col gap-[clamp(2rem,4vw,3.5rem)]">
   {
-    groups.map((group) => {
+    groups.map((group, i) => {
       const list = skillsForGroup(group.skills);
       if (!list.length) return null;
+      const treatment = treatments[i % treatments.length];
       return (
-        <section class="si__group" aria-labelledby={`g-${group.id}`}>
-          <header class="si__group-head">
-            <h3 class="si__group-title" id={`g-${group.id}`}>
-              {group.title}
-            </h3>
-            <p class="si__group-desc muted">{group.description}</p>
+        <section
+          class:list={[
+            "flex flex-col rounded-xl transition-[border-color,background] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            treatmentClass[treatment],
+          ]}
+          aria-labelledby={`g-${group.id}`}
+        >
+          <header class="flex flex-col gap-3 mb-5 pb-4 border-b border-border">
+            <div class="flex flex-wrap items-baseline gap-3">
+              <span
+                class="font-mono text-xs font-semibold text-muted"
+                aria-hidden="true"
+              >
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <h3 class="text-[1.25rem]" id={`g-${group.id}`}>
+                {group.title}
+              </h3>
+              <span class="ml-auto font-mono text-xs text-muted">
+                {list.length} {list.length === 1 ? "skill" : "skills"}
+              </span>
+            </div>
+            <p class="text-muted text-sm leading-[1.5] max-w-[56ch]">
+              {group.description}
+            </p>
           </header>
-          <ul class="si__list">
+
+          <ul class="flex flex-col gap-1">
             {list.map((s) => (
               <li>
-                <a class="si__row" href={`${base}skills/${s.slug}`}>
-                  <span class="si__title">{s.title}</span>
-                  <span class="si__liner">
+                <a
+                  class:list={[
+                    "group flex flex-col gap-2 p-4 rounded-sm border border-transparent transition-[background,border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-surface hover:border-border motion-safe:hover:translate-x-[3px]",
+                    s.hub && "border-l-2 border-l-crimson-line pl-[calc(1rem-2px)]",
+                  ]}
+                  href={`${base}skills/${s.slug}`}
+                >
+                  <span class="flex flex-wrap items-center gap-3">
+                    {s.hub && (
+                      <span
+                        class="text-[0.625rem] font-bold text-on-crimson bg-crimson px-[0.55em] py-[0.18em] rounded-full tracking-[0.02em] uppercase"
+                        aria-hidden="true"
+                      >
+                        Start here
+                      </span>
+                    )}
+                    <span class="font-semibold text-ink text-[1.0625rem]">
+                      {s.title}
+                    </span>
+                    <span class="ml-auto font-mono text-xs text-muted whitespace-nowrap transition-colors duration-200 group-hover:text-crimson max-[540px]:ml-0">
+                      {s.slug}
+                    </span>
+                  </span>
+                  <span class="text-ink-soft text-sm leading-[1.5]">
                     <Inline text={s.oneLiner} />
                   </span>
-                  <span class="si__slug mono">{s.slug}</span>
                 </a>
               </li>
             ))}
@@ -37,83 +87,3 @@ const base = import.meta.env.BASE_URL;
     })
   }
 </div>
-
-<style>
-  .skills-index {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
-    gap: clamp(2rem, 4vw, 3rem);
-    align-items: start;
-  }
-  /* Phones: force a single fluid column so the 22rem track min never
-     overflows viewports narrower than ~372px (e.g. 320px Android). */
-  @media (max-width: 540px) {
-    .skills-index { grid-template-columns: minmax(0, 1fr); }
-  }
-  .si__group-head {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3em;
-    margin-bottom: var(--space-4);
-    padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--border);
-  }
-  .si__group-title { font-size: 1.1rem; }
-  .si__group-desc {
-    font-size: 0.875rem;
-    line-height: 1.45;
-    max-width: 40ch;
-  }
-  .si__list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  .si__row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-areas: "title slug" "liner slug";
-    gap: 0.15em var(--space-4);
-    align-items: center;
-    padding: var(--space-3) var(--space-4);
-    border-radius: var(--radius-sm);
-    border: 1px solid transparent;
-    transition: background var(--dur) var(--ease),
-      border-color var(--dur) var(--ease);
-  }
-  .si__row:hover {
-    background: var(--surface);
-    border-color: var(--border);
-  }
-  .si__title {
-    grid-area: title;
-    font-weight: 600;
-    color: var(--ink);
-    font-size: 1rem;
-  }
-  .si__liner {
-    grid-area: liner;
-    color: var(--ink-soft);
-    font-size: 0.875rem;
-    line-height: 1.4;
-  }
-  .si__slug {
-    grid-area: slug;
-    align-self: center;
-    color: var(--muted);
-    font-size: 0.75rem;
-    white-space: nowrap;
-    transition: color var(--dur) var(--ease);
-  }
-  .si__row:hover .si__slug {
-    color: var(--crimson);
-  }
-
-  @media (max-width: 420px) {
-    .si__row {
-      grid-template-columns: 1fr;
-      grid-template-areas: "title" "liner" "slug";
-    }
-    .si__slug { align-self: start; }
-  }
-</style>

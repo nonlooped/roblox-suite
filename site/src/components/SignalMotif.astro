@@ -1,83 +1,140 @@
 ---
 // The bespoke "calibrated signal" hero visual. A crimson trace is damped onto
 // a dashed reference line and locks at a cursor — the brand's north star made
-// structural. No stock photo, no glass, no second hue.
+// structural. No stock photo, no glass, no second hue. Motion animates the
+// one-shot draw-in + lock settle on load (reduced motion: static, visible).
 ---
 
-<figure class="signal">
+<figure class="flex flex-col gap-4 m-0">
   <svg
-    class="signal__svg"
+    class="signal-svg w-full h-auto aspect-[600/440] bg-[color-mix(in_oklch,var(--color-bg)_80%,var(--color-surface))] border border-border rounded-xl"
     viewBox="0 0 600 440"
     role="img"
     aria-label="A crimson signal trace damped onto a dashed reference line, with a cursor locked at the steady state."
   >
     <defs>
       <pattern id="sg-grid" width="50" height="50" patternUnits="userSpaceOnUse">
-        <path d="M50 0 H0 V50" fill="none" stroke="var(--border)" stroke-width="1" />
+        <path d="M50 0 H0 V50" fill="none" stroke="var(--color-border)" stroke-width="1" />
       </pattern>
     </defs>
 
     <rect x="0" y="0" width="600" height="440" fill="url(#sg-grid)" />
 
-    <!-- calibration reference -->
     <line
       x1="0"
       y1="220"
       x2="600"
       y2="220"
-      stroke="var(--ink-soft)"
+      stroke="var(--color-ink-soft)"
       stroke-opacity="0.22"
       stroke-width="1"
       stroke-dasharray="3 5"
     />
 
-    <!-- the signal: oscillating, decaying, locking flat -->
     <path
+      class="signal-trace"
+      pathLength="1"
       d="M0 220 Q 70 70 140 220 Q 210 370 280 220 Q 350 145 420 220 Q 485 285 540 220 L 600 220"
       fill="none"
-      stroke="var(--crimson)"
+      stroke="var(--color-crimson)"
       stroke-width="2.75"
       stroke-linecap="round"
       stroke-linejoin="round"
     />
 
-    <!-- cursor at the locked steady state -->
     <line
+      class="signal-cursor"
       x1="560"
       y1="22"
       x2="560"
       y2="418"
-      stroke="var(--crimson-line)"
+      stroke="var(--color-crimson-line)"
       stroke-width="1"
       stroke-dasharray="3 5"
     />
-    <circle cx="560" cy="220" r="13" fill="none" stroke="var(--crimson)" stroke-width="1.5" opacity="0.4" />
-    <circle cx="560" cy="220" r="6" fill="var(--crimson)" />
+    <circle
+      class="signal-lock-ring"
+      cx="560"
+      cy="220"
+      r="13"
+      fill="none"
+      stroke="var(--color-crimson)"
+      stroke-width="1.5"
+    />
+    <circle
+      class="signal-lock-dot"
+      cx="560"
+      cy="220"
+      r="6"
+      fill="var(--color-crimson)"
+    />
   </svg>
 
-  <figcaption class="signal__caption">
+  <figcaption class="text-sm text-muted text-center">
     Every claim traces back to the Engine API Reference.
   </figcaption>
 </figure>
 
-<style>
-  .signal {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    margin: 0;
+<script>
+  // The trace, cursor, and lock are SVG elements. Motion v12's vanilla
+  // `animate()` only animates HTMLElements (its SVG path goes through the
+  // React/Vue `motion.*` component, which we don't have here). So for these
+  // SVG nodes we drive the one-shot draw-in with the native Web Animations
+  // API — the same WAAPI engine Motion uses under the hood. Reduced-motion
+  // shows the final state instantly.
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const ease = [0.22, 1, 0.36, 1];
+  const svg = document.querySelector<SVGSVGElement>(".signal-svg");
+  if (svg) {
+    const trace = svg.querySelector<SVGPathElement>(".signal-trace");
+    const cursor = svg.querySelector<SVGLineElement>(".signal-cursor");
+    const ring = svg.querySelector<SVGCircleElement>(".signal-lock-ring");
+    const dot = svg.querySelector<SVGCircleElement>(".signal-lock-dot");
+
+    if (reduce) {
+      if (trace) trace.style.strokeDashoffset = "0";
+      if (cursor) cursor.style.opacity = "1";
+      if (ring) ring.style.opacity = "0.4";
+      if (dot) dot.style.opacity = "1";
+    } else {
+      // pathLength="1" normalises the trace so dasharray/offset 0..1 map
+      // across the whole path. Draw the trace in once, then settle the
+      // cursor and lock.
+      if (trace) {
+        trace.style.strokeDasharray = "1";
+        trace.style.strokeDashoffset = "1";
+        trace.animate(
+          [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }],
+          { duration: 1900, delay: 200, easing: `cubic-bezier(${ease.join(",")})`, fill: "forwards" }
+        );
+      }
+      if (cursor) {
+        cursor.style.opacity = "0";
+        cursor.animate(
+          [{ opacity: 0 }, { opacity: 1 }],
+          { duration: 500, delay: 1650, easing: `cubic-bezier(${ease.join(",")})`, fill: "forwards" }
+        );
+      }
+      if (ring) {
+        ring.style.opacity = "0";
+        ring.animate(
+          [{ opacity: 0 }, { opacity: 0.4 }],
+          { duration: 500, delay: 1850, easing: `cubic-bezier(${ease.join(",")})`, fill: "forwards" }
+        );
+      }
+      if (dot) {
+        dot.style.opacity = "0";
+        dot.style.transformBox = "fill-box";
+        dot.style.transformOrigin = "center";
+        dot.animate(
+          [
+            { opacity: 0, transform: "scale(0.3)" },
+            { opacity: 1, transform: "scale(1.25)", offset: 0.55 },
+            { opacity: 1, transform: "scale(1)" },
+          ],
+          { duration: 550, delay: 2000, easing: `cubic-bezier(${ease.join(",")})`, fill: "forwards" }
+        );
+      }
+    }
   }
-  .signal__svg {
-    width: 100%;
-    height: auto;
-    background: color-mix(in oklch, var(--bg) 80%, var(--surface));
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    aspect-ratio: 600 / 440;
-  }
-  .signal__caption {
-    font-size: 0.875rem;
-    color: var(--muted);
-    text-align: center;
-  }
-</style>
+</script>

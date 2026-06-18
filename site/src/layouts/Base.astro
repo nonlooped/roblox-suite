@@ -1,6 +1,4 @@
 ---
-import "../styles/tokens.css";
-import "../styles/fonts.css";
 import "../styles/global.css";
 import "@fontsource/spline-sans-mono/latin-400.css";
 import "@fontsource/spline-sans-mono/latin-500.css";
@@ -15,8 +13,8 @@ interface Props {
 const siteName = "Roblox Suite";
 const { title, description } = Astro.props;
 const fullTitle = title
-  ? `${title} — ${siteName}`
-  : `${siteName} — current, sourced Roblox Luau skills`;
+  ? `${title} · ${siteName}`
+  : `${siteName} · current, sourced Roblox Luau skills`;
 const desc =
   description ??
   "An opinionated set of fifteen battle-tested Roblox skills, each accountable to the official Engine API Reference. The current, sourced alternative to stale wiki posts and confidently-wrong LLM output.";
@@ -45,40 +43,119 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://nonlooped.g
     <meta name="twitter:description" content={desc} />
   </head>
   <body>
-    <a class="skip" href="#main">Skip to content</a>
+    <a
+      class="sr-only focus:not-sr-only focus:fixed focus:left-6 focus:top-3 focus:z-[1000] focus:bg-surface focus:text-ink focus:px-4 focus:py-3 focus:rounded-sm focus:border focus:border-border-strong transition-top duration-200"
+      href="#main"
+    >
+      Skip to content
+    </a>
     <Header />
     <main id="main">
       <slot />
     </main>
     <Footer />
 
-    <script is:inline>
-      // Single delegated copy handler for every [data-copy] button.
-      (() => {
-        const revert = (btn) => {
-          const label = btn.querySelector("[data-copy-label]");
-          btn.classList.remove("is-copied");
-          if (label && btn.dataset.copyLabel) label.textContent = btn.dataset.copyLabel;
-        };
-        document.addEventListener("click", (e) => {
-          const btn = e.target.closest("[data-copy]");
-          if (!btn) return;
-          const sel = btn.getAttribute("data-copy");
-          const el = sel ? document.querySelector(sel) : null;
-          const text = el ? (el.textContent || "").trim() : "";
-          if (!text) return;
-          const label = btn.querySelector("[data-copy-label]");
-          if (label && !btn.dataset.copyLabel) btn.dataset.copyLabel = label.textContent;
-          const after = () => {
-            if (label) label.textContent = "Copied";
-            btn.classList.add("is-copied");
-            window.setTimeout(() => revert(btn), 1600);
-          };
-          const w = navigator.clipboard?.writeText?.bind(navigator.clipboard);
-          if (w) w(text).then(after, after);
-          else after();
+    <script>
+      import { inView, animate } from "motion";
+
+      // Scroll-reveal: Motion's inView drives the entrance animations.
+      // Initial hidden state is set inline; Motion animates them in.
+      // Reduced-motion shows instantly.
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+      const reveal = (el: HTMLElement) => {
+        if (reduce) {
+          el.classList.add("is-visible");
+          return;
+        }
+        animate(
+          el,
+          { opacity: [0, 1], transform: ["translateY(18px)", "none"] },
+          { duration: 0.62, ease }
+        ).then(() => el.classList.add("is-visible"));
+      };
+
+      const revealStagger = (el: HTMLElement) => {
+        const children = Array.from(el.children) as HTMLElement[];
+        if (!children.length) return;
+        if (reduce) {
+          children.forEach((c) => c.classList.add("is-visible"));
+          el.classList.add("is-visible");
+          return;
+        }
+        children.forEach((child, i) => {
+          animate(
+            child,
+            { opacity: [0, 1], transform: ["translateY(14px)", "none"] },
+            { duration: 0.62, delay: 0.06 * i, ease }
+          );
         });
-      })();
+        el.classList.add("is-visible");
+      };
+
+      document
+        .querySelectorAll<HTMLElement>("[data-reveal]")
+        .forEach((el) => {
+          if (reduce) {
+            el.style.opacity = "1";
+            el.style.transform = "none";
+            el.classList.add("is-visible");
+            return;
+          }
+          el.style.opacity = "0";
+          el.style.transform = "translateY(18px)";
+          el.style.willChange = "opacity, transform";
+          inView(
+            el,
+            () => reveal(el),
+            { margin: "0px 0px -10% 0px", amount: 0.12 }
+          );
+        });
+
+      document
+        .querySelectorAll<HTMLElement>("[data-reveal-stagger]")
+        .forEach((el) => {
+          if (reduce) {
+            Array.from(el.children).forEach((c) =>
+              c.classList.add("is-visible")
+            );
+            el.classList.add("is-visible");
+            return;
+          }
+          Array.from(el.children).forEach((child) => {
+            (child as HTMLElement).style.opacity = "0";
+            (child as HTMLElement).style.transform = "translateY(14px)";
+          });
+          inView(
+            el,
+            () => revealStagger(el),
+            { margin: "0px 0px -10% 0px", amount: 0.12 }
+          );
+        });
+
+      // Delegated copy handler for [data-copy] buttons.
+      document.addEventListener("click", (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-copy]");
+        if (!btn) return;
+        const sel = btn.getAttribute("data-copy");
+        const el = sel ? document.querySelector(sel) : null;
+        const text = el ? (el.textContent || "").trim() : "";
+        if (!text) return;
+        const label = btn.querySelector<HTMLElement>("[data-copy-label]");
+        const orig = label && btn.dataset.copyLabel ? btn.dataset.copyLabel : label?.textContent;
+        const after = () => {
+          if (label) label.textContent = "Copied";
+          btn.classList.add("is-copied");
+          window.setTimeout(() => {
+            btn.classList.remove("is-copied");
+            if (label && orig) label.textContent = orig;
+          }, 1600);
+        };
+        const w = navigator.clipboard?.writeText?.bind(navigator.clipboard);
+        if (w) w(text).then(after, after);
+        else after();
+      });
     </script>
   </body>
 </html>

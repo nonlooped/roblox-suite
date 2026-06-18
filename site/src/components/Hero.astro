@@ -1,83 +1,29 @@
 ---
 import SignalMotif from "./SignalMotif.astro";
 import CodeChip from "./CodeChip.astro";
-import { repoUrl, freshness } from "../data/trust";
 
 const base = import.meta.env.BASE_URL;
 ---
 
-<section class="hero">
-  <div class="wrap hero__grid">
-    <div class="hero__copy">
-      <p class="pill">
-        <span class="pill__dot" aria-hidden="true"></span>
-        Current as of {freshness.lastReviewed}
+<section class="py-[clamp(2.5rem,5vw,4.5rem)] pb-[clamp(3.5rem,8vw,6rem)]">
+  <div class="wrap grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] gap-[clamp(2rem,5vw,5rem)] items-center max-[920px]:grid-cols-1 max-[920px]:gap-[clamp(2.5rem,6vw,4rem)]">
+    <div class="flex flex-col gap-6 items-start min-w-0">
+      <h1 class="max-w-[15ch]">Your AI agent, writing current Roblox code.</h1>
+      <p class="lede max-w-[46ch] text-[clamp(1.125rem,0.5rem+0.9vw,1.375rem)] leading-[1.5] text-ink-soft font-normal">
+        Roblox Suite is fifteen skills you install once. Each one tells your
+        agent which Roblox APIs are current, which are deprecated, and where
+        the official docs say so. No more guessing from stale memory.
       </p>
-      <h1 class="hero__title">Ship current Luau with confidence.</h1>
-      <p class="hero__sub lede">
-        An opinionated set of fifteen battle-tested Roblox skills — each
-        accountable to the official Engine API Reference. The current, sourced
-        alternative to stale wiki posts and confidently-wrong LLM output.
-      </p>
-      <div class="hero__ctas">
-        <a class="button button--primary" href={`${base}#install`}>Add the suite</a>
-        <a class="button button--ghost" href={repoUrl}>Star on GitHub</a>
+      <div class="flex flex-wrap gap-3 items-center">
+        <a class="btn-primary" href={`${base}#install`}>Add the suite</a>
+        <a class="btn-ghost" href={`${base}skills`}>Browse the skills</a>
       </div>
-      <div class="hero__install">
+      <div class="flex flex-col gap-2 mt-1 self-stretch">
         <CodeChip />
-        <p class="hero__chip-note muted">
-          Runs once. Adds all fifteen skills to your agent.
-        </p>
       </div>
     </div>
-    <div class="hero__visual">
+    <div class="hero-visual min-w-0 max-[920px]:max-w-[32rem]">
       <SignalMotif />
     </div>
   </div>
 </section>
-
-<style>
-  .hero {
-    padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(3.5rem, 8vw, 6rem);
-  }
-  .hero__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-    gap: clamp(2rem, 5vw, 5rem);
-    align-items: center;
-  }
-  .hero__copy {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-    align-items: flex-start;
-    min-width: 0;
-  }
-  .hero__title { max-width: 15ch; }
-  .hero__sub { max-width: 46ch; }
-  .hero__ctas {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    align-items: center;
-  }
-  .hero__install {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    margin-top: var(--space-1);
-    align-self: stretch; /* fill hero__copy's definite track so the
-       codechip's `width: min(100%, 30rem)` resolves instead of falling
-       back to its nowrap intrinsic width and overflowing. */
-  }
-  .hero__chip-note { font-size: 0.8125rem; }
-  .hero__visual { min-width: 0; }
-
-  @media (max-width: 920px) {
-    .hero__grid {
-      grid-template-columns: minmax(0, 1fr);
-      gap: clamp(2.5rem, 6vw, 4rem);
-    }
-    .hero__visual { max-width: 32rem; }
-  }
-</style>

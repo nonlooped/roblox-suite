@@ -1,134 +1,65 @@
 ---
-import { installCommand, installSingleSkill, repoUrl } from "../data/trust";
+import { installCommand } from "../data/trust";
 import CodeChip from "./CodeChip.astro";
 import SectionHeading from "./SectionHeading.astro";
 
+// Single-column install flow: heading, the command, then three plain
+// steps. A different layout family from the How / Domains rows so the
+// install moment reads as its own beat.
 const steps = [
   {
     n: "1",
     t: "Add the suite",
-    d: "Runs once. It drops all fifteen skills into your agent's skills directory — plain Markdown, no build step.",
+    d: "One command. Drops all fifteen skills into your agent: plain Markdown, no build step.",
   },
   {
     n: "2",
-    t: "Open the hub",
-    d: "The roblox skill is the entry point. It routes you to the right specialized skill with a decision tree.",
+    t: "Start with the hub",
+    d: "The roblox skill is the entry point. Tell your agent what you're building and it picks the right specialist.",
   },
   {
     n: "3",
     t: "Ask your agent",
-    d: "Each skill carries its own sources, so the agent stays current instead of guessing from memory.",
+    d: "Each skill carries its own sources, so the agent uses the current API and can cite the doc behind it.",
   },
 ];
 ---
 
-<section class="section install" id="install">
-  <div class="wrap install__grid">
-    <SectionHeading
-      title="Install."
-      lead="One command. Fifteen skills. No build step, no lock-in — just Markdown your agent can read."
-    />
+<section
+  class="section bg-[color-mix(in_oklch,var(--color-bg)_92%,var(--color-surface))] border-y border-border"
+  id="install"
+>
+  <div class="wrap">
+    <div class="install-head mb-12" data-reveal>
+      <SectionHeading
+        title="Install."
+        lead="One command. Fifteen skills. No build step, no lock-in. Just Markdown your agent can read."
+      />
+    </div>
 
-    <div class="install__body">
-      <CodeChip command={installCommand} />
+    <div class="install-body flex flex-col gap-12 max-w-[52rem]">
+      <div class="install-cmd max-w-[34rem]" data-reveal>
+        <CodeChip command={installCommand} />
+      </div>
 
-      <ol class="install__steps">
+      <ol
+        class="install-steps grid grid-cols-3 gap-8 max-[720px]:grid-cols-1 max-[720px]:gap-5"
+        data-reveal-stagger
+      >
         {
           steps.map((s) => (
-            <li class="install__step">
-              <span class="install__n mono">{s.n}</span>
-              <div class="install__step-body">
-                <p class="install__step-t">{s.t}</p>
-                <p class="muted">{s.d}</p>
+            <li class="install-step flex flex-col gap-3 max-[720px]:flex-row max-[720px]:items-start max-[720px]:gap-4">
+              <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-crimson text-on-crimson text-sm font-bold leading-none">
+                {s.n}
+              </span>
+              <div class="flex flex-col gap-[0.3em]">
+                <p class="font-semibold text-ink text-base">{s.t}</p>
+                <p class="text-muted text-sm leading-[1.5] max-w-[34ch]">{s.d}</p>
               </div>
             </li>
           ))
         }
       </ol>
-
-      <div class="install__single">
-        <p class="install__single-label">Just one skill?</p>
-        <CodeChip command={installSingleSkill("roblox-datastores")} />
-        <p class="muted install__single-note">
-          Swap <code>roblox-datastores</code> for any slug from the explorer.
-        </p>
-      </div>
-
-      <div class="install__foot">
-        <a class="button button--ghost" href={repoUrl}>Star on GitHub</a>
-      </div>
     </div>
   </div>
 </section>
-
-<style>
-  .install {
-    background: color-mix(in oklch, var(--bg) 92%, var(--surface));
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-  .install__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: clamp(2rem, 5vw, 4.5rem);
-    align-items: start;
-  }
-  .install__body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-6);
-    min-width: 0;
-  }
-  .install__steps {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-  }
-  .install__step {
-    display: grid;
-    grid-template-columns: 2.2em 1fr;
-    gap: var(--space-4);
-    align-items: start;
-  }
-  .install__n {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--crimson);
-    padding-top: 0.1em;
-  }
-  .install__step-body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25em;
-  }
-  .install__step-t {
-    font-weight: 600;
-    color: var(--ink);
-    font-size: 1rem;
-  }
-  .install__step-body .muted {
-    font-size: 0.9375rem;
-    line-height: 1.5;
-  }
-  .install__single {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    padding-top: var(--space-5);
-    border-top: 1px solid var(--border);
-  }
-  .install__single-label {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--muted);
-  }
-  .install__single-note { font-size: 0.875rem; }
-  .install__foot { padding-top: var(--space-2); }
-
-  @media (max-width: 820px) {
-    .install__grid {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-6);
-    }
-  }
-</style>

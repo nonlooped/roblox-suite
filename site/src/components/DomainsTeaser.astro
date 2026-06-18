@@ -1,0 +1,67 @@
+---
+// A newcomer-friendly teaser of the six domains. Two-column list of
+// domain + plain-language description. Clean registry that reads fast and
+// points onward. Numbered to rhyme with the How / Install step rows.
+import { groups } from "../data/groups";
+import SectionHeading from "./SectionHeading.astro";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section class="section" id="domains">
+  <div class="wrap">
+    <div data-reveal>
+      <SectionHeading
+        title="Six domains, fifteen skills."
+        lead="The suite covers the parts of Roblox you actually build with. Each domain has its own skills, each one current against the official docs."
+      />
+    </div>
+
+    <ul
+      class="domains-list grid grid-cols-2 gap-0 mt-12 border-t border-border max-[720px]:grid-cols-1"
+      data-reveal-stagger
+    >
+      {
+        groups.map((g, i) => (
+          <li
+            class:list={[
+              "domains-row border-b border-border",
+              i % 2 === 0 && "min-[721px]:border-r min-[721px]:border-border",
+            ]}
+          >
+            <a
+              class="group domains-link grid grid-cols-[2.5em_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 items-center py-6 px-4 transition-[background,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-surface motion-safe:hover:translate-x-[3px] max-[420px]:grid-cols-[2.5em_1fr] max-[420px]:[&>span:last-child]:hidden"
+              href={`${base}skills`}
+            >
+              <span
+                class="row-span-2 self-start font-mono text-xs text-muted pt-[0.35em]"
+                aria-hidden="true"
+              >
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span class="font-semibold text-ink text-[1.0625rem]">
+                {g.title}
+              </span>
+              <span
+                class="row-span-2 self-center text-muted transition-[color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:text-crimson motion-safe:group-hover:translate-x-1"
+                aria-hidden="true"
+              >
+                →
+              </span>
+              <span class="text-ink-soft text-sm leading-[1.5] max-w-[42ch]">
+                {g.description}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="mt-12">
+      <a class="link inline-flex items-baseline gap-1.5 group" href={`${base}skills`}>
+        See every skill with its sources
+        <span class="transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </div>
+</section>

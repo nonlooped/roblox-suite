@@ -6,88 +6,28 @@ import { installCommand } from "../data/trust";
 const { command = installCommand } = Astro.props as { command?: string };
 ---
 
-<div class="codechip">
-  <span class="codechip__prompt" aria-hidden="true">$</span>
-  <code class="codechip__cmd" data-copy-text>{command}</code>
+<div
+  class="codechip inline-flex items-center gap-3 px-[1.05em] py-[0.7em] bg-surface border border-border-strong rounded-lg font-mono text-[0.9375rem] w-[min(100%,30rem)] min-w-0"
+>
+  <span class="text-muted select-none" aria-hidden="true">$</span>
+  <code
+    class="flex-1 min-w-0 overflow-x-auto whitespace-nowrap text-ink bg-transparent border-0 p-0 text-inherit font-medium [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    data-copy-text
+  >
+    {command}
+  </code>
   <button
-    class="codechip__btn"
+    class="codechip-btn flex-none inline-flex items-center gap-1.5 px-3 py-2 rounded-sm border border-border bg-surface-2 text-ink-soft font-sans text-[0.8125rem] font-semibold cursor-pointer transition-[color,border-color,background] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-ink hover:border-border-strong is-copied:text-on-crimson is-copied:bg-crimson is-copied:border-crimson"
     type="button"
     data-copy="[data-copy-text]"
     aria-label="Copy command to clipboard"
   >
-    <svg
-      class="codechip__icon"
-      viewBox="0 0 16 16"
-      width="15"
-      height="15"
-      aria-hidden="true"
-    >
+    <svg class="flex-none" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
       <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9.5 2.5H4.5A1.5 1.5 0 0 0 3 4v8a1.5 1.5 0 0 0 1.5 1.5h2" />
         <rect x="6.5" y="4.5" width="7" height="7" rx="1.5" />
       </g>
     </svg>
-    <span class="codechip__label" data-copy-label>Copy</span>
+    <span class="codechip-label" data-copy-label>Copy</span>
   </button>
 </div>
-
-<style>
-  .codechip {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: 0.7em 0.7em 0.7em 1.05em;
-    background: var(--surface);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius);
-    font-family: var(--font-mono);
-    font-size: 0.9375rem;
-    width: min(100%, 30rem);
-    min-width: 0;
-  }
-  .codechip__prompt {
-    color: var(--muted);
-    user-select: none;
-  }
-  .codechip__cmd {
-    flex: 1 1 auto;
-    min-width: 0;
-    overflow-x: auto;
-    white-space: nowrap;
-    color: var(--ink);
-    background: none;
-    border: none;
-    padding: 0;
-    font-size: inherit;
-    font-weight: 500;
-    scrollbar-width: none;
-  }
-  .codechip__cmd::-webkit-scrollbar { display: none; }
-  .codechip__btn {
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4em;
-    padding: 0.5em 0.8em;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    background: var(--surface-2);
-    color: var(--ink-soft);
-    font-family: var(--font-sans);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease),
-      background var(--dur) var(--ease);
-  }
-  .codechip__btn:hover {
-    color: var(--ink);
-    border-color: var(--border-strong);
-  }
-  .codechip__btn.is-copied {
-    color: var(--on-crimson);
-    background: var(--crimson);
-    border-color: var(--crimson);
-  }
-  .codechip__icon { flex: none; }
-</style>

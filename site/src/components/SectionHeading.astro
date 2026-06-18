@@ -15,21 +15,7 @@ const {
 };
 ---
 
-<div class:list={["section-heading", className]} id={id}>
-  <Tag class="section-heading__title">{title}</Tag>
-  {lead && <p class="section-heading__lead">{lead}</p>}
+<div class:list={["flex flex-col gap-4 max-w-[62ch]", className]} id={id}>
+  <Tag>{title}</Tag>
+  {lead && <p class="text-ink-soft text-[1.0625rem] leading-[1.55]">{lead}</p>}
 </div>
-
-<style>
-  .section-heading {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    max-width: 62ch;
-  }
-  .section-heading__lead {
-    color: var(--ink-soft);
-    font-size: 1.0625rem;
-    line-height: 1.55;
-  }
-</style>

@@ -1,0 +1,60 @@
+---
+// Newcomer-first "what this is and how it helps" section. Explains the
+// agent→skill→docs loop in plain language. Three-step horizontal row that
+// rhymes with the Install section's numbered steps. Spacing + a left number
+// rail carry the hierarchy. No cards, no borders.
+import SectionHeading from "./SectionHeading.astro";
+
+const steps = [
+  {
+    n: "1",
+    t: "You install the suite once",
+    d: "One command drops fifteen skills into your agent. Each skill is a Markdown file with the current Roblox APIs and their official doc links, nothing to configure, no build step.",
+  },
+  {
+    n: "2",
+    t: "You ask your agent to build something",
+    d: "Animate a character, save player data, set up a game pass, send players between places. The agent reads the matching skill instead of recalling from memory.",
+  },
+  {
+    n: "3",
+    t: "The agent writes current, documented code",
+    d: "Roblox deprecates APIs and changes policy on a rolling basis. The skills track that, so the agent uses the right call and can show you the doc it came from.",
+  },
+];
+---
+
+<section class="section" id="how">
+  <div class="wrap">
+    <div data-reveal>
+      <SectionHeading
+        title="How it works."
+        lead="If you use an AI coding agent like Claude to write Roblox code, the agent only knows what it was trained on. Roblox changes faster than that. A skill is a small instruction file that keeps the agent current."
+      />
+    </div>
+
+    <ol
+      class="how-steps grid grid-cols-3 gap-[clamp(1.5rem,3vw,3rem)] mt-12 max-[720px]:grid-cols-1 max-[720px]:gap-5"
+      data-reveal-stagger
+    >
+      {
+        steps.map((s) => (
+          <li class="grid grid-cols-[auto_1fr] gap-4 items-start">
+            <span
+              class="font-mono text-sm font-semibold text-crimson pt-[0.2em]"
+              aria-hidden="true"
+            >
+              {s.n}
+            </span>
+            <div class="flex flex-col gap-2">
+              <p class="text-[1.0625rem] font-semibold text-ink leading-[1.3]">
+                {s.t}
+              </p>
+              <p class="text-muted text-sm leading-[1.55] max-w-[38ch]">{s.d}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
