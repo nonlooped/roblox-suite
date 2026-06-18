@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install, build, and upload your site
-        uses: withastro/action@v3
+        uses: withastro/action@v6
         with:
           path: site
           node-version: 24
