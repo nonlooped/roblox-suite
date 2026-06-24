@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
-    "@fontsource/spline-sans-mono": "^5.1.0",
+    "@fontsource/spline-sans-mono": "^5.2.8",
     "@tailwindcss/vite": "^4.3.1",
-    "astro": "^6.4.8",
+    "astro": "^7.0.2",
     "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
