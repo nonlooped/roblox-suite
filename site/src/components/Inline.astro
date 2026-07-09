@@ -1,7 +1,7 @@
 ---
 // Render inline `code` spans from a plain string containing backtick pairs.
 // Plain text is emitted as escaped text nodes; only matched backtick pairs
-// become <code>. No set:html — content comes from our own data modules.
+// become <code>. No set:html - content comes from our own data modules.
 const { text = "" } = Astro.props as { text?: string };
 
 type Node = { code: boolean; t: string };

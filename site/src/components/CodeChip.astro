@@ -1,5 +1,5 @@
 ---
-// A copyable command chip. Markup only — the copy behaviour is a single
+// A copyable command chip. Markup only - the copy behaviour is a single
 // delegated handler in Base.astro, keyed off [data-copy].
 import { installCommand } from "../data/trust";
 
@@ -11,7 +11,7 @@ const { command = installCommand } = Astro.props as { command?: string };
 >
   <span class="text-muted select-none" aria-hidden="true">$</span>
   <code
-    class="flex-1 min-w-0 overflow-x-auto whitespace-nowrap text-ink bg-transparent border-0 p-0 text-inherit font-medium [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    class="flex-1 min-w-0 overflow-x-auto whitespace-nowrap text-ink bg-transparent border-0 p-0 text-inherit font-medium [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [mask-image:linear-gradient(to_right,#000_calc(100%_-_1.1rem),transparent)] [-webkit-mask-image:linear-gradient(to_right,#000_calc(100%_-_1.1rem),transparent)]"
     data-copy-text
   >
     {command}

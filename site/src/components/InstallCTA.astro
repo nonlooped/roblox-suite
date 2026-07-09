@@ -1,28 +1,6 @@
 ---
 import { installCommand } from "../data/trust";
 import CodeChip from "./CodeChip.astro";
-import SectionHeading from "./SectionHeading.astro";
-
-// Single-column install flow: heading, the command, then three plain
-// steps. A different layout family from the How / Domains rows so the
-// install moment reads as its own beat.
-const steps = [
-  {
-    n: "1",
-    t: "Add the suite",
-    d: "One command. Drops all fifteen skills into your agent: plain Markdown, no build step.",
-  },
-  {
-    n: "2",
-    t: "Start with the hub",
-    d: "The roblox skill is the entry point. Tell your agent what you're building and it picks the right specialist.",
-  },
-  {
-    n: "3",
-    t: "Ask your agent",
-    d: "Each skill carries its own sources, so the agent uses the current API and can cite the doc behind it.",
-  },
-];
 ---
 
 <section
@@ -30,36 +8,13 @@ const steps = [
   id="install"
 >
   <div class="wrap">
-    <div class="install-head mb-12" data-reveal>
-      <SectionHeading
-        title="Install."
-        lead="One command. Fifteen skills. No build step, no lock-in. Just Markdown your agent can read."
-      />
-    </div>
-
-    <div class="install-body flex flex-col gap-12 max-w-[52rem]">
-      <div class="install-cmd max-w-[34rem]" data-reveal>
-        <CodeChip command={installCommand} />
-      </div>
-
-      <ol
-        class="install-steps grid grid-cols-3 gap-8 max-[720px]:grid-cols-1 max-[720px]:gap-5"
-        data-reveal-stagger
-      >
-        {
-          steps.map((s) => (
-            <li class="install-step flex flex-col gap-3 max-[720px]:flex-row max-[720px]:items-start max-[720px]:gap-4">
-              <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-crimson text-on-crimson text-sm font-bold leading-none">
-                {s.n}
-              </span>
-              <div class="flex flex-col gap-[0.3em]">
-                <p class="font-semibold text-ink text-base">{s.t}</p>
-                <p class="text-muted text-sm leading-[1.5] max-w-[34ch]">{s.d}</p>
-              </div>
-            </li>
-          ))
-        }
-      </ol>
+    <div class="install-body flex flex-col gap-6 max-w-[34rem]" data-reveal>
+      <h2>Install</h2>
+      <CodeChip command={installCommand} />
+      <p class="font-mono text-[0.8125rem] text-ink-soft leading-[1.55]">
+        Claude Code, Cursor, Codex, Copilot - any agent that reads Markdown skills.
+        Verify: <span class="text-ink">"which Roblox skills do you have?"</span>
+      </p>
     </div>
   </div>
 </section>

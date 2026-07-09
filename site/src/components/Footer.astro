@@ -8,10 +8,9 @@ const cols = [
     label: "Explore",
     links: [
       { label: "All skills", href: `${base}skills` },
-      { label: "What you stop doing", href: `${base}skills/roblox-animation` },
       { label: "Install", href: `${base}#install` },
       { label: "GitHub", href: repoUrl },
-      { label: "skills.sh listing", href: skillsShUrl },
+      { label: "skills.sh", href: skillsShUrl },
     ],
   },
   {
@@ -42,8 +41,7 @@ const cols = [
         <span>Roblox Suite</span>
       </a>
       <p class="text-ink-soft max-w-[36ch] text-[0.9375rem] leading-[1.55]">
-        An opinionated, current skill set for Roblox Luau — accountable to the
-        Engine API Reference.
+        Roblox Luau skills for AI agents, cited to the Engine API Reference.
       </p>
       <p class="font-mono text-[0.8125rem] text-muted">MIT</p>
     </div>
@@ -54,16 +52,21 @@ const cols = [
           <div class="min-w-[10rem]">
             <h3 class="text-xs font-semibold text-muted mb-3">{col.label}</h3>
             <ul class="flex flex-col gap-2">
-              {col.links.map((l) => (
-                <li>
-                  <a
-                    class="text-[0.9375rem] text-ink-soft transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-ink"
-                    href={l.href}
-                  >
-                    {l.label}
-                  </a>
-                </li>
-              ))}
+              {col.links.map((l) => {
+                const external = /^https?:\/\//.test(l.href);
+                return (
+                  <li>
+                    <a
+                      class="text-[0.9375rem] text-ink-soft transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-ink"
+                      href={l.href}
+                      target={external ? "_blank" : undefined}
+                      rel={external ? "noopener noreferrer" : undefined}
+                    >
+                      {l.label}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))
