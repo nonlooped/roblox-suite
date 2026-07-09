@@ -1,0 +1,85 @@
+---
+// Ledger-style old→new row. Mono APIs only. Links to owning skill when href set.
+type Props = {
+  old: string;
+  new: string;
+  note?: string;
+  href?: string;
+  slug?: string;
+  /** Hero / full ledger columns */
+  ledger?: boolean;
+};
+
+const { old, new: neu, note, href, slug, ledger = false } = Astro.props;
+
+const rowClass = [
+  "group ledger-row",
+  ledger
+    ? "grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1.1fr)_auto] gap-x-3 gap-y-1 items-baseline px-4 py-3.5 border-b border-border last:border-b-0 max-[540px]:grid-cols-1 max-[540px]:gap-1.5"
+    : "flex flex-col gap-2 p-4 border-b border-border last:border-b-0",
+  href && "transition-colors duration-150 hover:bg-surface",
+]
+  .filter(Boolean)
+  .join(" ");
+
+const Tag = href ? "a" : "div";
+const tagProps = href ? { href } : {};
+---
+
+<Tag class={rowClass} {...tagProps}>
+  {
+    ledger ? (
+      <>
+        <span class="font-mono text-[0.875rem] text-muted leading-[1.4] break-words line-through decoration-muted/40 min-w-0">
+          <span class="no-underline mr-1.5 text-muted/70" aria-hidden="true">✕</span>
+          {old}
+        </span>
+        <span class="text-crimson font-semibold text-xs shrink-0 max-[540px]:hidden" aria-hidden="true">
+          →
+        </span>
+        <span class="font-mono text-[0.875rem] text-ink leading-[1.4] break-words min-w-0">
+          <span class="text-crimson font-bold mr-1.5" aria-hidden="true">✓</span>
+          {neu}
+          {note && (
+            <span class="block mt-0.5 font-sans text-[0.6875rem] text-muted leading-[1.35] no-underline">
+              {note}
+            </span>
+          )}
+        </span>
+        {slug ? (
+          <span class="font-mono text-[0.625rem] text-muted transition-colors duration-150 group-hover:text-crimson shrink-0 max-[540px]:mt-0.5">
+            {slug}
+          </span>
+        ) : (
+          <span />
+        )}
+      </>
+    ) : (
+      <>
+        <div class="grid grid-cols-[1fr_auto_1fr] items-start gap-3 min-w-0 max-[540px]:grid-cols-1 max-[540px]:gap-2">
+          <div class="grid grid-cols-[1.1em_1fr] gap-2.5 items-start min-w-0">
+            <span class="text-muted text-sm leading-[1.4]" aria-hidden="true">✕</span>
+            <span class="font-mono text-[0.875rem] text-muted leading-[1.4] break-words line-through decoration-muted/40">
+              {old}
+            </span>
+          </div>
+          <div class="text-crimson font-semibold text-sm max-[540px]:pl-[1.1em]" aria-hidden="true">
+            →
+          </div>
+          <div class="grid grid-cols-[1.1em_1fr] gap-2.5 items-start min-w-0">
+            <span class="text-crimson font-bold text-sm leading-[1.4]" aria-hidden="true">✓</span>
+            <div class="flex flex-col gap-1 min-w-0">
+              <span class="font-mono text-[0.875rem] text-ink leading-[1.4] break-words">{neu}</span>
+              {note && <span class="text-muted text-xs leading-[1.4] font-sans">{note}</span>}
+            </div>
+          </div>
+        </div>
+        {slug && (
+          <span class="font-mono text-[0.6875rem] text-muted self-end transition-colors duration-150 group-hover:text-crimson">
+            {slug}
+          </span>
+        )}
+      </>
+    )
+  }
+</Tag>

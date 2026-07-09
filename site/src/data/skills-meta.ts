@@ -4,9 +4,9 @@ import { getFrontmatterForSlugs } from "./skill-frontmatter";
 // Curated from the repo: one-liners from the README skill table, covers
 // from each SKILL.md, and source URLs taken verbatim from each SKILL.md's
 // "Official sources" block. `displayTitle` and `overview` are hand-written
-// for SERP (keyword-leading titles, substantive prose intros) and are
-// the only fields here that are editorial rather than verbatim. Nothing
-// technical is invented — overviews paraphrase the SKILL.md description.
+// for SERP (keyword-leading titles, short hooks) and are the only fields
+// here that are editorial rather than verbatim. Nothing technical is
+// invented - overviews paraphrase the SKILL.md description.
 // `lastReviewed` is pulled from each SKILL.md's `last_reviewed` frontmatter
 // at build time so a single-skill update flows through automatically.
 const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
@@ -17,7 +17,7 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "Architecture principles, cross-skill workflows, quick-reference patterns",
     displayTitle: "Roblox development hub: architecture and skill routing",
     overview:
-      "The entry-point skill for the suite. It gives your agent the big-picture architecture — server authority, the client-server model, performance mindset, and code organization — plus a decision tree that routes to the right specialist skill for datastores, animation, UI, monetization, networking, and more. Load this first; it tells the agent which deep skill to read next.",
+      "Entry-point skill: server authority, client-server model, and a decision tree that routes to the right specialist. Load this first.",
     covers: [
       "The single entry point: overarching architecture and server-authority principles.",
       "Quick-reference patterns and a decision tree that routes you to the right specialized skill.",
@@ -35,7 +35,7 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "Services, Luau types, serialization, script locations, `RunContext`, the data model",
     displayTitle: "Roblox core services, Luau types, and RunContext",
     overview:
-      "The foundational layer every other skill assumes you know: the important services via `game:GetService`, Luau data types and serialization rules, script locations and execution contexts (including modern `BaseScript.RunContext`), and the client-server data model. Load this first so higher-level skills rest on correct assumptions. Also covers the reality that there is no runtime filesystem I/O inside experiences.",
+      "Services via `game:GetService`, Luau types, script locations, `RunContext`, and the client-server data model. The layer every other skill assumes.",
     covers: [
       "Every important service via `game:GetService`, Luau data types and serialization rules.",
       "Script locations and execution contexts, including modern `BaseScript.RunContext`.",
@@ -55,10 +55,10 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "Remotes, server authority, network ownership, exploit defenses, capabilities",
     displayTitle: "Roblox networking: remotes, server authority, security",
     overview:
-      "Complete coverage of the Roblox client-server model: RemoteEvent and RemoteFunction versus Bindable equivalents, RunService execution contexts, network ownership of assemblies, and server authority as the foundation for secure experiences. Includes common exploit vectors and the defensive patterns that stop them — validation, rate limiting, source-of-truth tables, and capability-based access control.",
+      "Remotes, network ownership, and server authority. Validation, rate limiting, and capability patterns that stop common exploits.",
     covers: [
       "RemoteEvent/RemoteFunction vs Bindable equivalents, and RunService execution contexts.",
-      "Server authority as the foundation — validation and rate-limiting on every request.",
+      "Server authority as the foundation: validation and rate-limiting on every request.",
       "Common exploit vectors and capability-based access control.",
     ],
     sources: [
@@ -73,11 +73,11 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "DataStores, versioning, metadata, quotas, throttling, safe save/load patterns",
     displayTitle: "Roblox DataStores: safe saves, versioning, quotas",
     overview:
-      "Production-grade expertise on every Roblox DataStore type — DataStore, OrderedDataStore, MemoryStore Service — their differences, scopes, and operations. Covers `UpdateAsync` with a pure transform for contended values, hourly versioning for recovery, every error code and quota, throttling strategy, and the save/load patterns that avoid data loss, races, and throttling walls. Always combine with roblox-networking for validation.",
+      "DataStore, OrderedDataStore, and MemoryStore: `UpdateAsync`, versioning, quotas, and save patterns that avoid data loss. Pair with roblox-networking.",
     covers: [
       "DataStore vs OrderedDataStore vs MemoryStore Service decision tree.",
       "`UpdateAsync` with a pure transform for contended values; hourly versioning for recovery.",
-      "Every error code, quota, and throttling strategy — patterns that avoid data loss.",
+      "Every error code, quota, and throttling strategy, with patterns that avoid data loss.",
     ],
     sources: [
       { label: "Data stores", url: "https://create.roblox.com/docs/cloud-services/data-stores" },
@@ -93,11 +93,11 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "GUI containers, responsive layouts, interaction, particles-in-UI techniques",
     displayTitle: "Roblox UI: containers, responsive layouts, interaction",
     overview:
-      "An exhaustive, modern guide to every Roblox GUI container — ScreenGui, SurfaceGui, BillboardGui — and every building block from Frame and TextLabel to ScrollingFrame and ViewportFrame. Covers scale + offset responsive layouts that survive every screen size, the interaction model (Activated versus mouse events, drag detectors), and particles-in-UI techniques, including the truth that 3D ParticleEmitters do not render inside ViewportFrame.",
+      "ScreenGui, SurfaceGui, BillboardGui, and building blocks. Scale+offset layouts, Activated vs mouse events, and particles-in-UI limits.",
     covers: [
       "Every GUI container (ScreenGui, SurfaceGui, BillboardGui) and building block.",
       "Scale + offset responsive layouts that survive every screen size.",
-      "Particles-in-UI techniques — and the truth that 3D ParticleEmitters don't render in ViewportFrame.",
+      "Particles-in-UI techniques, and the truth that 3D ParticleEmitters don't render in ViewportFrame.",
     ],
     sources: [
       { label: "In-experience containers", url: "https://create.roblox.com/docs/en-us/ui/in-experience-containers" },
@@ -111,7 +111,7 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "`Animator`, tracks, IK, `TweenService`, UI tweens, animation markers",
     displayTitle: "Roblox animation: Animator, IK, TweenService, markers",
     overview:
-      "Production-oriented coverage of Roblox's two motion systems: 3D character animation with `Animator`, `AnimationTrack`, `KeyframeSequence`, priorities, markers, and `IKControl` for procedural posing; and `TweenService` for UI and 3D property interpolation, sequences, chaining, and typewriter effects. Corrects the deprecated `Humanoid:LoadAnimation` pattern and covers the Animation Editor workflow, exporting, and performance tradeoffs.",
+      "`Animator` / `AnimationTrack` / `IKControl` for characters; `TweenService` for UI and 3D. Replaces deprecated `Humanoid:LoadAnimation`.",
     covers: [
       "Animator-based loading with proper track lifecycle and marker-driven gameplay.",
       "`IKControl` for procedural posing; CurveAnimation vs KeyframeSequence.",
@@ -130,10 +130,10 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "`ParticleEmitter`, shapes, flipbooks, beams, trails, highlights, performance",
     displayTitle: "Roblox VFX: ParticleEmitter, Beam, Trail, performance",
     overview:
-      "A deep dive into Roblox visual effects: `ParticleEmitter` properties, sequences, shapes, and flipbooks, plus `Beam`, `Trail`, and `Highlight`. Covers one-shot versus continuous emission, LOD-aware patterns that degrade gracefully on low-end devices, and the performance discipline that separates effects that look good from ones that tank FPS. Surface-level `add a ParticleEmitter and tweak Rate` is not enough.",
+      "`ParticleEmitter`, `Beam`, `Trail`, `Highlight` - emission patterns, flipbooks, and LOD so effects don't tank FPS.",
     covers: [
       "ParticleEmitter properties, sequences, shapes, and flipbooks.",
-      "Beam, Trail, Highlight — and one-shot vs continuous emission.",
+      "Beam, Trail, Highlight, plus one-shot vs continuous emission.",
       "Performance: LOD-aware patterns that degrade gracefully on low-end devices.",
     ],
     sources: [
@@ -147,10 +147,10 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "Modern audio graph (`AudioPlayer`/`AudioEmitter`/`Wire`/TTS/STT), legacy `Sound`, 3D audio, effects, performance",
     displayTitle: "Roblox audio: modern graph, legacy Sound, 3D, effects",
     overview:
-      "Complete coverage of Roblox audio: the modern modular audio graph (`AudioPlayer`, `AudioEmitter`, `AudioListener`, `Wire`, `AudioTextToSpeech`, `AudioSpeechToText`) and the legacy `Sound`/`SoundGroup`/`SoundEffect` system it replaces. Covers 2D versus 3D audio, spatial attenuation, effect chains, the 2022 audio privacy changes, mobile performance caps, preloading, and script-context rules. Use whenever implementing any sound, music, or voice feedback.",
+      "Modern audio graph (`AudioPlayer`, `AudioEmitter`, `Wire`, TTS/STT) vs legacy `Sound`. 2D/3D, effects, and mobile caps.",
     covers: [
       "The modern modular audio graph: AudioPlayer, AudioEmitter, Wire, TTS, STT.",
-      "Legacy Sound/SoundGroup — discouraged for new work — and when to still use it.",
+      "Legacy Sound/SoundGroup: discouraged for new work, and when to still use it.",
       "2D vs 3D audio, effect chains, and mobile performance caps.",
     ],
     sources: [
@@ -166,7 +166,7 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "Game passes, dev products, subscriptions, purchase flow, policy, Robux transfers, analytics",
     displayTitle: "Roblox monetization: game passes, products, subscriptions",
     overview:
-      "A rule-accurate, production implementation guide for Roblox monetization: game passes (one-time Robux purchases), developer products (repeatable via `ProcessReceipt`), and subscriptions (auto-renewing via `UserSubscriptionStatusChanged`). Covers server-authoritative granting with idempotency guards, `PlayerAdded` re-verification, and current policy — cross-experience sales disabled as of May 30 2026, and Creator Rewards replaced Premium Payouts as of July 24 2025.",
+      "Game passes, developer products (`ProcessReceipt`), and subscriptions - server-side grants, idempotency, and current policy dates.",
     covers: [
       "Game passes, developer products (`ProcessReceipt`), and subscriptions.",
       "Server-authoritative granting with idempotency guards and `PlayerAdded` re-verification.",
@@ -184,9 +184,9 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "Open Cloud REST APIs: API keys/OAuth2, data stores, assets, universes, webhooks, in-experience calling",
     displayTitle: "Roblox Open Cloud: REST APIs, keys, in-experience calls",
     overview:
-      "Complete coverage of Roblox Open Cloud — the REST API surface for data stores, assets, universes, places, users, groups, subscriptions, notifications, bans, and Luau execution, accessed from outside the engine or in-experience via `HttpService`. Covers authentication (API keys, OAuth 2.0, the 60-day key auto-expiry rule), least-privilege scopes, IP allowlists, the Secrets Store for in-experience key storage, webhooks, and the decision tree for in-engine versus Open Cloud.",
+      "Open Cloud REST APIs for data stores, assets, universes, and more. Keys, OAuth2, scopes, Secrets Store, and in-experience `HttpService`.",
     covers: [
-      "REST APIs for data stores, assets, universes, and more — from outside the engine or in-experience via HttpService.",
+      "REST APIs for data stores, assets, universes, and more, from outside the engine or in-experience via HttpService.",
       "API keys, OAuth2, least-privilege scopes, and the 60-day key auto-expiry rule.",
       "Secrets Store + `HttpService:GetSecret` so keys never sit in scripts.",
     ],
@@ -205,7 +205,7 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "`TeleportAsync`, `TeleportOptions`, reserved servers, multi-place, matchmaking, DataStore handoff",
     displayTitle: "Roblox TeleportService: TeleportAsync, reserved servers",
     overview:
-      "Complete coverage of `TeleportService`, multi-place architecture, reserved servers, and matchmaking. Covers the unified `TeleportAsync` API that replaces the deprecated `Teleport`/`TeleportPartyAsync`/`TeleportToPlaceInstance` methods, `TeleportOptions` for reserved servers, `TeleportAsyncResult` error handling, the 50-player group teleport limit, DataStore handoff patterns across teleports, and the security caveat that teleport data is client-spoofable.",
+      "`TeleportAsync` (replaces legacy teleport methods), reserved servers, multi-place handoff, and spoofable teleport-data caveats.",
     covers: [
       "The unified `TeleportAsync` API that replaces the deprecated teleport methods.",
       "`TeleportOptions`, reserved servers, and `TeleportAsyncResult` error handling.",
@@ -219,12 +219,32 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     ],
   },
   {
+    slug: "roblox-rojo",
+    title: "roblox-rojo",
+    oneLiner: "Rojo 7: CLI/plugin, project format, live sync, build/upload, sourcemap, syncback",
+    displayTitle: "Rojo: filesystem projects, live sync, build",
+    overview:
+      "Rojo 7 project workflows: install CLI/plugin, `.project.json`, live sync, build/upload, sourcemaps, and `syncback` for place→files.",
+    covers: [
+      "Install CLI + Studio plugin (Rokit, GitHub, cargo) and connect with `rojo serve`.",
+      "Project format, file→instance mapping (`.server.luau` / `.client.luau` / modules), meta files.",
+      "`rojo build` / `upload` / `sourcemap` / `syncback`; live-sync limits and two-way caveats.",
+    ],
+    sources: [
+      { label: "Rojo docs (v7)", url: "https://rojo.space/docs/v7/" },
+      { label: "Installation", url: "https://rojo.space/docs/v7/getting-started/installation/" },
+      { label: "Project format", url: "https://rojo.space/docs/v7/project-format/" },
+      { label: "Sync details", url: "https://rojo.space/docs/v7/sync-details/" },
+      { label: "Rojo releases", url: "https://github.com/rojo-rbx/rojo/releases" },
+    ],
+  },
+  {
     slug: "roblox-mcp",
     title: "roblox-mcp",
     oneLiner: "Connect AI agents to Roblox Studio via MCP: setup, tools, Script Sync, playtesting",
     displayTitle: "Roblox Studio MCP: connect AI agents to Studio",
     overview:
-      "How to set up and use the official Roblox Studio MCP (Model Context Protocol) server so an AI agent can read and write scripts, explore the data model, execute Luau, run playtests, capture the viewport, and control Studio directly. Covers prerequisites, enabling Studio as an MCP server, quick-connect versus JSON/CLI configuration for Cursor, VS Code, Claude, and Codex, every available MCP tool, and combining MCP with Script Sync for a file-based workflow.",
+      "Official Studio MCP server: read/write scripts, run Luau, playtest, capture viewport. Setup for Cursor, VS Code, Claude, Codex + Script Sync.",
     covers: [
       "Connect AI agents to Roblox Studio via the official MCP server.",
       "Read and write scripts, explore the data model, run Luau, and capture the viewport.",
@@ -242,10 +262,10 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "Rigid bodies, assemblies, mechanical/mover constraints, network ownership, vehicles",
     displayTitle: "Roblox physics: assemblies, constraints, network ownership",
     overview:
-      "Complete coverage of Roblox rigid-body physics for vehicles, mechanisms, doors, platforms, and dynamic objects. Covers assemblies, root parts, anchoring, `WeldConstraint` versus `RigidConstraint`, mechanical constraints (hinge, spring, prismatic, rope), mover constraints (`AlignPosition`, `LinearVelocity`, `VectorForce`) as the modern replacements for deprecated `BodyMover` objects, network ownership for vehicles, the sleep system, and adaptive timestepping.",
+      "Assemblies, welds, mechanical/mover constraints (replacing BodyMovers), network ownership for vehicles, and sleep/timestepping.",
     covers: [
       "Assemblies, root parts, anchoring, and WeldConstraint vs RigidConstraint.",
-      "Mechanical and mover constraints — and the modern replacements for deprecated BodyMovers.",
+      "Mechanical and mover constraints, the modern replacements for deprecated BodyMovers.",
       "Network ownership for vehicles, the sleep system, and adaptive timestepping.",
     ],
     sources: [
@@ -262,7 +282,7 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "PathfindingService, modifiers/links, waypoint following, patrol/chase AI patterns",
     displayTitle: "Roblox NPCs: PathfindingService, AI patterns, patrol",
     overview:
-      "Complete coverage of Roblox pathfinding and NPC AI: `PathfindingService`, agent parameters (radius, height, jump, climb), waypoint actions, blocked-path handling, `PathfindingModifier` and `PathfindingLink`, material and region costs, and streaming compatibility. Plus the NPC design patterns that scale — state machines, behavior trees, and simple follow, patrol, and chase — and the performance considerations for AI at scale.",
+      "`PathfindingService`, modifiers/links, and NPC patterns (state machines, patrol/chase) that scale.",
     covers: [
       "PathfindingService, agent parameters, and blocked-path handling.",
       "PathfindingModifier and PathfindingLink, with material and region costs.",
@@ -280,7 +300,7 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
     oneLiner: "Developer Console, MicroProfiler, Scene Analysis, tests, logging, common bug fixes",
     displayTitle: "Roblox testing: Developer Console, MicroProfiler, TestEZ",
     overview:
-      "Practical guidance for testing, debugging, and profiling Roblox experiences. Covers the Developer Console and Output discipline, `pcall` and assertion patterns, TestEZ unit tests, the MicroProfiler (client and server), Scene Analysis, the Script Profiler, memory diagnostics, and a methodology for isolating issues. Use when something is broken, slow, or unreliable, or when setting up automated and manual test workflows.",
+      "Developer Console, MicroProfiler, Scene Analysis, TestEZ, and a method for isolating bugs and perf issues.",
     covers: [
       "Developer Console, Output discipline, and pcall/assert patterns.",
       "MicroProfiler, Scene Analysis, and the Script Profiler.",
@@ -296,8 +316,8 @@ const SKILLS_RAW: Omit<Skill, "lastReviewed">[] = [
 ];
 
 // Fallback freshness date if a SKILL.md frontmatter can't be read.
-// This should never be the active value in a normal build — every skill
-// ships a `last_reviewed` frontmatter field — but it keeps the build
+// This should never be the active value in a normal build - every skill
+// ships a `last_reviewed` frontmatter field - but it keeps the build
 // type-safe and gives a sane default if a SKILL.md is unreadable.
 const FALLBACK_LAST_REVIEWED = "2026-06-17";
 
@@ -327,10 +347,13 @@ export const skills: Skill[] = SKILLS_RAW.map((s) => ({
   lastReviewed: FALLBACK_LAST_REVIEWED,
 }));
 
+/** Catalog size - always derived from skills-meta, never hardcode in UI. */
+export const skillCount = skills.length;
+
 // Synchronous map keyed by slug (uses the fallback date).
 export const skillsBySlug = new Map(skills.map((s) => [s.slug, s]));
 
-// Async map keyed by slug — the version pages should use to get real
+// Async map keyed by slug - the version pages should use to get real
 // per-skill freshness dates from SKILL.md frontmatter.
 let bySlugPromise: Promise<Map<string, Skill>> | null = null;
 export async function loadSkillsBySlug(): Promise<Map<string, Skill>> {
