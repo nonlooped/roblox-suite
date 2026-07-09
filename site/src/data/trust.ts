@@ -27,7 +27,7 @@ export const freshness = {
       text: "Engagement-Based Payouts (Premium Payouts) were discontinued and replaced by Creator Rewards.",
     },
   ],
-  // From .github/workflows/validate.yml — accuracy is enforced, not asserted.
+  // From .github/workflows/validate.yml - accuracy is enforced, not asserted.
   ciChecks: [
     "lychee link-checks every Markdown file so broken docs links fail the build",
     "ajv validates skills.sh.json against the official skills.sh schema",

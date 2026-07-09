@@ -78,7 +78,7 @@ export async function getSkillFrontmatter(slug: string): Promise<SkillFrontmatte
     const src = await readFile(path, "utf-8");
     fm = parseFrontmatter(src);
   } catch {
-    // SKILL.md unreadable or missing — leave defaults empty.
+    // SKILL.md unreadable or missing - leave defaults empty.
   }
   cache.set(slug, fm);
   return fm;
@@ -100,7 +100,7 @@ async function getSkillLastReviewed(slug: string): Promise<string | undefined> {
       if (e.isFile() && /\.md$/i.test(e.name)) candidates.push(join(refsDir, e.name));
     }
   } catch {
-    // No references/ dir — fine, just check SKILL.md.
+    // No references/ dir - fine, just check SKILL.md.
   }
   for (const path of candidates) {
     try {
@@ -109,7 +109,7 @@ async function getSkillLastReviewed(slug: string): Promise<string | undefined> {
       const d = fm.last_reviewed;
       if (d && (!latest || d > latest)) latest = d;
     } catch {
-      // File unreadable — skip.
+      // File unreadable - skip.
     }
   }
   return latest;
