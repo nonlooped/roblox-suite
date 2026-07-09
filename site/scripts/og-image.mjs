@@ -4,9 +4,23 @@
 import sharp from 'sharp';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { readFileSync, readdirSync } from 'node:fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT = join(__dirname, '..', 'public', 'og.png');
+const REPO_ROOT = join(__dirname, '..', '..');
+
+// Count skill dirs (each has SKILL.md) so OG copy stays in sync with the suite.
+const skillCount = readdirSync(REPO_ROOT, { withFileTypes: true })
+  .filter((d) => d.isDirectory() && d.name.startsWith('roblox'))
+  .filter((d) => {
+    try {
+      readFileSync(join(REPO_ROOT, d.name, 'SKILL.md'));
+      return true;
+    } catch {
+      return false;
+    }
+  }).length;
 
 // Brand palette (kept in sync with the site's CSS tokens).
 const BG = '#0a0a0a';
@@ -68,7 +82,7 @@ const svg = `
 
   <!-- Lede -->
   <text x="80" y="410" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="400" fill="${INK_SOFT}">
-    <tspan x="80" y="410">Fifteen skills. Each one tells your agent which Roblox APIs are current,</tspan>
+    <tspan x="80" y="410">${skillCount} skills. Each one tells your agent which Roblox APIs are current,</tspan>
     <tspan x="80" y="448">which are deprecated, and where the official docs say so.</tspan>
   </text>
 

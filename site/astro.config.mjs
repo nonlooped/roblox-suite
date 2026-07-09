@@ -11,7 +11,7 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      // Filter out the 404 — it shouldn't be indexed as a real page.
+      // Filter out the 404 - it shouldn't be indexed as a real page.
       filter: (page) => !page.includes('/404'),
       // Lastmod per-page from build time; changefreq + priority per route type.
       changefreq: 'weekly',

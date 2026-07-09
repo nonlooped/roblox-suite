@@ -1,4 +1,4 @@
-# Roblox Suite — https://nonlooped.github.io/roblox-suite/
+# Roblox Suite - https://nonlooped.github.io/roblox-suite/
 User-agent: *
 Allow: /
 
