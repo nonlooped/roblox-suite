@@ -1,10 +1,10 @@
 ---
 import Base from "../layouts/Base.astro";
 import Hero from "../components/Hero.astro";
-import HowItWorks from "../components/HowItWorks.astro";
 import DomainsTeaser from "../components/DomainsTeaser.astro";
 import InstallCTA from "../components/InstallCTA.astro";
 import { repoUrl, skillsShUrl } from "../data/trust";
+import { skillCount } from "../data/skills-meta";
 
 const base = import.meta.env.BASE_URL;
 const siteOrigin = (Astro.site ?? "https://nonlooped.github.io").toString().replace(/\/$/, "");
@@ -17,8 +17,7 @@ const appSchema = {
   name: "Roblox Suite",
   applicationCategory: "DeveloperApplication",
   operatingSystem: "Any (cross-platform via skills.sh CLI)",
-  description:
-    "Fifteen battle-tested Roblox Luau skills for AI agents. Every API recommendation is cited to the official Engine API Reference, not pulled from stale memory.",
+  description: `${skillCount} Roblox Luau skills for AI agents. Every API recommendation is cited to the official Engine API Reference.`,
   url: `${siteOrigin}${base}`.replace(/\/+$/, "/"),
   downloadUrl: repoUrl,
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -32,7 +31,7 @@ const appSchema = {
     sameAs: [repoUrl, skillsShUrl],
   },
   featureList: [
-    "Fifteen curated Roblox Luau skills",
+    `${skillCount} curated Roblox Luau skills`,
     "Every API recommendation cited to the official Engine API Reference",
     "Deprecated-vs-current guidance per skill",
     "Installs via the skills.sh CLI as plain Markdown",
@@ -46,7 +45,6 @@ const appSchema = {
 >
   <script type="application/ld+json" is:inline set:html={JSON.stringify(appSchema)} />
   <Hero />
-  <HowItWorks />
   <DomainsTeaser />
   <InstallCTA />
 </Base>
