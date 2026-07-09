@@ -1,24 +1,27 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────────────────────
-   Roblox Suite — Tailwind v4 theme tokens
+   Roblox Suite - Tailwind v4 theme tokens
    "The Calibrated Signal": near-black + campari crimson.
    OKLCH throughout. One signal hue carries all the color personality.
    ───────────────────────────────────────────────────────────── */
 
 @theme {
-  /* Neutral ramp — pure dark, no hue tint */
+  /* Neutral ramp - pure dark, no hue tint */
   --color-bg: oklch(0.145 0 0);
   --color-surface: oklch(0.190 0 0);
   --color-surface-2: oklch(0.240 0 0);
   --color-ink: oklch(0.945 0.006 22);
   --color-ink-soft: oklch(0.820 0.006 22);
-  --color-muted: oklch(0.660 0.006 22);
+  /* muted is the quiet tier for labels, slugs, counts and hairline-adjacent
+     text. Held at 0.70 so even 10px mono slugs on the surface-2 hover ground
+     clear WCAG AA (≈6.6:1). Genuine paragraph copy uses ink-soft, not muted. */
+  --color-muted: oklch(0.700 0.006 22);
 
   --color-border: oklch(0.945 0.006 22 / 0.12);
   --color-border-strong: oklch(0.945 0.006 22 / 0.24);
 
-  /* The one signal — campari crimson, hue ~22° */
+  /* The one signal - campari crimson, hue ~22° */
   --color-crimson: oklch(0.53 0.19 22);
   --color-crimson-hover: oklch(0.46 0.17 22);
   --color-crimson-tint: oklch(0.53 0.19 22 / 0.14);
@@ -149,7 +152,7 @@
 /* ── Reveal animation JS-gate ──
    Initial hidden state is applied ONLY when <html class="js"> is present
    (set by the inline head script in Base.astro). No-JS users and
-   reduced-motion users see content immediately — LCP/CLS-safe.
+   reduced-motion users see content immediately - LCP/CLS-safe.
    The Motion script in Base.astro animates [data-reveal] into view and
    adds .is-visible, which restores opacity for any element that never
    triggered (defensive). */

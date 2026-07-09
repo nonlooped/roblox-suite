@@ -5,6 +5,7 @@ import "@fontsource/spline-sans-mono/latin-500.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { repoUrl, skillsShUrl, freshness } from "../data/trust";
+import { skillCount } from "../data/skills-meta";
 
 interface Props {
   title?: string;
@@ -34,9 +35,9 @@ const fullTitle = title
   : `Roblox Luau skills for AI agents · ${siteName}`;
 const desc =
   description ??
-  "Fifteen battle-tested Roblox Luau skills for AI agents. Every API recommendation is cited to the official Engine API Reference, not pulled from stale memory.";
+  `${skillCount} Roblox Luau skills for AI agents. Every API recommendation is cited to the official Engine API Reference.`;
 
-// Canonical — strip trailing index/default.html noise, normalize trailing slash.
+// Canonical - strip trailing index/default.html noise, normalize trailing slash.
 const canonical = new URL(Astro.url.pathname, siteOrigin).toString();
 
 // OG image: page can override, otherwise the branded default.
@@ -65,7 +66,7 @@ const robotsContent = noindex
   ? "noindex, nofollow"
   : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 
-// JSON-LD: WebSite schema on every page. No SearchAction — the site has no
+// JSON-LD: WebSite schema on every page. No SearchAction - the site has no
 // working ?q= search, and a non-functional SearchAction target is a known
 // trigger for Google's "spammy structured data" manual actions. Google
 // deprecated the sitelinks search box entirely in 2025.
@@ -96,7 +97,7 @@ const websiteSchema = {
     {/* JS-gate: mark <html> as JS-enabled before first paint so CSS can
         scope the pre-animation hidden state to JS-capable clients only.
         No-JS users see content immediately (LCP/CLS-safe). Reduced-motion
-        users also get visible content — the inline script sets the class
+        users also get visible content - the inline script sets the class
         but the Motion code short-circuits to is-visible. */}
     <script is:inline>
       (function () {
@@ -115,7 +116,7 @@ const websiteSchema = {
 
     <meta name="generator" content={Astro.generator} />
 
-    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="theme-color" content="#1a1a1a" />
     <meta name="color-scheme" content="dark" />
     <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={`${base}favicon.svg`} />
@@ -133,7 +134,7 @@ const websiteSchema = {
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImageUrl} />
     <meta property="og:image:secure_url" content={ogImageUrl} />
-    <meta property="og:image:alt" content={`${siteName} — ${fullTitle}`} />
+    <meta property="og:image:alt" content={`${siteName} · ${fullTitle}`} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="en_US" />
@@ -144,14 +145,14 @@ const websiteSchema = {
     {article && <meta property="article:modified_time" content={freshness.lastReviewed} />}
     {article && tags && tags.map((t) => <meta property="article:tag" content={t} />)}
 
-    {/* Twitter — large image summary card for richer shares */}
+    {/* Twitter - large image summary card for richer shares */}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content={twitterHandle} />
     <meta name="twitter:creator" content={twitterHandle} />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={desc} />
     <meta name="twitter:image" content={ogImageUrl} />
-    <meta name="twitter:image:alt" content={`${siteName} — ${fullTitle}`} />
+    <meta name="twitter:image:alt" content={`${siteName} · ${fullTitle}`} />
 
     {/* JSON-LD: WebSite on every page */}
     <script type="application/ld+json" is:inline set:html={JSON.stringify(websiteSchema)} />
@@ -171,7 +172,7 @@ const websiteSchema = {
 
     <script>
       // Scroll-reveal: native IntersectionObserver + Web Animations API.
-      // No Motion library — drops the JS bundle from ~63KB to ~1KB inline.
+      // No Motion library - drops the JS bundle from ~63KB to ~1KB inline.
       // The initial hidden state is owned by CSS (`.js [data-reveal]`),
       // gated on <html class="js"> which the inline head script sets only
       // when JS is available AND reduced-motion is not requested. This
@@ -210,7 +211,7 @@ const websiteSchema = {
               { opacity: 0, transform: "translateY(14px)" },
               { opacity: 1, transform: "none" },
             ],
-            { duration: DURATION, delay: 60 * i, easing: ease, fill: "forwards" }
+            { duration: DURATION, delay: 60 * i, easing: ease, fill: "both" }
           );
         });
         el.classList.add("is-visible");
@@ -238,7 +239,10 @@ const websiteSchema = {
           .forEach((el) => io.observe(el));
       }
 
-      // Delegated copy handler for [data-copy] buttons.
+      // Delegated copy handler for [data-copy] buttons. Uses the async
+      // Clipboard API when available; falls back to execCommand on a temp
+      // selection for insecure/old contexts; surfaces failure honestly
+      // instead of flashing "Copied" when nothing was copied.
       document.addEventListener("click", (e) => {
         const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-copy]");
         if (!btn) return;
@@ -248,7 +252,7 @@ const websiteSchema = {
         if (!text) return;
         const label = btn.querySelector<HTMLElement>("[data-copy-label]");
         const orig = label && btn.dataset.copyLabel ? btn.dataset.copyLabel : label?.textContent;
-        const after = () => {
+        const succeed = () => {
           if (label) label.textContent = "Copied";
           btn.classList.add("is-copied");
           window.setTimeout(() => {
@@ -256,9 +260,31 @@ const websiteSchema = {
             if (label && orig) label.textContent = orig;
           }, 1600);
         };
+        const fail = () => {
+          if (label) label.textContent = "Copy failed - select & \u2318C";
+          window.setTimeout(() => {
+            if (label && orig) label.textContent = orig;
+          }, 2600);
+        };
         const w = navigator.clipboard?.writeText?.bind(navigator.clipboard);
-        if (w) w(text).then(after, after);
-        else after();
+        if (w) {
+          w(text).then(succeed, fail);
+        } else {
+          // execCommand fallback for non-secure contexts (http) / old browsers.
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed";
+          ta.style.top = "0";
+          ta.style.left = "0";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          let ok = false;
+          try { ok = document.execCommand("copy"); } catch { ok = false; }
+          document.body.removeChild(ta);
+          if (ok) succeed(); else fail();
+        }
       });
     </script>
   </body>
