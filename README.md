@@ -2,7 +2,7 @@
 
 ### Stop shipping outdated Luau. Start shipping production-grade code.
 
-An opinionated set of fifteen battle-tested skills for AI agents writing Roblox Luau. Each skill tells your agent which Roblox APIs are current, which are deprecated, and where the official docs say so — accountable to the [Roblox Engine API Reference](https://create.roblox.com/docs/reference/engine), not to stale memory.
+An opinionated set of battle-tested skills for AI agents writing Roblox Luau. Each skill tells your agent which Roblox APIs are current, which are deprecated, and where the official docs say so — accountable to the [Roblox Engine API Reference](https://create.roblox.com/docs/reference/engine), not to stale memory.
 
 [![installs](https://shieldcn.dev/skills/installs/nonlooped/roblox-suite/roblox.svg?variant=branded)](https://www.skills.sh/nonlooped/roblox-suite/roblox)
 [![Luau](https://shieldcn.dev/badge/Luau-Official-00A2FF.svg?logo=luau&variant=branded)](https://create.roblox.com/docs/luau)
@@ -19,7 +19,7 @@ An opinionated set of fifteen battle-tested skills for AI agents writing Roblox 
 npx skills add nonlooped/roblox-suite
 ```
 
-That drops all fifteen skills into your agent. Start with [`roblox/SKILL.md`](roblox/SKILL.md) — it's the hub that routes you to the right specialist. For a single skill, add `--skill <name>`:
+That drops every skill in the suite into your agent. Start with [`roblox/SKILL.md`](roblox/SKILL.md) — it's the hub that routes you to the right specialist. For a single skill, add `--skill <name>`:
 
 ```sh
 npx skills add nonlooped/roblox-suite --skill roblox-datastores
