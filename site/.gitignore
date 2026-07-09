@@ -4,5 +4,3 @@ dist/
 .astro/
 # dependencies
 node_modules/
-# impeccable audit artifacts
-.impeccable/
