@@ -48,8 +48,9 @@
     },
     {
       "title": "Agent Workflows",
-      "description": "Skills for connecting AI agents directly to Roblox Studio.",
+      "description": "Skills for filesystem workflows (Rojo) and connecting AI agents directly to Roblox Studio.",
       "skills": [
+        "roblox-rojo",
         "roblox-mcp"
       ]
     }

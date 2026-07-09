@@ -1,6 +1,6 @@
 ---
 name: roblox
-description: Roblox Luau development hub that routes agents to the right specialist skill and keeps every API recommendation cited to the official Engine Reference. Covers server-authority architecture, modern API selection (Animator, task.*, TweenService, IKControl), and progressive disclosure into 14 deep skills spanning datastores, networking, UI, animation, VFX, audio, physics, NPCs, monetization, Open Cloud, teleportation, testing, and Studio MCP. Use as the entry point for any Roblox task before loading a specialized skill.
+description: Roblox Luau development hub that routes agents to the right specialist skill and keeps every API recommendation cited to the official Engine Reference. Covers server-authority architecture, modern API selection (Animator, task.*, TweenService, IKControl), and progressive disclosure into deep skills spanning datastores, networking, UI, animation, VFX, audio, physics, NPCs, monetization, Open Cloud, teleportation, testing, Rojo, and Studio MCP. Use as the entry point for any Roblox task before loading a specialized skill.
 ---
 
 # roblox
@@ -46,6 +46,9 @@ Load the full specialized SKILL.md when the task narrows. Then follow its "Read 
 
 - **Roblox Studio MCP server (connect AI agents to Studio via MCP, Script Sync, tool reference, security/troubleshooting):** [roblox-mcp/SKILL.md](../roblox-mcp/SKILL.md)  
   Its references/ cover [setup-and-connection.md](../roblox-mcp/references/setup-and-connection.md), [tool-reference.md](../roblox-mcp/references/tool-reference.md), [script-sync-integration.md](../roblox-mcp/references/script-sync-integration.md), [security-and-troubleshooting.md](../roblox-mcp/references/security-and-troubleshooting.md). Diagnostic scripts are in [scripts/MCPReadyChecker.lua](../roblox-mcp/scripts/MCPReadyChecker.lua) and [scripts/StudioModelProbe.lua](../roblox-mcp/scripts/StudioModelProbe.lua).
+
+- **Rojo filesystem projects (CLI/plugin install, `.project.json`, live sync, build/upload, sourcemap, syncback, file→instance mapping):** [roblox-rojo/SKILL.md](../roblox-rojo/SKILL.md)  
+  Its references/ cover [installation-and-cli.md](../roblox-rojo/references/installation-and-cli.md), [project-format.md](../roblox-rojo/references/project-format.md), [sync-details.md](../roblox-rojo/references/sync-details.md), [workflows-and-syncback.md](../roblox-rojo/references/workflows-and-syncback.md).
 
 - **Physics and constraints (rigid bodies, assemblies, mechanical/mover constraints, network ownership, collisions, sleep system, adaptive timestepping, units, vehicles, mechanisms):** [roblox-physics/SKILL.md](../roblox-physics/SKILL.md)  
   Its references/ cover [mechanical-constraints.md](../roblox-physics/references/mechanical-constraints.md), [mover-constraints.md](../roblox-physics/references/mover-constraints.md), [network-ownership.md](../roblox-physics/references/network-ownership.md), [collisions-and-filtering.md](../roblox-physics/references/collisions-and-filtering.md), [units-and-physical-properties.md](../roblox-physics/references/units-and-physical-properties.md). Example scripts are in [scripts/VehicleController.lua](../roblox-physics/scripts/VehicleController.lua), [scripts/DoorHinge.lua](../roblox-physics/scripts/DoorHinge.lua), [scripts/PlatformMover.lua](../roblox-physics/scripts/PlatformMover.lua), and [scripts/Suspension.lua](../roblox-physics/scripts/Suspension.lua).
