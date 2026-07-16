@@ -1,0 +1,3 @@
+# Roblox's generated API names and legacy enum values include intentional spellings.
+[files]
+extend-exclude = ["types/globalTypes.None.d.luau"]

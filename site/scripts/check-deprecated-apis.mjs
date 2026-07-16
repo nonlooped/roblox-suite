@@ -12,7 +12,7 @@ const rules = [
   "BodyVelocity",
   "BodyGyro",
 ];
-const acknowledgement = /deprecat|legacy|avoid|replace|migration|do not use|older api/i;
+const acknowledgement = /deprecated?|deprecation|legacy|avoid|replace|migration|do not use|older api/i;
 const errors = [];
 
 async function markdownFiles(directory) {

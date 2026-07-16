@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.2 — 2026-07-16
+
+### CI
+
+- Excluded vendored Roblox API identifiers from spelling checks and replaced a partial-word deprecation regex that the spelling checker correctly rejected.
+
 ## 1.6.1 — 2026-07-16
 
 ### CI
