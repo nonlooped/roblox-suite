@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — correctness and verification release
+## 1.6.0 — 2026-07-16
 
 ### Corrected
 
@@ -22,4 +22,4 @@
 - Added pinned Luau formatting, lint, analysis, site checks, strict frontmatter/catalog validation, generated-route smoke tests, and source monitoring.
 - Added the authoritative catalog, per-file freshness coverage, evidence page, correction flow, policies, roadmap, and evaluation harness.
 
-This release should be published as a patch after required CI passes and owner-controlled repository settings are applied.
+This release establishes the first repository-wide correctness, verification, and evaluation baseline. Owner-controlled branch protection and repository settings remain separate from versioned files.
