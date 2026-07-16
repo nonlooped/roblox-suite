@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.1 — 2026-07-16
+
+### CI
+
+- Excluded the project's live GitHub Pages URLs from the external Markdown link check; generated-route and post-deployment smoke tests validate those URLs without racing the deployment job.
+
 ## 1.6.0 — 2026-07-16
 
 ### Corrected
