@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 --[[
     AudioBus.lua
     A small music/SFX bus helper using the modern audio graph.
@@ -28,20 +33,18 @@
 local TweenService = game:GetService("TweenService")
 local SoundService = game:GetService("SoundService")
 
-export type AudioBus = {
-    musicFader: AudioFader,
-    sfxFader: AudioFader,
-    output: AudioDeviceOutput,
-    musicVolume: number,
-    attachMusic: (self: AudioBus, player: AudioPlayer) -> (),
-    attachSfx: (self: AudioBus, player: AudioPlayer) -> (),
-    setMusicVolume: (self: AudioBus, volume: number, fadeTime: number?) -> (),
-    playSfxWithDuck: (self: AudioBus, player: AudioPlayer, duckTo: number?, duckDuration: number?) -> (),
-    destroy: (self: AudioBus) -> (),
-}
-
 local AudioBus = {}
 AudioBus.__index = AudioBus
+
+export type AudioBus = typeof(setmetatable(
+    {} :: {
+        musicFader: AudioFader,
+        sfxFader: AudioFader,
+        output: AudioDeviceOutput,
+        musicVolume: number,
+    },
+    AudioBus
+))
 
 local function makeFader(parent: Instance, name: string, volume: number): AudioFader
     local fader = Instance.new("AudioFader")
@@ -60,21 +63,23 @@ local function wire(source: Instance, target: Instance, parent: Instance): Wire
 end
 
 function AudioBus.new(): AudioBus
-    local self = setmetatable({}, AudioBus) :: AudioBus
+    local output = Instance.new("AudioDeviceOutput")
+    output.Name = "BusOutput"
+    output.Parent = SoundService
 
-    self.output = Instance.new("AudioDeviceOutput")
-    self.output.Name = "BusOutput"
-    self.output.Parent = SoundService
-
-    self.musicFader = makeFader(SoundService, "MusicFader", 1)
-    self.sfxFader = makeFader(SoundService, "SfxFader", 1)
+    local musicFader = makeFader(SoundService, "MusicFader", 1)
+    local sfxFader = makeFader(SoundService, "SfxFader", 1)
 
     -- Bus → output
-    wire(self.musicFader, self.output, SoundService)
-    wire(self.sfxFader, self.output, SoundService)
+    wire(musicFader, output, SoundService)
+    wire(sfxFader, output, SoundService)
 
-    self.musicVolume = 1
-    return self
+    return setmetatable({
+        output = output,
+        musicFader = musicFader,
+        sfxFader = sfxFader,
+        musicVolume = 1,
+    }, AudioBus) :: AudioBus
 end
 
 function AudioBus:attachMusic(player: AudioPlayer): ()
@@ -99,7 +104,7 @@ function AudioBus:setMusicVolume(volume: number, fadeTime: number?): ()
     tween:Play()
 end
 
-function AudioBus:playSfxWithDuck(player: AudioPlayer, duckTo: number?, duckDuration: number?). ()
+function AudioBus:playSfxWithDuck(player: AudioPlayer, duckTo: number?, duckDuration: number?): ()
     duckTo = duckTo or 0.3
     duckDuration = duckDuration or 1.5
     local original = self.musicVolume

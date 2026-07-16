@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 --[[
     NPCPathFollower.lua
     A strict, Humanoid-based path follower with cleanup.
@@ -14,83 +19,90 @@
 
 local PathfindingService = game:GetService("PathfindingService")
 
-export type PathWaypoint = {
-    Position: Vector3,
-    Action: Enum.PathWaypointAction,
-    Label: string,
-}
-
-export type NPCPathFollowerOptions = {
-    agentRadius: number?,
-    agentHeight: number?,
-    agentCanJump: boolean?,
-    agentCanClimb: boolean?,
-    waypointSpacing: number?,
-    costs: {[string]: number}?,
-    calculationSecondsTimeout: number?,
-    moveToTimeout: number?,
-    moveToRetryDelay: number?,
-    maxMoveFailures: number?,
-    customActionHandlers: {[string]: (humanoid: Humanoid, waypoint: PathWaypoint, follower: NPCPathFollower) -> ()}?,
-}
-
-export type NPCPathFollower = {
-    humanoid: Humanoid,
-    options: NPCPathFollowerOptions,
-    agentRadius: number,
-    agentHeight: number,
-    agentCanJump: boolean,
-    agentCanClimb: boolean,
-    waypointSpacing: number,
-    costs: {[string]: number},
-    calculationSecondsTimeout: number,
-    moveToTimeout: number,
-    moveToRetryDelay: number,
-    maxMoveFailures: number,
-    customActionHandlers: {[string]: (humanoid: Humanoid, waypoint: PathWaypoint, follower: NPCPathFollower) -> ()},
-
-    path: any,
-    waypoints: {PathWaypoint},
-    currentIndex: number,
-    blockedConnection: RBXScriptConnection?,
-    reachedConnection: RBXScriptConnection?,
-    diedConnection: RBXScriptConnection?,
-    moveToTimeoutThread: thread?,
-    recomputeThread: thread?,
-    running: boolean,
-    moveFailCount: number,
-}
-
 local NPCPathFollower = {}
 NPCPathFollower.__index = NPCPathFollower
 
+export type PathWaypoint = typeof(PathfindingService:CreatePath():GetWaypoints()[1])
+
+export type NPCPathFollowerOptions =
+    {
+        agentRadius: number?,
+        agentHeight: number?,
+        agentCanJump: boolean?,
+        agentCanClimb: boolean?,
+        waypointSpacing: number?,
+        costs: { [string]: number }?,
+        calculationSecondsTimeout: number?,
+        moveToTimeout: number?,
+        moveToRetryDelay: number?,
+        maxMoveFailures: number?,
+        customActionHandlers: {
+            [string]: (humanoid: Humanoid, waypoint: PathWaypoint, follower: NPCPathFollower) -> (),
+        }?,
+    }
+
+type NPCPathFollowerState =
+    {
+        humanoid: Humanoid,
+        options: NPCPathFollowerOptions,
+        agentRadius: number,
+        agentHeight: number,
+        agentCanJump: boolean,
+        agentCanClimb: boolean,
+        waypointSpacing: number,
+        costs: { [string]: number },
+        calculationSecondsTimeout: number,
+        moveToTimeout: number,
+        moveToRetryDelay: number,
+        maxMoveFailures: number,
+        customActionHandlers: {
+            [string]: (humanoid: Humanoid, waypoint: PathWaypoint, follower: NPCPathFollower) -> (),
+        },
+
+        path: Path?,
+        waypoints: { PathWaypoint },
+        currentIndex: number,
+        blockedConnection: RBXScriptConnection?,
+        reachedConnection: RBXScriptConnection?,
+        diedConnection: RBXScriptConnection?,
+        moveToTimeoutThread: thread?,
+        recomputeThread: thread?,
+        running: boolean,
+        moveFailCount: number,
+    }
+
+export type NPCPathFollower = typeof(setmetatable({} :: NPCPathFollowerState, NPCPathFollower))
+
 function NPCPathFollower.new(humanoid: Humanoid, options: NPCPathFollowerOptions?): NPCPathFollower
-    local self = setmetatable({}, NPCPathFollower) :: NPCPathFollower
-    self.humanoid = humanoid
-    self.options = options or {}
-
-    self.agentRadius = self.options.agentRadius or 2
-    self.agentHeight = self.options.agentHeight or 5
-    self.agentCanJump = self.options.agentCanJump ~= false
-    self.agentCanClimb = self.options.agentCanClimb or false
-    self.waypointSpacing = self.options.waypointSpacing or 4
-    self.costs = self.options.costs or {}
-    self.calculationSecondsTimeout = self.options.calculationSecondsTimeout or 1
-    self.moveToTimeout = self.options.moveToTimeout or 6
-    self.moveToRetryDelay = self.options.moveToRetryDelay or 0.2
-    self.maxMoveFailures = self.options.maxMoveFailures or 3
-    self.customActionHandlers = self.options.customActionHandlers or {}
-
-    self.path = nil
-    self.waypoints = {}
-    self.currentIndex = 1
-    self.blockedConnection = nil
-    self.reachedConnection = nil
-    self.diedConnection = nil
-    self.moveToTimeoutThread = nil
-    self.recomputeThread = nil
-    self.running = false
-    self.moveFailCount = 0
+    local resolvedOptions: NPCPathFollowerOptions = options or {}
+    local self = setmetatable(
+        {
+            humanoid = humanoid,
+            options = resolvedOptions,
+            agentRadius = resolvedOptions.agentRadius or 2,
+            agentHeight = resolvedOptions.agentHeight or 5,
+            agentCanJump = resolvedOptions.agentCanJump ~= false,
+            agentCanClimb = resolvedOptions.agentCanClimb or false,
+            waypointSpacing = resolvedOptions.waypointSpacing or 4,
+            costs = resolvedOptions.costs or {},
+            calculationSecondsTimeout = resolvedOptions.calculationSecondsTimeout or 1,
+            moveToTimeout = resolvedOptions.moveToTimeout or 6,
+            moveToRetryDelay = resolvedOptions.moveToRetryDelay or 0.2,
+            maxMoveFailures = resolvedOptions.maxMoveFailures or 3,
+            customActionHandlers = resolvedOptions.customActionHandlers or {},
+            path = nil :: Path?,
+            waypoints = {} :: { PathWaypoint },
+            currentIndex = 1,
+            blockedConnection = nil :: RBXScriptConnection?,
+            reachedConnection = nil :: RBXScriptConnection?,
+            diedConnection = nil :: RBXScriptConnection?,
+            moveToTimeoutThread = nil :: thread?,
+            recomputeThread = nil :: thread?,
+            running = false,
+            moveFailCount = 0,
+        } :: NPCPathFollowerState,
+        NPCPathFollower
+    )
 
     self.diedConnection = humanoid.Died:Connect(function()
         self:stop()
@@ -99,7 +111,7 @@ function NPCPathFollower.new(humanoid: Humanoid, options: NPCPathFollowerOptions
     return self
 end
 
-function NPCPathFollower:createPath(): any
+function NPCPathFollower.createPath(self: NPCPathFollower): Path
     local path = PathfindingService:CreatePath({
         AgentRadius = self.agentRadius,
         AgentHeight = self.agentHeight,
@@ -112,28 +124,28 @@ function NPCPathFollower:createPath(): any
     return path
 end
 
-function NPCPathFollower:_disconnectReached()
+function NPCPathFollower._disconnectReached(self: NPCPathFollower)
     if self.reachedConnection then
         self.reachedConnection:Disconnect()
         self.reachedConnection = nil
     end
 end
 
-function NPCPathFollower:_cancelMoveToTimeout()
+function NPCPathFollower._cancelMoveToTimeout(self: NPCPathFollower)
     if self.moveToTimeoutThread then
         task.cancel(self.moveToTimeoutThread)
         self.moveToTimeoutThread = nil
     end
 end
 
-function NPCPathFollower:_cancelRecompute()
+function NPCPathFollower._cancelRecompute(self: NPCPathFollower)
     if self.recomputeThread then
         task.cancel(self.recomputeThread)
         self.recomputeThread = nil
     end
 end
 
-function NPCPathFollower:_cleanupPathConnections()
+function NPCPathFollower._cleanupPathConnections(self: NPCPathFollower)
     self:_cancelRecompute()
     if self.blockedConnection then
         self.blockedConnection:Disconnect()
@@ -143,7 +155,7 @@ function NPCPathFollower:_cleanupPathConnections()
     self:_cancelMoveToTimeout()
 end
 
-function NPCPathFollower:follow(targetPosition: Vector3)
+function NPCPathFollower.follow(self: NPCPathFollower, targetPosition: Vector3)
     if self.humanoid.Health <= 0 then
         return
     end
@@ -154,14 +166,15 @@ function NPCPathFollower:follow(targetPosition: Vector3)
     self:computeAndMove(targetPosition)
 end
 
-function NPCPathFollower:computeAndMove(targetPosition: Vector3)
+function NPCPathFollower.computeAndMove(self: NPCPathFollower, targetPosition: Vector3)
     if not self.running or self.humanoid.Health <= 0 then
         self:stop()
         return
     end
 
     self:_cleanupPathConnections()
-    self.path = self:createPath()
+    local path = self:createPath()
+    self.path = path
 
     local character = self.humanoid.Parent
     if not character then
@@ -175,20 +188,20 @@ function NPCPathFollower:computeAndMove(targetPosition: Vector3)
     end
 
     local success, err = pcall(function()
-        self.path:ComputeAsync(rootPart.Position, targetPosition)
+        path:ComputeAsync(rootPart.Position, targetPosition)
     end)
 
-    if not success or self.path.Status ~= Enum.PathStatus.Success then
-        warn("NPCPathFollower failed:", err or self.path.Status)
+    if not success or path.Status ~= Enum.PathStatus.Success then
+        warn("NPCPathFollower failed:", err or path.Status)
         self:stop()
         return
     end
 
-    self.waypoints = self.path:GetWaypoints()
+    self.waypoints = path:GetWaypoints()
     self.currentIndex = 1
     self.moveFailCount = 0
 
-    self.blockedConnection = self.path.Blocked:Connect(function(blockedIndex: number)
+    self.blockedConnection = path.Blocked:Connect(function(blockedIndex: number)
         if not self.running or self.humanoid.Health <= 0 then
             return
         end
@@ -206,7 +219,7 @@ function NPCPathFollower:computeAndMove(targetPosition: Vector3)
     self:moveToNextWaypoint()
 end
 
-function NPCPathFollower:moveToNextWaypoint()
+function NPCPathFollower.moveToNextWaypoint(self: NPCPathFollower)
     if not self.running or self.humanoid.Health <= 0 then
         self:stop()
         return
@@ -231,8 +244,6 @@ function NPCPathFollower:moveToNextWaypoint()
 
     if waypoint.Action == Enum.PathWaypointAction.Jump then
         self.humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-    elseif waypoint.Action == Enum.PathWaypointAction.Climb then
-        -- Climbing truss parts is handled automatically by the Humanoid.
     end
 
     self.humanoid:MoveTo(waypoint.Position)
@@ -271,7 +282,7 @@ function NPCPathFollower:moveToNextWaypoint()
     end)
 end
 
-function NPCPathFollower:_onMoveToTimeout()
+function NPCPathFollower._onMoveToTimeout(self: NPCPathFollower)
     if not self.running or self.humanoid.Health <= 0 then
         self:stop()
         return
@@ -292,7 +303,7 @@ function NPCPathFollower:_onMoveToTimeout()
     end)
 end
 
-function NPCPathFollower:stop()
+function NPCPathFollower.stop(self: NPCPathFollower)
     self.running = false
     self:_cleanupPathConnections()
 
@@ -304,7 +315,7 @@ function NPCPathFollower:stop()
     end
 end
 
-function NPCPathFollower:Destroy()
+function NPCPathFollower.Destroy(self: NPCPathFollower)
     self:stop()
     if self.diedConnection then
         self.diedConnection:Disconnect()

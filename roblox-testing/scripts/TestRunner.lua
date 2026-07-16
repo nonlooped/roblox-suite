@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 --[[
     TestRunner.lua
     A minimal in-Studio test runner shim.
@@ -25,24 +30,67 @@ local TestService = game:GetService("TestService")
 local TestRunner = {}
 TestRunner.__index = TestRunner
 
-function TestRunner.new(options)
-    options = options or {}
-    local self = setmetatable({}, TestRunner)
+export type TestRunnerOptions = {
+    useTestService: boolean?,
+    timeout: number?,
+}
+
+type Hook = () -> ()
+type TestCase = {
+    name: string,
+    fn: () -> any,
+}
+type Suite = {
+    name: string,
+    tests: { TestCase },
+    suites: { Suite },
+    parent: Suite?,
+    beforeEach: { Hook },
+    afterEach: { Hook },
+}
+type TestResults = {
+    total: number,
+    passed: number,
+    failed: number,
+    errors: { string },
+}
+type PromiseLike = {
+    andThen: (
+        self: PromiseLike,
+        onResolve: (...any) -> (),
+        onReject: (any) -> ()
+    ) -> any,
+}
+
+export type TestRunner = typeof(setmetatable(
+    {} :: {
+        suites: { Suite },
+        stack: { Suite },
+        hooks: { beforeEach: { Hook }, afterEach: { Hook } },
+        useTestService: boolean,
+        timeout: number,
+    },
+    TestRunner
+))
+
+function TestRunner.new(options: TestRunnerOptions?): TestRunner
+    local resolvedOptions: TestRunnerOptions = options or {}
+    local self = setmetatable({}, TestRunner) :: TestRunner
     self.suites = {}
     self.stack = {}
     self.hooks = { beforeEach = {}, afterEach = {} }
-    self.useTestService = options.useTestService ~= false
-    self.timeout = options.timeout or 5
+    self.useTestService = resolvedOptions.useTestService ~= false
+    self.timeout = resolvedOptions.timeout or 5
     return self
 end
 
-function TestRunner:_currentSuite()
+function TestRunner._currentSuite(self: TestRunner): Suite?
     return self.stack[#self.stack]
 end
 
-function TestRunner:describe(name, fn)
+function TestRunner.describe(self: TestRunner, name: string, fn: () -> ())
     local parent = self:_currentSuite()
-    local suite = {
+    local suite: Suite = {
         name = name,
         tests = {},
         suites = {},
@@ -62,30 +110,30 @@ function TestRunner:describe(name, fn)
     table.remove(self.stack)
 end
 
-function TestRunner:beforeEach(fn)
+function TestRunner.beforeEach(self: TestRunner, fn: Hook)
     local suite = self:_currentSuite()
     assert(suite, "beforeEach() must be called inside describe()")
     table.insert(suite.beforeEach, fn)
 end
 
-function TestRunner:afterEach(fn)
+function TestRunner.afterEach(self: TestRunner, fn: Hook)
     local suite = self:_currentSuite()
     assert(suite, "afterEach() must be called inside describe()")
     table.insert(suite.afterEach, fn)
 end
 
-function TestRunner:it(name, fn)
+function TestRunner.it(self: TestRunner, name: string, fn: () -> any)
     local suite = self:_currentSuite()
     assert(suite, "it() must be called inside describe()")
     table.insert(suite.tests, { name = name, fn = fn })
 end
 
-local function deepEqual(a, b)
+local function deepEqual(a: any, b: any): (boolean, any?)
     if a == b then
-        return true
+        return true, nil
     end
     if typeof(a) ~= "table" or typeof(b) ~= "table" then
-        return false
+        return false, nil
     end
     for k, v in pairs(a) do
         if not deepEqual(v, b[k]) then
@@ -97,27 +145,33 @@ local function deepEqual(a, b)
             return false, k
         end
     end
-    return true
+    return true, nil
 end
 
-local function isPromiseLike(obj)
+local function isPromiseLike(obj: any): boolean
     return typeof(obj) == "table" and typeof(obj.andThen) == "function"
 end
 
-function TestRunner:expect(value)
+function TestRunner.expect(_self: TestRunner, value: any)
     local matchers = {}
 
-    function matchers.toBe(expected)
-        assert(value == expected, string.format("expected %s, got %s", tostring(expected), tostring(value)))
+    function matchers.toBe(expected: any)
+        assert(
+            value == expected,
+            string.format("expected %s, got %s", tostring(expected), tostring(value))
+        )
     end
 
-    function matchers.toEqual(expected)
+    function matchers.toEqual(expected: any)
         local ok, key = deepEqual(value, expected)
         if not ok then
             if key ~= nil then
                 assert(false, string.format("deep equality mismatch at key %s", tostring(key)))
             else
-                assert(false, string.format("expected %s, got %s", tostring(expected), tostring(value)))
+                assert(
+                    false,
+                    string.format("expected %s, got %s", tostring(expected), tostring(value))
+                )
             end
         end
     end
@@ -130,65 +184,97 @@ function TestRunner:expect(value)
         assert(value == nil, "expected nil")
     end
 
-    function matchers.toBeType(typeName)
-        assert(typeof(value) == typeName, string.format("expected type %s, got %s", typeName, typeof(value)))
+    function matchers.toBeType(typeName: string)
+        assert(
+            typeof(value) == typeName,
+            string.format("expected type %s, got %s", typeName, typeof(value))
+        )
     end
 
-    function matchers.toBeGreaterThan(threshold)
+    function matchers.toBeGreaterThan(threshold: number)
         assert(typeof(value) == "number", "value must be a number")
-        assert(value > threshold, string.format("expected value > %s, got %s", tostring(threshold), tostring(value)))
+        assert(
+            value > threshold,
+            string.format("expected value > %s, got %s", tostring(threshold), tostring(value))
+        )
     end
 
-    function matchers.toBeGreaterThanOrEqual(threshold)
+    function matchers.toBeGreaterThanOrEqual(threshold: number)
         assert(typeof(value) == "number", "value must be a number")
-        assert(value >= threshold, string.format("expected value >= %s, got %s", tostring(threshold), tostring(value)))
+        assert(
+            value >= threshold,
+            string.format("expected value >= %s, got %s", tostring(threshold), tostring(value))
+        )
     end
 
-    function matchers.toBeLessThan(threshold)
+    function matchers.toBeLessThan(threshold: number)
         assert(typeof(value) == "number", "value must be a number")
-        assert(value < threshold, string.format("expected value < %s, got %s", tostring(threshold), tostring(value)))
+        assert(
+            value < threshold,
+            string.format("expected value < %s, got %s", tostring(threshold), tostring(value))
+        )
     end
 
-    function matchers.toBeLessThanOrEqual(threshold)
+    function matchers.toBeLessThanOrEqual(threshold: number)
         assert(typeof(value) == "number", "value must be a number")
-        assert(value <= threshold, string.format("expected value <= %s, got %s", tostring(threshold), tostring(value)))
+        assert(
+            value <= threshold,
+            string.format("expected value <= %s, got %s", tostring(threshold), tostring(value))
+        )
     end
 
-    function matchers.toBeCloseTo(expected, tolerance)
-        tolerance = tolerance or 0.00001
+    function matchers.toBeCloseTo(expected: number, tolerance: number?)
+        local resolvedTolerance = tolerance or 0.00001
         assert(typeof(value) == "number" and typeof(expected) == "number", "values must be numbers")
-        assert(math.abs(value - expected) <= tolerance, string.format("expected %s to be close to %s (tolerance %s)", tostring(value), tostring(expected), tostring(tolerance)))
+        assert(
+            math.abs(value - expected) <= resolvedTolerance,
+            string.format(
+                "expected %s to be close to %s (tolerance %s)",
+                tostring(value),
+                tostring(expected),
+                tostring(resolvedTolerance)
+            )
+        )
     end
 
-    function matchers.toThrow(expectedPattern)
-        local ok, err = pcall(value)
+    function matchers.toThrow(expectedPattern: string?)
+        assert(typeof(value) == "function", "value must be a function")
+        local ok, err = pcall(value :: () -> any)
         assert(not ok, "expected function to throw")
         if expectedPattern then
             local errStr = tostring(err)
-            assert(string.find(errStr, expectedPattern, 1, true), string.format("expected error to contain %q, got %q", expectedPattern, errStr))
+            assert(
+                string.find(errStr, expectedPattern, 1, true),
+                string.format("expected error to contain %q, got %q", expectedPattern, errStr)
+            )
         end
     end
 
     return matchers
 end
 
-function TestRunner:_runHooks(hooksList)
+function TestRunner._runHooks(_self: TestRunner, hooksList: { Hook })
     for _, fn in ipairs(hooksList) do
         fn()
     end
 end
 
-function TestRunner:_collectHooks(suite, kind)
-    local collected = {}
-    local current = suite
+function TestRunner._collectHooks(
+    _self: TestRunner,
+    suite: Suite,
+    kind: "beforeEach" | "afterEach"
+): { Hook }
+    local collected: { Hook } = {}
+    local current: Suite? = suite
     while current do
-        for _, fn in ipairs(current[kind]) do
+        local hooks = if kind == "beforeEach" then current.beforeEach else current.afterEach
+        for _, fn in ipairs(hooks) do
             table.insert(collected, fn)
         end
         current = current.parent
     end
     if kind == "beforeEach" then
-        local reversed = {}
+        local reversed: { Hook } = {}
         for i = #collected, 1, -1 do
             table.insert(reversed, collected[i])
         end
@@ -197,7 +283,7 @@ function TestRunner:_collectHooks(suite, kind)
     return collected
 end
 
-function TestRunner:_runTest(test, suite)
+function TestRunner._runTest(self: TestRunner, test: TestCase, suite: Suite): (boolean, any?)
     local beforeHooks = self:_collectHooks(suite, "beforeEach")
     local afterHooks = self:_collectHooks(suite, "afterEach")
 
@@ -208,12 +294,15 @@ function TestRunner:_runTest(test, suite)
         return false, "beforeEach failed: " .. tostring(err)
     end
 
-    ok, err = pcall(test.fn)
+    local testOk, testResult: any = pcall(test.fn)
+    ok = testOk
+    err = testResult
     if ok then
-        if isPromiseLike(err) then
+        if isPromiseLike(testResult) then
             local resolved = false
-            local promiseErr
-            err:andThen(function()
+            local promiseErr: any = nil
+            local promise = testResult :: PromiseLike
+            promise:andThen(function()
                 resolved = true
             end, function(e)
                 resolved = true
@@ -225,13 +314,15 @@ function TestRunner:_runTest(test, suite)
             end
             if not resolved then
                 ok = false
-                err = "async test timed out"
+                testResult = "async test timed out"
             elseif promiseErr ~= nil then
                 ok = false
-                err = promiseErr
+                testResult = promiseErr
             end
         end
     end
+
+    err = testResult
 
     local afterOk, afterErr = pcall(function()
         self:_runHooks(afterHooks)
@@ -245,19 +336,25 @@ function TestRunner:_runTest(test, suite)
     return ok, err
 end
 
-function TestRunner:_runSuite(suite, indent, results)
-    indent = indent or ""
-    print(indent .. "Suite: " .. suite.name)
+function TestRunner._runSuite(self: TestRunner, suite: Suite, indent: string?, results: TestResults)
+    local resolvedIndent = indent or ""
+    print(resolvedIndent .. "Suite: " .. suite.name)
 
     for _, test in ipairs(suite.tests) do
         results.total += 1
         local ok, err = self:_runTest(test, suite)
         if ok then
             results.passed += 1
-            print(indent .. "  [PASS] " .. test.name)
+            print(resolvedIndent .. "  [PASS] " .. test.name)
         else
             results.failed += 1
-            local msg = indent .. "[FAIL] " .. suite.name .. " > " .. test.name .. ": " .. tostring(err)
+            local msg = resolvedIndent
+                .. "[FAIL] "
+                .. suite.name
+                .. " > "
+                .. test.name
+                .. ": "
+                .. tostring(err)
             warn(msg)
             table.insert(results.errors, msg)
             if self.useTestService then
@@ -269,18 +366,25 @@ function TestRunner:_runSuite(suite, indent, results)
     end
 
     for _, child in ipairs(suite.suites) do
-        self:_runSuite(child, indent .. "  ", results)
+        self:_runSuite(child, resolvedIndent .. "  ", results)
     end
 end
 
-function TestRunner:run()
-    local results = { total = 0, passed = 0, failed = 0, errors = {} }
+function TestRunner.run(self: TestRunner): (boolean, TestResults)
+    local results: TestResults = { total = 0, passed = 0, failed = 0, errors = {} }
 
     for _, suite in ipairs(self.suites) do
         self:_runSuite(suite, "", results)
     end
 
-    print(string.format("\nResults: %d total, %d passed, %d failed", results.total, results.passed, results.failed))
+    print(
+        string.format(
+            "\nResults: %d total, %d passed, %d failed",
+            results.total,
+            results.passed,
+            results.failed
+        )
+    )
     if results.failed > 0 then
         warn("Failed tests:")
         for _, err in ipairs(results.errors) do

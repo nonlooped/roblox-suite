@@ -1,0 +1,6 @@
+# Pinned Roblox/Luau toolchain. Install with https://github.com/rojo-rbx/rokit
+[tools]
+luau-lsp = "JohnnyMorganz/luau-lsp@1.68.1"
+selene = "Kampfkarren/selene@0.31.0"
+stylua = "JohnnyMorganz/StyLua@2.5.2"
+rojo = "rojo-rbx/rojo@7.5.1"

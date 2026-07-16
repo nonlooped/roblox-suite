@@ -1,26 +1,33 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 local AnimationLoader = {}
 AnimationLoader.__index = AnimationLoader
 
-export type AnimationLoader = {
-    animator: Animator,
+type AnimationLoaderState = {
+    animator: Animator?,
     cache: { [Animation]: AnimationTrack },
     connections: { RBXScriptConnection },
-    LoadTrack: (self: AnimationLoader, animation: Animation, priority: Enum.AnimationPriority?, fadeTime: number?, weight: number?, speed: number?) -> AnimationTrack,
-    PlayById: (self: AnimationLoader, assetId: string, priority: Enum.AnimationPriority?, fadeTime: number?, weight: number?, speed: number?) -> AnimationTrack?,
-    StopAll: (self: AnimationLoader, fadeTime: number?) -> (),
-    Destroy: (self: AnimationLoader) -> (),
+    destroyed: boolean,
 }
 
-local TweenService: TweenService = game:GetService("TweenService")
+export type AnimationLoader = typeof(setmetatable({} :: AnimationLoaderState, AnimationLoader))
 
 function AnimationLoader.new(animator: Animator): AnimationLoader
     assert(animator and animator:IsA("Animator"), "AnimationLoader requires a valid Animator")
-    local self = setmetatable({}, AnimationLoader) :: any
-    self.animator = animator
-    self.cache = {}
-    self.connections = {}
-    return self :: AnimationLoader
+    local self = setmetatable(
+        {
+            animator = animator,
+            cache = {},
+            connections = {},
+            destroyed = false,
+        } :: AnimationLoaderState,
+        AnimationLoader
+    )
+    return self
 end
 
 function AnimationLoader:LoadTrack(
@@ -30,9 +37,11 @@ function AnimationLoader:LoadTrack(
     weight: number?,
     speed: number?
 ): AnimationTrack
+    assert(not self.destroyed, "AnimationLoader has been destroyed")
+    local animator = assert(self.animator, "AnimationLoader has no Animator")
     local track = self.cache[animation]
-    if not track or not track.IsPlaying then
-        track = self.animator:LoadAnimation(animation)
+    if not track then
+        track = animator:LoadAnimation(animation)
         self.cache[animation] = track
     end
     track.Priority = priority or Enum.AnimationPriority.Action
@@ -49,12 +58,13 @@ function AnimationLoader:PlayById(
 ): AnimationTrack?
     local animation = Instance.new("Animation")
     animation.AnimationId = assetId
-    animation.Name = "Anim_" .. assetId:match("%d+") or "Anim"
-    local track = self:LoadTrack(animation, priority, fadeTime, weight, speed)
+    local numericId = assetId:match("%d+")
+    animation.Name = if numericId then "Anim_" .. numericId else "Anim"
+    local track: AnimationTrack = self:LoadTrack(animation, priority, fadeTime, weight, speed)
     self.connections[#self.connections + 1] = track.Stopped:Connect(function()
-        if animation then
-            animation:Destroy()
-        end
+        self.cache[animation] = nil
+        track:Destroy()
+        animation:Destroy()
     end)
     return track
 end
@@ -68,13 +78,17 @@ function AnimationLoader:StopAll(fadeTime: number?)
 end
 
 function AnimationLoader:Destroy()
+    if self.destroyed then
+        return
+    end
+    self.destroyed = true
     for _, conn in ipairs(self.connections) do
         conn:Disconnect()
     end
     table.clear(self.connections)
     self:StopAll(0)
     table.clear(self.cache)
-    self.animator = nil :: any
+    self.animator = nil
 end
 
 return AnimationLoader

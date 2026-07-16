@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 local IKSetup = {}
 
 export type IKChainConfig = {
@@ -25,13 +30,19 @@ function IKSetup.create(config: IKChainConfig): IKControl
         ik.Target = targetAttachment
     end
     ik.SmoothTime = config.smoothTime or 0.1
-    ik.P = config.p or 9000
+    ik.Weight = config.p or 1
     ik.Parent = config.parent
     ik.Enabled = true
     return ik
 end
 
-function IKSetup.createHingeConstraint(parent: BasePart, attachment0: Attachment, attachment1: Attachment, lowerAngle: number?, upperAngle: number?): HingeConstraint
+function IKSetup.createHingeConstraint(
+    parent: BasePart,
+    attachment0: Attachment,
+    attachment1: Attachment,
+    lowerAngle: number?,
+    upperAngle: number?
+): HingeConstraint
     local hinge = Instance.new("HingeConstraint")
     hinge.Attachment0 = attachment0
     hinge.Attachment1 = attachment1

@@ -1,30 +1,20 @@
 --!strict
+-- Status: reviewed
+-- Last verified: 2026-07-16
+-- Test coverage: write-state regression fixture in tests/SafeDataStore.spec.lua; Studio integration still required.
+-- Intended use: safety-oriented example; adapt and test against a dedicated test experience.
 --[[
 SafeDataStore.lua
-A production-oriented, server-only wrapper around DataStoreService that handles:
-- Server-side guard (fails fast if required from client)
-- Key/userIds/value validation before writes
-- Consistent pcall + error classification
-- Budget-aware waiting (rechecked before every attempt)
-- Exponential backoff + jitter retry for transient errors
-- Automatic metadata/userIds round-trip on SetAsync/IncrementAsync
-- Existing metadata/userIds injection for UpdateAsync unless explicitly overridden
-- RemoveAsync, ListKeysAsync, ListVersionsAsync wrappers
-- Fresh verification reads after writes
-- Logging hooks
 
-Usage (server only):
-local SafeDS = require(path.to.SafeDataStore)
-local store = SafeDS.new("PlayerData", "")  -- or with options
+Reads retry automatically. Writes do not: once a write call is invoked and
+fails, Roblox documents that the backend outcome can be unknown. The caller
+receives committed/rejected/unknown and must reconcile with a fresh read.
 
-local data, info = store:getAsync("User_" .. userId)
-store:updateAsync("User_" .. userId, function(current, keyInfo)
-    current = current or {}
-    current.Gold = (current.Gold or 0) + 50
-    return current  -- existing userIds/metadata are preserved automatically
-end)
-
-IMPORTANT: Transform functions passed to updateAsync must not yield.
+SetAsync-style writes preserve existing metadata atomically through
+UpdateAsync when userIds or metadata are omitted. Increment operations are
+implemented as one atomic UpdateAsync call and are never replayed by this
+wrapper. Update transforms may run multiple times inside Roblox and therefore
+must not yield or perform external side effects.
 ]]
 
 local DataStoreService = game:GetService("DataStoreService")
@@ -35,88 +25,164 @@ if RunService:IsClient() then
     error("SafeDataStore must be required on the server", 2)
 end
 
-local SafeDataStore = {}
-SafeDataStore.__index = SafeDataStore
-
 local MAX_KEY_LENGTH = 50
 local MAX_USER_IDS = 50
 local MAX_VALUE_SIZE = 4 * 1024 * 1024
 
-local function isTransientError(err)
-    if type(err) ~= "string" then return false end
-    return err:match("Throttle") or err:match("throttled") or
-           err:match("Internal") or err:match("internal") or
-           err:match("RequestRejected") or err:match("DataModelNoAccess")
+export type WriteStatus = "committed" | "rejected" | "unknown"
+export type WriteResult = {
+    status: WriteStatus,
+    value: any?,
+    keyInfo: DataStoreKeyInfo?,
+    error: any?,
+    attempts: number,
+}
+export type Reconcile = (freshValue: any, freshInfo: DataStoreKeyInfo?) -> WriteStatus
+export type WriteOptions = {
+    -- Declares that replaying the entire operation is safe. False by default.
+    idempotent: boolean?,
+    -- Classifies a fresh, uncached read after an ambiguous response.
+    reconcile: Reconcile?,
+}
+export type UpdateTransform = (
+    currentValue: any,
+    keyInfo: DataStoreKeyInfo?
+) -> (any?, { number }?, { [string]: any }?)
+
+type WriteOperation = () -> (any?, DataStoreKeyInfo?)
+
+local SafeDataStore = {}
+SafeDataStore.__index = SafeDataStore
+
+type SafeDataStoreState = {
+    _store: DataStore,
+    _name: string,
+    _maxRetries: number,
+    _backoffBase: number,
+    _backoffCap: number,
+}
+
+export type SafeDataStore = typeof(setmetatable({} :: SafeDataStoreState, SafeDataStore))
+
+local function result(
+    status: WriteStatus,
+    attempts: number,
+    value: any?,
+    keyInfo: DataStoreKeyInfo?,
+    err: any?
+): WriteResult
+    return {
+        status = status,
+        attempts = attempts,
+        value = value,
+        keyInfo = keyInfo,
+        error = err,
+    }
 end
 
-local function validateKey(key)
+local function isTransientError(err: any): boolean
+    if type(err) ~= "string" then
+        return false
+    end
+    return err:match("[Tt]hrottl") ~= nil
+        or err:match("[Ii]nternal") ~= nil
+        or err:match("RequestRejected") ~= nil
+        or err:match("DataModelNoAccess") ~= nil
+end
+
+local function validateKey(key: any): (boolean, string?)
     if type(key) ~= "string" or #key == 0 or #key > MAX_KEY_LENGTH then
-        return false, string.format("key must be a non-empty string up to %d chars", MAX_KEY_LENGTH)
+        return false, `key must be a non-empty string up to {MAX_KEY_LENGTH} chars`
     end
-    return true
+    return true, nil
 end
 
-local function validateUserIds(userIds)
-    if userIds == nil then return true end
+local function validateUserIds(userIds: any): (boolean, string?)
+    if userIds == nil then
+        return true, nil
+    end
     if type(userIds) ~= "table" then
-        return false, "userIds must be a table"
+        return false, "userIds must be an array"
     end
-    if #userIds > MAX_USER_IDS then
-        return false, string.format("userIds array exceeds %d entries", MAX_USER_IDS)
-    end
-    for _, id in ipairs(userIds) do
-        if type(id) ~= "number" then
-            return false, "userIds must be numbers"
+    local count = 0
+    for index, id in userIds do
+        count += 1
+        if
+            type(index) ~= "number"
+            or index % 1 ~= 0
+            or index < 1
+            or type(id) ~= "number"
+            or id ~= id
+            or id == math.huge
+            or id == -math.huge
+            or id % 1 ~= 0
+        then
+            return false, "userIds must be a dense array of finite integers"
         end
     end
-    return true
+    if count > MAX_USER_IDS then
+        return false, `userIds array exceeds {MAX_USER_IDS} entries`
+    end
+    for index = 1, count do
+        if userIds[index] == nil then
+            return false, "userIds must not contain gaps"
+        end
+    end
+    return true, nil
 end
 
-local function validateValueSize(value)
-    local ok, encoded = pcall(HttpService.JSONEncode, HttpService, value)
+local function validateValueSize(value: any): (boolean, string?)
+    local ok, encoded = pcall(function()
+        return HttpService:JSONEncode(value)
+    end)
     if not ok then
         return false, "value is not JSON-serializable"
     end
     if #encoded > MAX_VALUE_SIZE then
-        return false, string.format("serialized value exceeds %d bytes", MAX_VALUE_SIZE)
+        return false, `serialized value exceeds {MAX_VALUE_SIZE} bytes`
     end
-    return true
+    return true, nil
 end
 
-local function mergeDefaults(existing, override)
-    if override ~= nil then return override end
-    if existing ~= nil then return existing end
-    return {}
+local function preserve<T>(existing: T?, replacement: T?, empty: T): T
+    if replacement ~= nil then
+        return replacement
+    end
+    if existing ~= nil then
+        return existing
+    end
+    return empty
 end
 
-function SafeDataStore.new(name, scope, options)
-    local self = setmetatable({}, SafeDataStore)
-    self._store = DataStoreService:GetDataStore(name, scope or "", options)
-    self._name = name
-    self._scope = scope or ""
-    self._maxRetries = 3
-    self._backoffBase = 0.5
-    self._backoffCap = 8
+function SafeDataStore.new(name: string, scope: string?, options: DataStoreOptions?): SafeDataStore
+    assert(type(name) == "string" and name ~= "", "name must be a non-empty string")
+    local self = setmetatable({
+        _store = DataStoreService:GetDataStore(name, scope or "", options),
+        _name = name,
+        _maxRetries = 3,
+        _backoffBase = 0.5,
+        _backoffCap = 8,
+    }, SafeDataStore)
     return self
 end
 
-function SafeDataStore:_log(level, msg, ...)
-    -- Replace with your logging system (AnalyticsService, etc.)
-    print(string.format("[SafeDS:%s] %s: %s", level, self._name, string.format(msg, ...)))
+function SafeDataStore:_log(level: string, message: string, ...: any)
+    warn(`[SafeDS:{self._name}:{level}] {string.format(message, ...)}`)
 end
 
-function SafeDataStore:_backoff(attempt)
-    local exponential = self._backoffBase * (2 ^ (attempt - 1))
-    local capped = math.min(exponential, self._backoffCap)
-    local jitter = math.random() * capped * 0.5
-    return capped + jitter
+function SafeDataStore._backoff(self: SafeDataStore, attempt: number): number
+    local capped = math.min(self._backoffBase * (2 ^ (attempt - 1)), self._backoffCap)
+    return capped + math.random() * capped * 0.5
 end
 
-function SafeDataStore:_waitForBudget(requestType, maxWait)
-    maxWait = maxWait or 30
-    local start = os.clock()
+function SafeDataStore:_waitForBudget(
+    requestType: Enum.DataStoreRequestType,
+    maxWait: number?
+): boolean
+    local started = os.clock()
+    local limit = maxWait or 30
     while DataStoreService:GetRequestBudgetForRequestType(requestType) <= 0 do
-        if os.clock() - start > maxWait then
+        if os.clock() - started >= limit then
             return false
         end
         task.wait(0.25)
@@ -124,286 +190,262 @@ function SafeDataStore:_waitForBudget(requestType, maxWait)
     return true
 end
 
-function SafeDataStore:getAsync(key, useCache)
-    local ok, err = validateKey(key)
-    if not ok then return nil, nil, err end
-
-    local opts
-    if useCache == false then
-        opts = Instance.new("DataStoreGetOptions")
-        opts.UseCache = false
+function SafeDataStore:getAsync(key: string, useCache: boolean?): (any?, DataStoreKeyInfo?, any?)
+    local valid, validationError = validateKey(key)
+    if not valid then
+        return nil, nil, validationError
     end
 
-    local requestType = Enum.DataStoreRequestType.StandardRead
+    local getOptions: DataStoreGetOptions? = nil
+    if useCache == false then
+        local noCacheOptions = Instance.new("DataStoreGetOptions")
+        noCacheOptions.UseCache = false
+        getOptions = noCacheOptions
+    end
 
     for attempt = 1, self._maxRetries do
-        if not self:_waitForBudget(requestType) then
-            self:_log("WARN", "Budget timeout on GetAsync for key %s", key)
+        if not self:_waitForBudget(Enum.DataStoreRequestType.StandardRead) then
             return nil, nil, "BudgetTimeout"
         end
-
         local success, value, keyInfo = pcall(function()
-            return self._store:GetAsync(key, opts)
+            return self._store:GetAsync(key, getOptions)
         end)
         if success then
-            return value, keyInfo
+            return value, keyInfo, nil
         end
-
-        self:_log("ERROR", "GetAsync failed (attempt %d) key=%s err=%s", attempt, key, tostring(value))
-
-        if attempt < self._maxRetries and isTransientError(value) then
-            task.wait(self:_backoff(attempt))
-        else
+        self:_log("ERROR", "GetAsync attempt %d failed for %s: %s", attempt, key, tostring(value))
+        if attempt == self._maxRetries or not isTransientError(value) then
             return nil, nil, value
         end
+        task.wait(self:_backoff(attempt))
     end
-
     return nil, nil, "MaxRetriesExceeded"
 end
 
-function SafeDataStore:_getExistingInfo(key)
-    local value, info = self:getAsync(key, true)
-    return info
+function SafeDataStore:_reconcile(key: string, callback: Reconcile): WriteResult
+    local value, keyInfo, readError = self:getAsync(key, false)
+    if readError ~= nil then
+        return result("unknown", 1, nil, nil, readError)
+    end
+    local ok, status = pcall(callback, value, keyInfo)
+    if not ok then
+        return result("unknown", 1, value, keyInfo, status)
+    end
+    if status ~= "committed" and status ~= "rejected" and status ~= "unknown" then
+        return result("unknown", 1, value, keyInfo, "reconcile returned an invalid status")
+    end
+    return result(status, 1, value, keyInfo, nil)
 end
 
-function SafeDataStore:setAsync(key, value, userIds, metadataTable)
-    local ok, err = validateKey(key)
-    if not ok then return false, err end
-    ok, err = validateUserIds(userIds)
-    if not ok then return false, err end
-    ok, err = validateValueSize(value)
-    if not ok then return false, err end
+function SafeDataStore:_write(
+    key: string,
+    requestTypes: { Enum.DataStoreRequestType },
+    operation: WriteOperation,
+    options: WriteOptions?
+): WriteResult
+    local writeOptions: WriteOptions = options or {}
+    local maxAttempts = if writeOptions.idempotent == true then self._maxRetries else 1
 
-    local needsExisting = userIds == nil or metadataTable == nil
-    local existingInfo
-    if needsExisting then
-        existingInfo = self:_getExistingInfo(key)
+    for attempt = 1, maxAttempts do
+        for _, requestType in requestTypes do
+            if not self:_waitForBudget(requestType) then
+                return result("rejected", attempt - 1, nil, nil, "BudgetTimeout")
+            end
+        end
+
+        local success, value, keyInfo = pcall(operation)
+        if success then
+            return result("committed", attempt, value, keyInfo, nil)
+        end
+
+        local writeError = value
+        self:_log("ERROR", "write attempt %d failed for %s: %s", attempt, key, tostring(writeError))
+        if writeOptions.reconcile then
+            local reconciled = self:_reconcile(key, writeOptions.reconcile)
+            reconciled.attempts = attempt
+            if reconciled.status ~= "unknown" then
+                return reconciled
+            end
+        end
+
+        local mayReplay = writeOptions.idempotent == true
+            and attempt < maxAttempts
+            and isTransientError(writeError)
+        if not mayReplay then
+            return result("unknown", attempt, nil, nil, writeError)
+        end
+        task.wait(self:_backoff(attempt))
     end
 
-    local finalUserIds = mergeDefaults(existingInfo and existingInfo:GetUserIds() or nil, userIds)
-    local finalMetadata = mergeDefaults(existingInfo and existingInfo:GetMetadata() or nil, metadataTable)
+    return result("unknown", maxAttempts, nil, nil, "MaxRetriesExceeded")
+end
+
+function SafeDataStore:setAsync(
+    key: string,
+    value: any,
+    userIds: { number }?,
+    metadata: { [string]: any }?,
+    options: WriteOptions?
+): WriteResult
+    local valid, validationError = validateKey(key)
+    if not valid then
+        return result("rejected", 0, nil, nil, validationError)
+    end
+    valid, validationError = validateUserIds(userIds)
+    if not valid then
+        return result("rejected", 0, nil, nil, validationError)
+    end
+    valid, validationError = validateValueSize(value)
+    if not valid then
+        return result("rejected", 0, nil, nil, validationError)
+    end
+
+    if userIds == nil or metadata == nil then
+        return self:_write(
+            key,
+            { Enum.DataStoreRequestType.StandardRead, Enum.DataStoreRequestType.StandardWrite },
+            function()
+                return self._store:UpdateAsync(key, function(_current, keyInfo)
+                    return value,
+                        preserve(keyInfo and keyInfo:GetUserIds() or nil, userIds, {}),
+                        preserve(keyInfo and keyInfo:GetMetadata() or nil, metadata, {})
+                end)
+            end,
+            options
+        )
+    end
 
     local setOptions = Instance.new("DataStoreSetOptions")
-    setOptions:SetMetadata(finalMetadata)
-
-    local requestType = Enum.DataStoreRequestType.StandardWrite
-
-    for attempt = 1, self._maxRetries do
-        if not self:_waitForBudget(requestType) then
-            self:_log("WARN", "Budget timeout on SetAsync for key %s", key)
-            return false, "BudgetTimeout"
-        end
-
-        local success, result = pcall(function()
-            return self._store:SetAsync(key, value, finalUserIds, setOptions)
-        end)
-
-        if success then
-            return true, result
-        end
-
-        self:_log("ERROR", "SetAsync failed (attempt %d) key=%s err=%s", attempt, key, tostring(result))
-
-        if attempt < self._maxRetries and isTransientError(result) then
-            task.wait(self:_backoff(attempt))
-        else
-            return false, result
-        end
-    end
-
-    return false, "MaxRetriesExceeded"
+    setOptions:SetMetadata(metadata)
+    return self:_write(key, { Enum.DataStoreRequestType.StandardWrite }, function()
+        return self._store:SetAsync(key, value, userIds, setOptions), nil
+    end, options)
 end
 
-function SafeDataStore:updateAsync(key, transformFn)
-    -- transformFn receives (currentValue, keyInfo?) and must return (newValue, userIds?, metadata?) or nil to cancel.
-    -- The transform MUST NOT YIELD (no task.wait, no datastore calls, no async work).
-    local ok, err = validateKey(key)
-    if not ok then return false, err end
-    if type(transformFn) ~= "function" then
-        return false, "transformFn must be a function"
+function SafeDataStore:updateAsync(
+    key: string,
+    transform: UpdateTransform,
+    options: WriteOptions?
+): WriteResult
+    local valid, validationError = validateKey(key)
+    if not valid then
+        return result("rejected", 0, nil, nil, validationError)
+    end
+    if type(transform) ~= "function" then
+        return result("rejected", 0, nil, nil, "transform must be a function")
     end
 
-    local wrappedTransform = function(currentValue, keyInfo)
-        local userResult, userIds, metadata = transformFn(currentValue, keyInfo)
-        if userResult == nil then
-            return nil
-        end
-        local finalUserIds = mergeDefaults(keyInfo and keyInfo:GetUserIds() or nil, userIds)
-        local finalMetadata = mergeDefaults(keyInfo and keyInfo:GetMetadata() or nil, metadata)
-        return userResult, finalUserIds, finalMetadata
+    local cancelled = false
+    local writeResult = self:_write(
+        key,
+        { Enum.DataStoreRequestType.StandardRead, Enum.DataStoreRequestType.StandardWrite },
+        function()
+            return self._store:UpdateAsync(key, function(current, keyInfo)
+                local newValue, userIds, metadata = transform(current, keyInfo)
+                if newValue == nil then
+                    cancelled = true
+                    return nil
+                end
+                return newValue,
+                    preserve(keyInfo and keyInfo:GetUserIds() or nil, userIds, {}),
+                    preserve(keyInfo and keyInfo:GetMetadata() or nil, metadata, {})
+            end)
+        end,
+        options
+    )
+    if writeResult.status == "committed" and cancelled then
+        return result("rejected", writeResult.attempts, nil, nil, "Cancelled")
     end
-
-    local requestTypeRead = Enum.DataStoreRequestType.StandardRead
-    local requestTypeWrite = Enum.DataStoreRequestType.StandardWrite
-
-    for attempt = 1, self._maxRetries do
-        if not self:_waitForBudget(requestTypeRead) or not self:_waitForBudget(requestTypeWrite) then
-            self:_log("WARN", "Budget timeout on UpdateAsync for key %s", key)
-            return false, "BudgetTimeout"
-        end
-
-        local success, newValue, keyInfo = pcall(function()
-            return self._store:UpdateAsync(key, wrappedTransform)
-        end)
-
-        if success then
-            return true, newValue, keyInfo
-        end
-
-        self:_log("ERROR", "UpdateAsync failed (attempt %d) key=%s err=%s", attempt, key, tostring(newValue))
-
-        if attempt < self._maxRetries and isTransientError(newValue) then
-            task.wait(self:_backoff(attempt))
-        else
-            return false, newValue
-        end
-    end
-
-    return false, "MaxRetriesExceeded"
+    return writeResult
 end
 
-function SafeDataStore:incrementAsync(key, delta, userIds, metadataTable)
-    local ok, err = validateKey(key)
-    if not ok then return nil, err end
-    ok, err = validateUserIds(userIds)
-    if not ok then return nil, err end
-
-    local needsExisting = userIds == nil or metadataTable == nil
-    local existingInfo
-    if needsExisting then
-        existingInfo = self:_getExistingInfo(key)
+function SafeDataStore:incrementAsync(
+    key: string,
+    delta: number?,
+    userIds: { number }?,
+    metadata: { [string]: any }?
+): WriteResult
+    local amount = delta or 1
+    if amount % 1 ~= 0 then
+        return result("rejected", 0, nil, nil, "delta must be an integer")
     end
+    -- One UpdateAsync invocation preserves metadata atomically. This wrapper
+    -- intentionally never replays IncrementAsync after an ambiguous response.
+    return self:updateAsync(key, function(current, keyInfo)
+        if current ~= nil and type(current) ~= "number" then
+            error("stored value is not a number")
+        end
+        return (current or 0) + amount,
+            preserve(keyInfo and keyInfo:GetUserIds() or nil, userIds, {}),
+            preserve(keyInfo and keyInfo:GetMetadata() or nil, metadata, {})
+    end)
+end
 
-    local finalUserIds = mergeDefaults(existingInfo and existingInfo:GetUserIds() or nil, userIds)
-    local finalMetadata = mergeDefaults(existingInfo and existingInfo:GetMetadata() or nil, metadataTable)
+function SafeDataStore:removeAsync(key: string, options: WriteOptions?): WriteResult
+    local valid, validationError = validateKey(key)
+    if not valid then
+        return result("rejected", 0, nil, nil, validationError)
+    end
+    return self:_write(key, { Enum.DataStoreRequestType.StandardRemove }, function()
+        return self._store:RemoveAsync(key)
+    end, options)
+end
 
-    local incOptions = Instance.new("DataStoreIncrementOptions")
-    incOptions:SetMetadata(finalMetadata)
+function SafeDataStore:verifyAfterWrite(key: string): (any?, DataStoreKeyInfo?, any?)
+    return self:getAsync(key, false)
+end
 
-    local requestType = Enum.DataStoreRequestType.StandardWrite
-
+function SafeDataStore:listKeysAsync(
+    prefix: string?,
+    pageSize: number?,
+    cursor: string?,
+    excludeDeleted: boolean?
+): (DataStoreKeyPages?, any?)
     for attempt = 1, self._maxRetries do
-        if not self:_waitForBudget(requestType) then
-            self:_log("WARN", "Budget timeout on IncrementAsync for key %s", key)
+        if not self:_waitForBudget(Enum.DataStoreRequestType.StandardList) then
             return nil, "BudgetTimeout"
         end
-
-        local success, result = pcall(function()
-            return self._store:IncrementAsync(key, delta or 1, finalUserIds, incOptions)
-        end)
-
-        if success then
-            return result
-        end
-
-        self:_log("ERROR", "IncrementAsync failed (attempt %d) key=%s err=%s", attempt, key, tostring(result))
-
-        if attempt < self._maxRetries and isTransientError(result) then
-            task.wait(self:_backoff(attempt))
-        else
-            return nil, result
-        end
-    end
-
-    return nil, "MaxRetriesExceeded"
-end
-
-function SafeDataStore:removeAsync(key)
-    local ok, err = validateKey(key)
-    if not ok then return false, err end
-
-    local requestType = Enum.DataStoreRequestType.StandardRemove
-
-    for attempt = 1, self._maxRetries do
-        if not self:_waitForBudget(requestType) then
-            self:_log("WARN", "Budget timeout on RemoveAsync for key %s", key)
-            return false, "BudgetTimeout"
-        end
-
-        local success, oldValue, oldInfo = pcall(function()
-            return self._store:RemoveAsync(key)
-        end)
-
-        if success then
-            return true, oldValue, oldInfo
-        end
-
-        self:_log("ERROR", "RemoveAsync failed (attempt %d) key=%s err=%s", attempt, key, tostring(oldValue))
-
-        if attempt < self._maxRetries and isTransientError(oldValue) then
-            task.wait(self:_backoff(attempt))
-        else
-            return false, oldValue
-        end
-    end
-
-    return false, "MaxRetriesExceeded"
-end
-
-function SafeDataStore:listKeysAsync(prefix, pageSize, cursor, excludeDeleted)
-    local requestType = Enum.DataStoreRequestType.StandardList
-
-    for attempt = 1, self._maxRetries do
-        if not self:_waitForBudget(requestType) then
-            self:_log("WARN", "Budget timeout on ListKeysAsync")
-            return nil, "BudgetTimeout"
-        end
-
         local success, pages = pcall(function()
             return self._store:ListKeysAsync(prefix, pageSize, cursor, excludeDeleted)
         end)
-
         if success then
-            return pages
+            return pages, nil
         end
-
-        self:_log("ERROR", "ListKeysAsync failed (attempt %d) err=%s", attempt, tostring(pages))
-
-        if attempt < self._maxRetries and isTransientError(pages) then
-            task.wait(self:_backoff(attempt))
-        else
+        if attempt == self._maxRetries or not isTransientError(pages) then
             return nil, pages
         end
+        task.wait(self:_backoff(attempt))
     end
-
     return nil, "MaxRetriesExceeded"
 end
 
-function SafeDataStore:listVersionsAsync(key, sortDirection, minDate, maxDate, pageSize)
-    local ok, err = validateKey(key)
-    if not ok then return nil, err end
-
-    local requestType = Enum.DataStoreRequestType.StandardList
-
+function SafeDataStore:listVersionsAsync(
+    key: string,
+    sortDirection: Enum.SortDirection?,
+    minDate: number?,
+    maxDate: number?,
+    pageSize: number?
+): (DataStoreVersionPages?, any?)
+    local valid, validationError = validateKey(key)
+    if not valid then
+        return nil, validationError
+    end
     for attempt = 1, self._maxRetries do
-        if not self:_waitForBudget(requestType) then
-            self:_log("WARN", "Budget timeout on ListVersionsAsync for key %s", key)
+        if not self:_waitForBudget(Enum.DataStoreRequestType.StandardList) then
             return nil, "BudgetTimeout"
         end
-
         local success, pages = pcall(function()
             return self._store:ListVersionsAsync(key, sortDirection, minDate, maxDate, pageSize)
         end)
-
         if success then
-            return pages
+            return pages, nil
         end
-
-        self:_log("ERROR", "ListVersionsAsync failed (attempt %d) key=%s err=%s", attempt, key, tostring(pages))
-
-        if attempt < self._maxRetries and isTransientError(pages) then
-            task.wait(self:_backoff(attempt))
-        else
+        if attempt == self._maxRetries or not isTransientError(pages) then
             return nil, pages
         end
+        task.wait(self:_backoff(attempt))
     end
-
     return nil, "MaxRetriesExceeded"
-end
-
--- Convenience: after any write that may have failed, force a fresh read to learn backend truth
-function SafeDataStore:verifyAfterWrite(key)
-    return self:getAsync(key, false)  -- UseCache = false
 end
 
 return SafeDataStore

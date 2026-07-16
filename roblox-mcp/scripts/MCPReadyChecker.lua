@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 --[[
     MCPReadyChecker.lua
     Diagnostic utilities for verifying Roblox Studio MCP + Script Sync readiness.
@@ -14,8 +19,22 @@ local HttpService = game:GetService("HttpService")
 
 local MCPReadyChecker = {}
 
+type ServiceSummary = {
+    name: string,
+    className: string,
+    syncStatus: string,
+    scriptCount: number,
+    moduleCount: number,
+    childCount: number,
+}
+
+type ScriptSyncSummary = {
+    available: boolean,
+    error: string?,
+}
+
 -- Summarize a service: script count, module count, sync status if available.
-function MCPReadyChecker.summarizeService(service)
+function MCPReadyChecker.summarizeService(service: Instance): ServiceSummary
     local syncStatus = "n/a"
     local ok, syncService = pcall(function()
         return game:GetService("InstanceFileSyncService")
@@ -67,13 +86,15 @@ function MCPReadyChecker.checkServices()
         local ok, service = pcall(function()
             return game:GetService(name)
         end)
-        result[name] = ok and {
-            present = true,
-            childCount = #service:GetChildren(),
-        } or {
-            present = false,
-            error = tostring(service),
-        }
+        result[name] = ok
+                and {
+                    present = true,
+                    childCount = #service:GetChildren(),
+                }
+            or {
+                present = false,
+                error = tostring(service),
+            }
     end
 
     return result
@@ -83,7 +104,7 @@ end
 function MCPReadyChecker.buildReport()
     local starterPlayer = game:GetService("StarterPlayer")
     local starterPlayerScripts = starterPlayer:FindFirstChild("StarterPlayerScripts")
-    local starterSummary
+    local starterSummary: ServiceSummary | { name: string, present: boolean }
     if starterPlayerScripts then
         starterSummary = MCPReadyChecker.summarizeService(starterPlayerScripts)
     else
@@ -96,7 +117,7 @@ function MCPReadyChecker.buildReport()
         gameId = game.GameId,
         studioRuntime = "Roblox Studio",
         services = MCPReadyChecker.checkServices(),
-        scriptSync = (function()
+        scriptSync = (function(): ScriptSyncSummary
             local ok, err = pcall(function()
                 return game:GetService("InstanceFileSyncService")
             end)
@@ -107,8 +128,12 @@ function MCPReadyChecker.buildReport()
             return { available = true }
         end)(),
         keyServices = {
-            ServerScriptService = MCPReadyChecker.summarizeService(game:GetService("ServerScriptService")),
-            ReplicatedStorage = MCPReadyChecker.summarizeService(game:GetService("ReplicatedStorage")),
+            ServerScriptService = MCPReadyChecker.summarizeService(
+                game:GetService("ServerScriptService")
+            ),
+            ReplicatedStorage = MCPReadyChecker.summarizeService(
+                game:GetService("ReplicatedStorage")
+            ),
             StarterPlayerScripts = starterSummary,
         },
     }

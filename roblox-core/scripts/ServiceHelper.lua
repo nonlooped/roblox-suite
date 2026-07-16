@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 --[[
 ServiceHelper.lua
 Small utilities for working with Roblox services and modules safely.
@@ -17,8 +22,8 @@ end
 local DEFAULT_TIMEOUT: number = 10
 
 function ServiceHelper.requireModule<T>(moduleName: string, parent: Instance?, timeout: number?): T
-    parent = parent or game:GetService("ReplicatedStorage")
-    local module = parent:WaitForChild(moduleName, timeout or DEFAULT_TIMEOUT)
+    local moduleParent = parent or game:GetService("ReplicatedStorage")
+    local module = moduleParent:WaitForChild(moduleName, timeout or DEFAULT_TIMEOUT)
     if module and module:IsA("ModuleScript") then
         return require(module) :: T
     end

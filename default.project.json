@@ -1,0 +1,64 @@
+{
+  "name": "roblox-suite-fixtures",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "RobloxSuite": {
+        "$className": "Folder",
+        "roblox": {
+          "$path": "roblox"
+        },
+        "roblox-core": {
+          "$path": "roblox-core"
+        },
+        "roblox-networking": {
+          "$path": "roblox-networking"
+        },
+        "roblox-datastores": {
+          "$path": "roblox-datastores"
+        },
+        "roblox-user-interfaces": {
+          "$path": "roblox-user-interfaces"
+        },
+        "roblox-animation": {
+          "$path": "roblox-animation"
+        },
+        "roblox-vfx": {
+          "$path": "roblox-vfx"
+        },
+        "roblox-audio": {
+          "$path": "roblox-audio"
+        },
+        "roblox-gamepasses": {
+          "$path": "roblox-gamepasses"
+        },
+        "roblox-open-cloud": {
+          "$path": "roblox-open-cloud"
+        },
+        "roblox-teleport": {
+          "$path": "roblox-teleport"
+        },
+        "roblox-rojo": {
+          "$path": "roblox-rojo"
+        },
+        "roblox-mcp": {
+          "$path": "roblox-mcp"
+        },
+        "roblox-physics": {
+          "$path": "roblox-physics"
+        },
+        "roblox-npcs": {
+          "$path": "roblox-npcs"
+        },
+        "roblox-testing": {
+          "$path": "roblox-testing"
+        }
+      }
+    },
+    "ServerScriptService": {
+      "RunRegressionTests": {
+        "$path": "tests/RunRegressionTests.server.lua"
+      }
+    }
+  }
+}

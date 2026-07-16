@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 --[[
     VehicleController.lua
     A client-authoritative vehicle chassis with server-side validation.
@@ -22,38 +27,65 @@ local Players = game:GetService("Players")
 local VehicleController = {}
 VehicleController.__index = VehicleController
 
-function VehicleController.new(model, config)
-    config = config or {}
-    local self = setmetatable({}, VehicleController)
+export type VehicleControllerConfig = {
+    maxSpeed: number?,
+    turnAngle: number?,
+    wheelRadius: number?,
+    motorMaxTorque: number?,
+    motorMaxAcceleration: number?,
+    servoMaxTorque: number?,
+    angularSpeed: number?,
+}
 
-    self.model = model
-    self.seat = model:WaitForChild("VehicleSeat")
-    self.maxSpeed = config.maxSpeed or 50
-    self.turnAngle = config.turnAngle or 30
-    self.wheelRadius = config.wheelRadius or 2
+type VehicleControllerState = {
+    model: Model,
+    seat: VehicleSeat,
+    maxSpeed: number,
+    turnAngle: number,
+    wheelRadius: number,
+    driveMotors: { HingeConstraint },
+    steerHinges: { HingeConstraint },
+    heartbeatConnection: RBXScriptConnection?,
+    validationConnection: RBXScriptConnection?,
+    occupantConnection: RBXScriptConnection?,
+}
 
-    self.driveMotors = {}
-    self.steerHinges = {}
+export type VehicleController =
+    typeof(setmetatable({} :: VehicleControllerState, VehicleController))
+
+function VehicleController.new(model: Model, config: VehicleControllerConfig?): VehicleController
+    local resolvedConfig: VehicleControllerConfig = config or {}
+    local self = setmetatable(
+        {
+            model = model,
+            seat = model:WaitForChild("VehicleSeat") :: VehicleSeat,
+            maxSpeed = resolvedConfig.maxSpeed or 50,
+            turnAngle = resolvedConfig.turnAngle or 30,
+            wheelRadius = resolvedConfig.wheelRadius or 2,
+            driveMotors = {} :: { HingeConstraint },
+            steerHinges = {} :: { HingeConstraint },
+            heartbeatConnection = nil :: RBXScriptConnection?,
+            validationConnection = nil :: RBXScriptConnection?,
+            occupantConnection = nil :: RBXScriptConnection?,
+        } :: VehicleControllerState,
+        VehicleController
+    )
 
     for _, obj in ipairs(model:GetDescendants()) do
         if obj:IsA("HingeConstraint") then
             if obj.Name == "DriveMotor" then
                 obj.ActuatorType = Enum.ActuatorType.Motor
-                obj.MotorMaxTorque = config.motorMaxTorque or 5000
-                obj.MotorMaxAcceleration = config.motorMaxAcceleration or 1500
+                obj.MotorMaxTorque = resolvedConfig.motorMaxTorque or 5000
+                obj.MotorMaxAcceleration = resolvedConfig.motorMaxAcceleration or 1500
                 table.insert(self.driveMotors, obj)
             elseif obj.Name == "SteerHinge" then
                 obj.ActuatorType = Enum.ActuatorType.Servo
-                obj.ServoMaxTorque = config.servoMaxTorque or 5000
-                obj.AngularSpeed = config.angularSpeed or 3
+                obj.ServoMaxTorque = resolvedConfig.servoMaxTorque or 5000
+                obj.AngularSpeed = resolvedConfig.angularSpeed or 3
                 table.insert(self.steerHinges, obj)
             end
         end
     end
-
-    self.heartbeatConnection = nil
-    self.validationConnection = nil
-    self.occupantConnection = nil
 
     self:setupOwnership()
     self:startLoop()
@@ -61,7 +93,7 @@ function VehicleController.new(model, config)
     return self
 end
 
-function VehicleController:setupOwnership()
+function VehicleController.setupOwnership(self: VehicleController)
     self.occupantConnection = self.seat:GetPropertyChangedSignal("Occupant"):Connect(function()
         local humanoid = self.seat.Occupant
         if humanoid then
@@ -75,8 +107,8 @@ function VehicleController:setupOwnership()
     end)
 end
 
-function VehicleController:validateState()
-    if not self.seat or not self.seat:IsDescendantOf(workspace) then
+function VehicleController.validateState(self: VehicleController)
+    if not self.seat:IsDescendantOf(workspace) then
         return
     end
 
@@ -96,9 +128,9 @@ function VehicleController:validateState()
     end
 end
 
-function VehicleController:startLoop()
+function VehicleController.startLoop(self: VehicleController)
     self.heartbeatConnection = RunService.Heartbeat:Connect(function()
-        if not self.seat or not self.seat:IsDescendantOf(workspace) then
+        if not self.seat:IsDescendantOf(workspace) then
             self:destroy()
             return
         end
@@ -124,7 +156,7 @@ function VehicleController:startLoop()
     end)
 end
 
-function VehicleController:destroy()
+function VehicleController.destroy(self: VehicleController)
     if self.heartbeatConnection then
         self.heartbeatConnection:Disconnect()
         self.heartbeatConnection = nil

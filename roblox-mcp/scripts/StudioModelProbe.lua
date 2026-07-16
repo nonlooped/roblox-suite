@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 --[[
     StudioModelProbe.lua
     A reusable utility for summarizing the Roblox data model.
@@ -14,52 +19,94 @@ local HttpService = game:GetService("HttpService")
 
 local StudioModelProbe = {}
 
-local DEFAULT_OPTIONS = {
+export type ProbeOptions = {
+    maxDepth: number?,
+    includeProperties: boolean?,
+    propertyNames: { string }?,
+    includeAttributes: boolean?,
+    maxChildren: number?,
+}
+
+export type InstanceSummary = {
+    name: string,
+    className: string,
+    path: string,
+    attributes: { [string]: any }?,
+    properties: { [string]: any }?,
+    children: { InstanceSummary }?,
+    childCount: number,
+    truncated: boolean?,
+}
+
+type ResolvedOptions = {
+    maxDepth: number,
+    includeProperties: boolean,
+    propertyNames: { string },
+    includeAttributes: boolean,
+    maxChildren: number,
+}
+
+local DEFAULT_OPTIONS: ResolvedOptions = {
     maxDepth = 2,
     includeProperties = false,
-    propertyNames = { "Archivable", "Locked", "Enabled", "Visible", "Transparency", "Reflectance", "Value", "Text" },
+    propertyNames = {
+        "Archivable",
+        "Locked",
+        "Enabled",
+        "Visible",
+        "Transparency",
+        "Reflectance",
+        "Value",
+        "Text",
+    },
     includeAttributes = true,
     maxChildren = 50,
 }
 
--- Merge user options with defaults.
-local function getOption(options, key)
-    if options[key] ~= nil then
-        return options[key]
-    end
-    return DEFAULT_OPTIONS[key]
-end
-
-local function mergeOptions(options)
-    options = options or {}
+local function mergeOptions(options: ProbeOptions?): ResolvedOptions
+    local source: ProbeOptions = options or {}
     return {
-        maxDepth = getOption(options, "maxDepth"),
-        includeProperties = getOption(options, "includeProperties"),
-        propertyNames = getOption(options, "propertyNames"),
-        includeAttributes = getOption(options, "includeAttributes"),
-        maxChildren = getOption(options, "maxChildren"),
+        maxDepth = source.maxDepth or DEFAULT_OPTIONS.maxDepth,
+        includeProperties = if source.includeProperties == nil
+            then DEFAULT_OPTIONS.includeProperties
+            else source.includeProperties,
+        propertyNames = source.propertyNames or DEFAULT_OPTIONS.propertyNames,
+        includeAttributes = if source.includeAttributes == nil
+            then DEFAULT_OPTIONS.includeAttributes
+            else source.includeAttributes,
+        maxChildren = source.maxChildren or DEFAULT_OPTIONS.maxChildren,
     }
 end
 
 -- Recursively summarize an instance tree.
-function StudioModelProbe.summarize(instance, options, currentDepth)
-    options = mergeOptions(options)
-    currentDepth = currentDepth or 0
+function StudioModelProbe.summarize(
+    instance: Instance,
+    options: ProbeOptions?,
+    currentDepth: number?
+): InstanceSummary
+    local resolvedOptions = mergeOptions(options)
+    local depth = currentDepth or 0
 
-    local maxDepth = options.maxDepth or DEFAULT_OPTIONS.maxDepth
-    local maxChildren = options.maxChildren or DEFAULT_OPTIONS.maxChildren
+    local maxDepth = resolvedOptions.maxDepth
+    local maxChildren = resolvedOptions.maxChildren
 
-    local entry = {
+    local entry: InstanceSummary = {
         name = instance.Name,
         className = instance.ClassName,
         path = instance:GetFullName(),
+        childCount = 0,
     }
 
-    if options.includeAttributes then
-        local attributes = {}
+    if resolvedOptions.includeAttributes then
+        local attributes: { [string]: any } = {}
         for name, value in pairs(instance:GetAttributes()) do
             local valueType = typeof(value)
-            if valueType == "string" or valueType == "number" or valueType == "boolean" or value == nil then
+            if
+                valueType == "string"
+                or valueType == "number"
+                or valueType == "boolean"
+                or value == nil
+            then
                 attributes[name] = value
             else
                 attributes[name] = tostring(value)
@@ -70,17 +117,22 @@ function StudioModelProbe.summarize(instance, options, currentDepth)
         end
     end
 
-    if options.includeProperties then
-        local props = {
+    if resolvedOptions.includeProperties then
+        local props: { [string]: any } = {
             Parent = instance.Parent and instance.Parent.Name or nil,
         }
-        for _, propName in ipairs(options.propertyNames or {}) do
+        for _, propName in ipairs(resolvedOptions.propertyNames) do
             local propOk, propValue = pcall(function()
-                return instance[propName]
+                return (instance :: any)[propName]
             end)
             if propOk then
                 local valueType = typeof(propValue)
-                if valueType == "string" or valueType == "number" or valueType == "boolean" or propValue == nil then
+                if
+                    valueType == "string"
+                    or valueType == "number"
+                    or valueType == "boolean"
+                    or propValue == nil
+                then
                     props[propName] = propValue
                 elseif valueType ~= "Instance" then
                     props[propName] = tostring(propValue)
@@ -92,11 +144,14 @@ function StudioModelProbe.summarize(instance, options, currentDepth)
         end
     end
 
-    if currentDepth < maxDepth then
+    if depth < maxDepth then
         local children = instance:GetChildren()
         local childSummaries = {}
         for i = 1, math.min(#children, maxChildren) do
-            table.insert(childSummaries, StudioModelProbe.summarize(children[i], options, currentDepth + 1))
+            table.insert(
+                childSummaries,
+                StudioModelProbe.summarize(children[i], resolvedOptions, depth + 1)
+            )
         end
         entry.children = childSummaries
         entry.childCount = #children
@@ -109,20 +164,24 @@ function StudioModelProbe.summarize(instance, options, currentDepth)
 end
 
 -- Summarize multiple top-level services at once.
-function StudioModelProbe.summarizeServices(serviceNames, options)
-    serviceNames = serviceNames or {
-        "Workspace",
-        "ServerScriptService",
-        "ReplicatedStorage",
-        "StarterGui",
-        "StarterPack",
-        "Lighting",
-    }
+function StudioModelProbe.summarizeServices(
+    serviceNames: { string }?,
+    options: ProbeOptions?
+): { [string]: any }
+    local resolvedServiceNames = serviceNames
+        or {
+            "Workspace",
+            "ServerScriptService",
+            "ReplicatedStorage",
+            "StarterGui",
+            "StarterPack",
+            "Lighting",
+        }
 
-    local result = {
+    local result: { [string]: any } = {
         placeName = workspace.Name,
     }
-    for _, name in ipairs(serviceNames) do
+    for _, name in ipairs(resolvedServiceNames) do
         local ok, service = pcall(function()
             return game:GetService(name)
         end)
@@ -136,7 +195,7 @@ function StudioModelProbe.summarizeServices(serviceNames, options)
 end
 
 -- Encode a summary as JSON for easy MCP consumption.
-function StudioModelProbe.summarizeAsJson(instance, options)
+function StudioModelProbe.summarizeAsJson(instance: Instance, options: ProbeOptions?): string
     local summary = StudioModelProbe.summarize(instance, options)
     local ok, encoded = pcall(function()
         return HttpService:JSONEncode(summary)
@@ -149,7 +208,10 @@ function StudioModelProbe.summarizeAsJson(instance, options)
 end
 
 -- Encode multiple service summaries as JSON.
-function StudioModelProbe.summarizeServicesAsJson(serviceNames, options)
+function StudioModelProbe.summarizeServicesAsJson(
+    serviceNames: { string }?,
+    options: ProbeOptions?
+): string
     local summary = StudioModelProbe.summarizeServices(serviceNames, options)
     local ok, encoded = pcall(function()
         return HttpService:JSONEncode(summary)

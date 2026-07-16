@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 local TweenHelper = {}
 
 export type TweenConfig = {
@@ -23,14 +28,22 @@ local function buildTweenInfo(config: TweenConfig): TweenInfo
     )
 end
 
-function TweenHelper.tween(instance: Instance, properties: { [string]: any }, config: TweenConfig): Tween
+function TweenHelper.tween(
+    instance: Instance,
+    properties: { [string]: any },
+    config: TweenConfig
+): Tween
     local info = buildTweenInfo(config)
     local tween = TweenService:Create(instance, info, properties)
     tween:Play()
     return tween
 end
 
-function TweenHelper.tweenAsync(instance: Instance, properties: { [string]: any }, config: TweenConfig): boolean
+function TweenHelper.tweenAsync(
+    instance: Instance,
+    properties: { [string]: any },
+    config: TweenConfig
+): boolean
     local tween = TweenHelper.tween(instance, properties, config)
     local completed = false
     local conn: RBXScriptConnection?
@@ -46,7 +59,13 @@ function TweenHelper.tweenAsync(instance: Instance, properties: { [string]: any 
     return completed
 end
 
-function TweenHelper.sequence(steps: { { instance: Instance, properties: { [string]: any }, config: TweenConfig } }): ()
+function TweenHelper.sequence(steps: {
+    {
+        instance: Instance,
+        properties: { [string]: any },
+        config: TweenConfig,
+    }
+}): ()
     local current = 1
     local function playNext()
         if current > #steps then

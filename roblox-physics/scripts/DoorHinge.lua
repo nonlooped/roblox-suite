@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 --[[
     DoorHinge.lua
     A servo-powered door with open/close state.
@@ -21,30 +26,49 @@
 local DoorHinge = {}
 DoorHinge.__index = DoorHinge
 
-function DoorHinge.new(hinge)
-    local self = setmetatable({}, DoorHinge)
-    self.hinge = hinge
-    self.hinge.ActuatorType = Enum.ActuatorType.Servo
-    self.hinge.ServoMaxTorque = 2000
-    self.hinge.AngularSpeed = 3
-    self.hinge.LimitsEnabled = true
-    self.hinge.LowerAngle = 0
-    self.hinge.UpperAngle = 90
-    self.isOpen = false
+type DoorHingeState = {
+    hinge: HingeConstraint?,
+    isOpen: boolean,
+}
+
+export type DoorHinge = typeof(setmetatable({} :: DoorHingeState, DoorHinge))
+
+function DoorHinge.new(hinge: HingeConstraint): DoorHinge
+    local self = setmetatable(
+        {
+            hinge = hinge,
+            isOpen = false,
+        } :: DoorHingeState,
+        DoorHinge
+    )
+    hinge.ActuatorType = Enum.ActuatorType.Servo
+    hinge.ServoMaxTorque = 2000
+    hinge.AngularSpeed = 3
+    hinge.LimitsEnabled = true
+    hinge.LowerAngle = 0
+    hinge.UpperAngle = 90
     return self
 end
 
-function DoorHinge:open()
-    self.hinge.TargetAngle = self.hinge.UpperAngle
+function DoorHinge.open(self: DoorHinge)
+    local hinge = self.hinge
+    if not hinge then
+        return
+    end
+    hinge.TargetAngle = hinge.UpperAngle
     self.isOpen = true
 end
 
-function DoorHinge:close()
-    self.hinge.TargetAngle = self.hinge.LowerAngle
+function DoorHinge.close(self: DoorHinge)
+    local hinge = self.hinge
+    if not hinge then
+        return
+    end
+    hinge.TargetAngle = hinge.LowerAngle
     self.isOpen = false
 end
 
-function DoorHinge:toggle()
+function DoorHinge.toggle(self: DoorHinge)
     if self.isOpen then
         self:close()
     else
@@ -52,9 +76,12 @@ function DoorHinge:toggle()
     end
 end
 
-function DoorHinge:destroy()
+function DoorHinge.destroy(self: DoorHinge)
     -- Release the servo so the hinge becomes passive after cleanup.
-    self.hinge.ActuatorType = Enum.ActuatorType.None
+    local hinge = self.hinge
+    if hinge then
+        hinge.ActuatorType = Enum.ActuatorType.None
+    end
     self.hinge = nil
 end
 

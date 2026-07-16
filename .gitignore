@@ -18,6 +18,7 @@ Thumbs.db
 # Temp / build artifacts
 dist/
 build/
+sourcemap.json
 
 # Local AI Tooling
 .agents

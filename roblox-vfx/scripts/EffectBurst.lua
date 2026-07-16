@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 --[[
     EffectBurst.lua
 
@@ -105,7 +110,10 @@ function EffectBurst.emitFrom(parent: Instance?, config: BurstConfig?): { Partic
 end
 
 -- Emit from a single ParticleEmitter template.
-function EffectBurst.emitFromEmitter(templateEmitter: ParticleEmitter?, config: BurstConfig?): ParticleEmitter?
+function EffectBurst.emitFromEmitter(
+    templateEmitter: ParticleEmitter?,
+    config: BurstConfig?
+): ParticleEmitter?
     if not templateEmitter then
         return nil
     end

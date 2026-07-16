@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 --[[
     PathfindingUtility.lua
     Helpers for throttled recomputation and waypoint formatting.
@@ -30,11 +35,16 @@ function PathfindingUtility.throttleRecompute(
     return true, currentPosition, now
 end
 
-function PathfindingUtility.formatWaypoint(waypoint: {Position: Vector3, Action: any, Label: string}?): string
+function PathfindingUtility.formatWaypoint(waypoint: {
+    Position: Vector3,
+    Action: Enum.PathWaypointAction,
+    Label: string,
+}?): string
     if not waypoint then
         return "Waypoint(nil)"
     end
-    return string.format("Waypoint(%s, %s, %s)",
+    return string.format(
+        "Waypoint(%s, %s, %s)",
         tostring(waypoint.Position),
         tostring(waypoint.Action),
         tostring(waypoint.Label)

@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 --[[
 UIParticlePool.lua
 Simple 2D UI particle pool using ImageLabels + TweenService.
@@ -47,17 +52,20 @@ export type UIParticleConfig = {
 local UIParticlePool = {}
 UIParticlePool.__index = UIParticlePool
 
-export type UIParticlePool = typeof(setmetatable({} :: {
-    _parent: GuiObject,
-    _pool: { ImageLabel },
-    _active: { [ImageLabel]: boolean },
-    _tweens: { [ImageLabel]: Tween },
-    _connections: { [Tween]: RBXScriptConnection },
-    _maxActive: number,
-    _zIndex: number,
-    _activeCount: number,
-    _destroyed: boolean,
-}, UIParticlePool))
+export type UIParticlePool = typeof(setmetatable(
+    {} :: {
+        _parent: GuiObject?,
+        _pool: { ImageLabel },
+        _active: { [ImageLabel]: boolean },
+        _tweens: { [ImageLabel]: Tween },
+        _connections: { [Tween]: RBXScriptConnection },
+        _maxActive: number,
+        _zIndex: number,
+        _activeCount: number,
+        _destroyed: boolean,
+    },
+    UIParticlePool
+))
 
 local function randomInRange(range: NumberRange | number): number
     if typeof(range) == "NumberRange" then
@@ -77,8 +85,11 @@ local function createLabel(parent: GuiObject, zIndex: number): ImageLabel
 end
 
 function UIParticlePool.new(parent: GuiObject, options: UIParticlePoolOptions?): UIParticlePool
-    assert(typeof(parent) == "Instance" and parent:IsA("GuiObject"), "UIParticlePool.new expects a GuiObject parent")
-    options = options or {}
+    assert(
+        typeof(parent) == "Instance" and parent:IsA("GuiObject"),
+        "UIParticlePool.new expects a GuiObject parent"
+    )
+    local resolvedOptions: UIParticlePoolOptions = options or {}
 
     local self = setmetatable({}, UIParticlePool) :: UIParticlePool
     self._parent = parent
@@ -86,12 +97,12 @@ function UIParticlePool.new(parent: GuiObject, options: UIParticlePoolOptions?):
     self._active = {}
     self._tweens = {}
     self._connections = {}
-    self._maxActive = options.maxActive or 80
-    self._zIndex = options.zIndex or 10
+    self._maxActive = resolvedOptions.maxActive or 80
+    self._zIndex = resolvedOptions.zIndex or 10
     self._activeCount = 0
     self._destroyed = false
 
-    local initialSize = options.poolSize or math.max(30, self._maxActive)
+    local initialSize = resolvedOptions.poolSize or math.max(30, self._maxActive)
     initialSize = math.min(initialSize, self._maxActive)
 
     for _ = 1, initialSize do
@@ -101,7 +112,7 @@ function UIParticlePool.new(parent: GuiObject, options: UIParticlePoolOptions?):
     return self
 end
 
-function UIParticlePool:_acquire(): ImageLabel?
+function UIParticlePool._acquire(self: UIParticlePool): ImageLabel?
     for _, label in ipairs(self._pool) do
         if not self._active[label] then
             return label
@@ -109,7 +120,9 @@ function UIParticlePool:_acquire(): ImageLabel?
     end
 
     if #self._pool < self._maxActive then
-        local label = createLabel(self._parent, self._zIndex)
+        local parent = self._parent
+        assert(parent, "Cannot acquire a particle from a destroyed UIParticlePool")
+        local label = createLabel(parent, self._zIndex)
         table.insert(self._pool, label)
         return label
     end
@@ -117,7 +130,7 @@ function UIParticlePool:_acquire(): ImageLabel?
     return nil
 end
 
-function UIParticlePool:_cleanupTween(label: ImageLabel)
+function UIParticlePool._cleanupTween(self: UIParticlePool, label: ImageLabel)
     local tween = self._tweens[label]
     if tween then
         local conn = self._connections[tween]
@@ -130,7 +143,7 @@ function UIParticlePool:_cleanupTween(label: ImageLabel)
     end
 end
 
-function UIParticlePool:_release(label: ImageLabel)
+function UIParticlePool._release(self: UIParticlePool, label: ImageLabel)
     self:_cleanupTween(label)
     if self._active[label] then
         self._active[label] = nil
@@ -140,27 +153,23 @@ function UIParticlePool:_release(label: ImageLabel)
     label.Image = ""
 end
 
-function UIParticlePool:emit(config: UIParticleConfig?)
+function UIParticlePool.emit(self: UIParticlePool, config: UIParticleConfig?)
     assert(not self._destroyed, "Cannot emit from a destroyed UIParticlePool")
-    config = config or {}
+    local resolvedConfig: UIParticleConfig = config or {}
 
-    local count = math.min(config.count or 10, self._maxActive - self._activeCount)
+    local count = math.min(resolvedConfig.count or 10, self._maxActive - self._activeCount)
     if count <= 0 then
         return
     end
 
-    local texture = config.texture or ""
-    local lifetime = config.lifetime or 0.6
-    local size = config.size or UDim2.fromScale(0.05, 0.05)
-    local color = config.color or Color3.new(1, 1, 1)
-    local spread = config.spread or Vector2.new(1, 1)
-    local origin = config.origin or UDim2.fromScale(0.5, 0.5)
-    local velocityRange = config.velocity or NumberRange.new(0.1, 0.2)
+    local texture = resolvedConfig.texture or ""
+    local lifetime = resolvedConfig.lifetime or 0.6
+    local size = resolvedConfig.size or UDim2.fromScale(0.05, 0.05)
+    local color = resolvedConfig.color or Color3.new(1, 1, 1)
+    local spread = resolvedConfig.spread or Vector2.new(1, 1)
+    local origin = resolvedConfig.origin or UDim2.fromScale(0.5, 0.5)
+    local velocityRange = resolvedConfig.velocity or NumberRange.new(0.1, 0.2)
     local fadeInfo = TweenInfo.new(lifetime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-
-    local parentSize = self._parent.AbsoluteSize
-    local parentWidth = math.max(parentSize.X, 1e-4)
-    local parentHeight = math.max(parentSize.Y, 1e-4)
 
     for _ = 1, count do
         local label = self:_acquire()
@@ -173,8 +182,8 @@ function UIParticlePool:emit(config: UIParticleConfig?)
 
         label.Image = texture
         label.ImageColor3 = color
-        label.ImageTransparency = config.startTransparency or 0
-        label.Rotation = config.rotation or math.random(0, 360)
+        label.ImageTransparency = resolvedConfig.startTransparency or 0
+        label.Rotation = resolvedConfig.rotation or math.random(0, 360)
         label.Size = size
         label.Position = origin
         label.Visible = true
@@ -189,8 +198,8 @@ function UIParticlePool:emit(config: UIParticleConfig?)
         )
         local goal = {
             Position = origin + offset,
-            ImageTransparency = config.endTransparency or 1,
-            Rotation = label.Rotation + (config.spin or math.random(-90, 90)),
+            ImageTransparency = resolvedConfig.endTransparency or 1,
+            Rotation = label.Rotation + (resolvedConfig.spin or math.random(-90, 90)),
         }
 
         local tween = TweenService:Create(label, fadeInfo, goal)
@@ -202,7 +211,7 @@ function UIParticlePool:emit(config: UIParticleConfig?)
     end
 end
 
-function UIParticlePool:destroy()
+function UIParticlePool.destroy(self: UIParticlePool)
     self._destroyed = true
 
     for _, label in ipairs(self._pool) do
@@ -215,7 +224,7 @@ function UIParticlePool:destroy()
     table.clear(self._tweens)
     table.clear(self._connections)
     self._activeCount = 0
-    self._parent = nil :: any
+    self._parent = nil
 end
 
 return UIParticlePool

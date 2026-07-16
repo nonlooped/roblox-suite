@@ -1,4 +1,9 @@
 --!strict
+-- Status: experimental
+-- Last verified: 2026-06-17
+-- Test coverage: no automated coverage
+-- Intended use: example; adapt and test before production.
+
 --[[
 PassPurchaseHelper.lua
 Client-side helper for game pass purchase UI state and prompting.
@@ -21,37 +26,37 @@ type ProductInfo = {
     [string]: any,
 }
 
-export type PassPurchaseHelper = {
-    passID: number,
-    _player: Player?,
-    _owns: boolean,
-    _button: GuiButton?,
-    _activatedConnection: RBXScriptConnection?,
-    _promptFinishedConnection: RBXScriptConnection?,
-
-    new: (passID: number) -> PassPurchaseHelper,
-    checkOwnership: (self: PassPurchaseHelper) -> (boolean, boolean?, string?),
-    promptPurchase: (self: PassPurchaseHelper) -> (boolean, string?),
-    connectButton: (self: PassPurchaseHelper, button: GuiButton) -> (),
-    refreshState: (self: PassPurchaseHelper) -> (),
-    destroy: (self: PassPurchaseHelper) -> (),
-}
-
 local PassPurchaseHelper = {}
 PassPurchaseHelper.__index = PassPurchaseHelper
 
+export type PassPurchaseHelper = typeof(setmetatable(
+    {} :: {
+        passID: number,
+        _player: Player?,
+        _owns: boolean,
+        _button: TextButton?,
+        _activatedConnection: RBXScriptConnection?,
+        _promptFinishedConnection: RBXScriptConnection?,
+    },
+    PassPurchaseHelper
+))
+
 function PassPurchaseHelper.new(passID: number): PassPurchaseHelper
     if typeof(passID) ~= "number" or passID <= 0 or passID % 1 ~= 0 then
-        error("PassPurchaseHelper.new expects a positive integer passID, got " .. tostring(passID), 2)
+        error(
+            "PassPurchaseHelper.new expects a positive integer passID, got " .. tostring(passID),
+            2
+        )
     end
 
-    local self = setmetatable({}, PassPurchaseHelper) :: PassPurchaseHelper
-    self.passID = passID
-    self._player = Players.LocalPlayer
-    self._owns = false
-    self._button = nil
-    self._activatedConnection = nil
-    self._promptFinishedConnection = nil
+    local self = setmetatable({
+        passID = passID,
+        _player = Players.LocalPlayer,
+        _owns = false,
+        _button = nil :: TextButton?,
+        _activatedConnection = nil :: RBXScriptConnection?,
+        _promptFinishedConnection = nil :: RBXScriptConnection?,
+    }, PassPurchaseHelper) :: PassPurchaseHelper
 
     self._promptFinishedConnection = MarketplaceService.PromptGamePassPurchaseFinished:Connect(
         function(player: Player, purchasedPassID: number, purchaseSuccess: boolean)
@@ -146,13 +151,14 @@ function PassPurchaseHelper:promptPurchase(): (boolean, string?)
     return true, nil
 end
 
-function PassPurchaseHelper:connectButton(button: GuiButton): ()
+function PassPurchaseHelper.connectButton(self: PassPurchaseHelper, button: TextButton): ()
     self._button = button
 
-    if self._activatedConnection then
-        self._activatedConnection:Disconnect()
-        self._activatedConnection = nil
+    local activatedConnection = self._activatedConnection
+    if activatedConnection then
+        activatedConnection:Disconnect()
     end
+    self._activatedConnection = nil
 
     self._activatedConnection = button.Activated:Connect(function()
         local ownsSuccess, owns, ownsErr = self:checkOwnership()
@@ -213,15 +219,17 @@ function PassPurchaseHelper:refreshState(): ()
     end)
 end
 
-function PassPurchaseHelper:destroy(): ()
-    if self._activatedConnection then
-        self._activatedConnection:Disconnect()
-        self._activatedConnection = nil
+function PassPurchaseHelper.destroy(self: PassPurchaseHelper): ()
+    local activatedConnection = self._activatedConnection
+    if activatedConnection then
+        activatedConnection:Disconnect()
     end
-    if self._promptFinishedConnection then
-        self._promptFinishedConnection:Disconnect()
-        self._promptFinishedConnection = nil
+    self._activatedConnection = nil
+    local promptFinishedConnection = self._promptFinishedConnection
+    if promptFinishedConnection then
+        promptFinishedConnection:Disconnect()
     end
+    self._promptFinishedConnection = nil
     self._button = nil
 end
 
