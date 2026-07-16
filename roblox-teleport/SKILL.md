@@ -1,6 +1,7 @@
 ---
 name: roblox-teleport
-description: Roblox TeleportService and multi-place architecture — the modern TeleportAsync API that replaces deprecated Teleport/TeleportPartyAsync/TeleportToPrivateServer variants. Covers TeleportOptions, reserved servers via ReserveServerAsync, the 50-player group limit, cross-experience restrictions, teleport data (and its client-spoofable security caveat), custom loading screens, DataStore handoff, and matchmaking with MessagingService/MemoryStoreService. Use whenever moving players between places, servers, or reserved servers.
+description: "Roblox TeleportService and multi-place architecture — the modern TeleportAsync API that replaces deprecated Teleport/TeleportPartyAsync/TeleportToPrivateServer variants. Covers TeleportOptions, reserved servers via ReserveServerAsync, the 50-player group limit, cross-experience restrictions, teleport data (and its client-spoofable security caveat), custom loading screens, DataStore handoff, and matchmaking with MessagingService/MemoryStoreService. Use whenever moving players between places, servers, or reserved servers."
+last_reviewed: 2026-07-16
 ---
 
 # roblox-teleport
@@ -99,9 +100,15 @@ When `TeleportOptions` is passed, `TeleportAsync` returns a `TeleportAsyncResult
 `TeleportService.TeleportInitFailed` fires when a teleport fails to start. Connect to it to show a retry UI. Failure reasons include invalid place ID, empty player list, non-Player instances, wrong teleport options type, client-called `TeleportAsync`, and conflicting parameters.
 
 ```lua
-TeleportService.TeleportInitFailed:Connect(function(player: Player, options: TeleportOptions, reason: Enum.TeleportResult, errMsg: string, placeId: number, groupName: string)
-    warn(`Teleport failed for {player.Name}: {reason} - {errMsg}`)
-    -- Show retry UI, log, etc.
+TeleportService.TeleportInitFailed:Connect(function(
+    player: Player,
+    reason: Enum.TeleportResult,
+    errMsg: string,
+    placeId: number,
+    options: TeleportOptions
+)
+    warn(`Teleport failed for {player.Name} to {placeId}: {reason.Name} - {errMsg}`)
+    -- Show retry UI, log options, etc.
 end)
 ```
 
@@ -121,17 +128,25 @@ local TeleportService = game:GetService("TeleportService")
 local DataStoreService = game:GetService("DataStoreService")
 local Players = game:GetService("Players")
 
--- Reserve once, persist the code, reuse it
-local store = DataStoreService:GetDataStore("ReservedServerCodes")
-local code
-local ok, saved = pcall(function() return store:GetAsync("DungeonRoom_1") end)
-if ok and typeof(saved) == "string" then
-    code = saved
-else
-    local reserveOk, newCode = pcall(function() return TeleportService:ReserveServerAsync(game.PlaceId) end)
-    if reserveOk then
-        code = newCode
-        pcall(function() store:SetAsync("DungeonRoom_1", code) end)
+-- Reserve a candidate, then atomically publish-or-use the winner.
+local store = DataStoreService:GetDataStore("ReservedServerAllocations_v2")
+local reserveOk, candidateCode = pcall(function()
+    return select(1, TeleportService:ReserveServerAsync(game.PlaceId))
+end)
+local code: string? = nil
+if reserveOk and typeof(candidateCode) == "string" then
+    local now = os.time()
+    local candidate = { accessCode = candidateCode, expiresAt = now + 3600, state = "allocated" }
+    local publishOk, winner = pcall(function()
+        return store:UpdateAsync("DungeonRoom_1", function(current)
+            if type(current) == "table" and type(current.accessCode) == "string" and current.expiresAt > now then
+                return current
+            end
+            return candidate
+        end)
+    end)
+    if publishOk and type(winner) == "table" then
+        code = winner.accessCode -- every racing allocator uses the same winner
     end
 end
 
@@ -240,14 +255,21 @@ The robust pattern for moving player state between places:
 
 ## Scripts
 
-- `scripts/TeleportHelper.lua` — a server-side helper that wraps `TeleportAsync` with pcall, options, and a simple reserved-server-code cache.
+- `scripts/TeleportHelper.lua` — a reviewed server-side example with atomic reserved-code publication, expiry, ambiguous-allocation reconciliation, and separate `teleporting`/`arrived` states.
 
 ## How to proceed
 
 1. Decide your place architecture: primary place + sub-places in one universe.
 2. For cross-place teleports, use `TeleportAsync` (server) + `TeleportOptions`.
-3. For reserved servers, `ReserveServerAsync` once, persist the code, reuse it.
+3. For reserved servers, reserve a candidate and publish it through `UpdateAsync`; use whichever allocation wins. Track teleport initiation separately from destination arrival.
 4. Pass non-sensitive hints via teleport data; pass authoritative state via DataStores.
 5. Connect `TeleportInitFailed` for retry UI.
 6. Validate and rate-limit any client-initiated teleport Remote.
 7. Test in the Roblox app (not Studio) with a published experience.
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [matchmaking.md](references/matchmaking.md)
+- [teleport-options.md](references/teleport-options.md)
+<!-- catalog:references:end -->

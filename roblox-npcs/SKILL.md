@@ -1,6 +1,7 @@
 ---
 name: roblox-npcs
-description: Roblox pathfinding and NPC AI — PathfindingService, agent parameters, waypoint actions, blocked-path handling, PathfindingModifier/Link, material and region costs, and streaming compatibility. Covers NPC design patterns: state machines, behavior trees, follow/patrol/chase, humanoid movement, obstacle avoidance, and performance at scale. Use for NPCs, enemy AI, companions, patrols, or any agent that navigates the 3D world.
+description: "Roblox pathfinding and NPC AI — PathfindingService, agent parameters, waypoint actions, blocked-path handling, PathfindingModifier/Link, material and region costs, and streaming compatibility. Covers NPC design patterns: state machines, behavior trees, follow/patrol/chase, humanoid movement, obstacle avoidance, and performance at scale. Use for NPCs, enemy AI, companions, patrols, or any agent that navigates the 3D world."
+last_reviewed: 2026-06-17
 ---
 
 # roblox-npcs
@@ -186,3 +187,12 @@ Common NPC states: Idle, Patrol, Chase, Attack, Return. Each state handles its o
 4. Layer a state machine for complex behaviors.
 5. Run on the server for authoritative AI; use client only for visual prediction.
 6. Profile with MicroProfiler and stagger recomputation for many agents.
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [modifiers-links-and-streaming.md](references/modifiers-links-and-streaming.md)
+- [npc-behavior-patterns.md](references/npc-behavior-patterns.md)
+- [pathfinding-service-details.md](references/pathfinding-service-details.md)
+- [performance-and-scaling.md](references/performance-and-scaling.md)
+<!-- catalog:references:end -->

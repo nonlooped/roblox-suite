@@ -1,6 +1,7 @@
 ---
 name: roblox-rojo
-description: Rojo project management for Roblox — install the CLI and Studio plugin, init/serve/build/upload/sourcemap/syncback, `.project.json` format, file-to-instance sync rules (`.luau`/`.server.luau`/`.client.luau`/`.plugin.luau`), meta files, `emitLegacyScripts`, live-sync limits, and porting existing places. Use when setting up Rojo, writing project files, live-syncing to Studio, building places/models, or converting a place with syncback.
+description: "Rojo project management for Roblox — install the CLI and Studio plugin, init/serve/build/upload/sourcemap/syncback, `.project.json` format, file-to-instance sync rules (`.luau`/`.server.luau`/`.client.luau`/`.plugin.luau`), meta files, `emitLegacyScripts`, live-sync limits, and porting existing places. Use when setting up Rojo, writing project files, live-syncing to Studio, building places/models, or converting a place with syncback."
+last_reviewed: 2026-07-09
 ---
 
 # roblox-rojo
@@ -201,3 +202,12 @@ Workflows and syncback rules: [references/workflows-and-syncback.md](references/
 2. Shape the tree: [references/project-format.md](references/project-format.md).
 3. Name files correctly: [references/sync-details.md](references/sync-details.md).
 4. For teams / porting / deploy: [references/workflows-and-syncback.md](references/workflows-and-syncback.md).
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [installation-and-cli.md](references/installation-and-cli.md)
+- [project-format.md](references/project-format.md)
+- [sync-details.md](references/sync-details.md)
+- [workflows-and-syncback.md](references/workflows-and-syncback.md)
+<!-- catalog:references:end -->

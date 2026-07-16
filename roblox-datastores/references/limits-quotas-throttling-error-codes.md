@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-07-16
 ---
 
 # Limits, Quotas, Throttling, and Error Codes
@@ -151,15 +151,15 @@ From the official table (study the complete page for every variant):
 
 **Shutdown / access errors (4xx):**
 - 401/402 DataModel or LuaWebService inaccessible during shutdown.
-- 403 StudioAccessToApisNotAllowed (you forgot to enable it on a test place, or it is enabled on live — bad).
-- 404/5xx various internal / corruption signals — retry later.
+- 403 StudioAccessToApisNotAllowed (a Studio session attempted backend access without the experience's Studio-access setting). Enable that access only against dedicated test data, not a production datastore.
+- 404/5xx various internal/corruption signals. Reads may retry with bounds; an invoked write remains ambiguous until reconciled.
 
 **Newer experience/server throttled errors (the *Throttled family):**
 Hundreds of variants such as:
 - StandardReadExperienceThrottled / StandardWriteExperienceThrottled / StandardListExperienceThrottled / StandardRemoveExperienceThrottled
 - Same for Ordered*
 - GameServerThrottled versions (per-server)
-- Also GetVersionAsyncThrottle, ListKeysAsyncThrottle, ListVersionsAsyncThrottle, RemoveVersionAsyncThrottle, etc.
+- Also GetVersionAsyncThrottle, ListKeysAsyncThrottle, ListVersionsAsyncThrottle, and the legacy `RemoveVersionAsyncThrottle`; the underlying `RemoveVersionAsync` API is deprecated.
 
 When you see any *Throttled, back off. Check budget. Consider raising your server rate limits (if you control them). Reduce frequency of operations. Use MemoryStores for hot paths.
 
@@ -173,9 +173,9 @@ When you see any *Throttled, back off. Check budget. Consider raising your serve
 **Handling strategy (always):**
 1. pcall around every call.
 2. Inspect the error string or code for the specific number/name.
-3. For transient (throttle, internal, shutdown): retry with exponential backoff + jitter (e.g. local delay = math.min(base * 2^(retryCount - 1), cap); task.wait(delay + math.random() * delay * 0.5)).
-4. For permanent (bad key name, bad value type, studio not enabled): log loudly and fail gracefully (don't spam retries).
-5. After any write error, immediately attempt a fresh Get (UseCache=false) to learn the actual backend state.
+3. For transient read failures: retry with bounded exponential backoff + jitter.
+4. After an invoked write error, return `unknown` and immediately attempt a fresh `GetAsync` with `UseCache = false`. Replay only if the complete operation is declared idempotent; never blindly replay `IncrementAsync`.
+5. For a request rejected before invocation or permanent validation errors, return `rejected`, log clearly, and do not retry.
 6. For leaderboards or sorted pages, be prepared for "IsFinished" and handle the final page gracefully.
 
 See the full error-codes page for the gigantic tables and the exact messages.
@@ -219,4 +219,4 @@ Recent 3 minutes may be incomplete. Supports custom time ranges (up to 30 days).
 - Set up notifications for quota approach/exceed.
 - Regularly review the dashboard for anomalies (sudden spikes often indicate a bug such as saving on every Heartbeat or per-frame).
 
-Mastering these limits and the error surface is what separates toy saving code from production-grade systems that survive thousands of concurrent players and years of operation without data incidents.
+Understanding these limits and ambiguous outcomes is necessary, but not sufficient, for a reliable persistence system; load tests, integration tests, reconciliation, and observability are still required.

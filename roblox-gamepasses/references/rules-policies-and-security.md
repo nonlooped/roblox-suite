@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-07-16
 ---
 
 # Rules, Policies, and Security for Game Passes
@@ -8,7 +8,7 @@ last_reviewed: 2026-06-17
 
 As of **May 30, 2026**, cross-experience game pass and developer product sales are disabled. You can no longer sell a pass or dev product from Experience A inside Experience B. Sales on an experience's own details page (EDP) remain available for passes and developer products owned by that experience.
 
-If your game previously relied on cross-experience pass sales (common in donation/tipping games), migrate to experience-specific passes and/or the [Robux Transfers API](https://create.roblox.com/docs/en-us/production/monetization/robux-transfers). `MarketplaceService:PromptRobuxTransferAsync` must be called from the server. Only **Roblox Plus** subscribers can initiate transfers, amounts are clamped to **10–500 Robux** per transaction, the sender cannot equal the receiver, Roblox takes a **10% platform fee**, and the recipient receives **90%**. A `BindReceiptHandler` callback must process transfer receipts; donations are high-risk for abuse and should include anti-abuse checks (rate limits, alt detection, moderation, no quid-pro-quo rewards).
+If your game previously relied on cross-experience pass sales (common in donation/tipping games), migrate to experience-specific passes and/or the [Robux Transfers API](https://create.roblox.com/docs/en-us/production/monetization/robux-transfers). `MarketplaceService:PromptRobuxTransferAsync` must be called from the server. Only **Roblox Plus** subscribers can initiate transfers, transfer amounts must be between **10 and 500 Robux**, and the sender cannot equal the receiver. The recipient receives **90%** and the experience earns the other **10%**; Roblox takes no transfer fee. A `BindReceiptHandler` callback must process transfer receipts. Roblox permits items or perks after a successful transfer receipt. Avoiding quid-pro-quo rewards can still be a useful anti-abuse or game-design choice, but it is not a platform requirement.
 
 ## What Game Passes Can and Cannot Do
 
@@ -34,7 +34,7 @@ Respecting these flags per-player is required by Roblox policy.
 
 ## Capability Requirements
 
-All `MarketplaceService` purchase APIs (`PromptGamePassPurchase`, `PromptPurchase`, developer-product `ProcessReceipt`, `PromptRobuxTransferAsync`, personalization calls, etc.) require **API Services** to be enabled for the place. In Studio this is controlled by **Game Settings → Security → Enable Studio Access to API Services** for local testing; live published places rely on the experience's deployed settings. Game passes, developer products, and transfers also require the experience to be published.
+Do not apply a blanket “API Services required” rule to all `MarketplaceService` purchase APIs. Publish the experience where the relevant product or transfer API requires it, and check that API's current Engine Reference requirements. Enable **Studio Access to API Services** only for APIs that require it and only in a dedicated test experience.
 
 ## Security Rules (Critical)
 
@@ -74,4 +74,4 @@ Use the Data Stores Manager or Open Cloud to inspect/delete when needed.
 - Hardcoding Robux prices in UI (breaks regional pricing and optimizations).
 - Using passes for temporary effects that should be developer products.
 
-Follow these and the implementation will be both secure and policy-compliant.
+Treat these as a starting checklist, then re-check current policy, threat-model the experience, and test each purchase/receipt path. This guidance cannot guarantee security or policy compliance.

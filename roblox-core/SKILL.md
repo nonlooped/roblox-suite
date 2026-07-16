@@ -1,6 +1,7 @@
 ---
 name: roblox-core
-description: Luau fundamentals and the complete Roblox service catalog — game:GetService patterns, data types, serialization rules, script locations, execution contexts, and the client-server data model. Load first so higher-level skills rest on correct assumptions about types, authority, and where code can run.
+description: "Luau fundamentals and the complete Roblox service catalog — game:GetService patterns, data types, serialization rules, script locations, execution contexts, and the client-server data model. Load first so higher-level skills rest on correct assumptions about types, authority, and where code can run."
+last_reviewed: 2026-06-17
 ---
 
 # roblox-core
@@ -146,3 +147,11 @@ This skill is the base. Load the specialized skills (datastores, UI, animation, 
 ## Scripts
 
 - `scripts/ServiceHelper.lua` — small utilities for safely acquiring services and requiring modules with timeouts.
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [luau-data-types-and-serialization.md](references/luau-data-types-and-serialization.md)
+- [script-locations-contexts-and-architecture.md](references/script-locations-contexts-and-architecture.md)
+- [services-catalog-and-usage.md](references/services-catalog-and-usage.md)
+<!-- catalog:references:end -->

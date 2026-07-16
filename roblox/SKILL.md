@@ -1,6 +1,7 @@
 ---
 name: roblox
-description: Roblox Luau development hub that routes agents to the right specialist skill and keeps every API recommendation cited to the official Engine Reference. Covers server-authority architecture, modern API selection (Animator, task.*, TweenService, IKControl), and progressive disclosure into deep skills spanning datastores, networking, UI, animation, VFX, audio, physics, NPCs, monetization, Open Cloud, teleportation, testing, Rojo, and Studio MCP. Use as the entry point for any Roblox task before loading a specialized skill.
+description: "Roblox Luau development hub that routes agents to the right specialist skill and keeps every API recommendation cited to the official Engine Reference. Covers server-authority architecture, modern API selection (Animator, task.*, TweenService, IKControl), and progressive disclosure into deep skills spanning datastores, networking, UI, animation, VFX, audio, physics, NPCs, monetization, Open Cloud, teleportation, testing, Rojo, and Studio MCP. Use as the entry point for any Roblox task before loading a specialized skill."
+last_reviewed: 2026-06-17
 ---
 
 # roblox
@@ -11,7 +12,7 @@ Full documentation indexes for agents:
 - https://create.roblox.com/docs/llms.txt (start here, then route to Engine vs Open Cloud sub-indexes)
 - Engine-specific: https://create.roblox.com/docs/reference/engine/llms.txt
 
-This hub skill exists because individual topics are deep and interconnected. It gives you the big picture, decision frameworks, and explicit pointers (with relative file paths) into the specialized skills' `references/` folders so agents can load only the exact detailed material needed.
+This hub skill gives the big picture and routes to specialist `SKILL.md` entry points. Each specialist owns its deep `references/` index so agents load only the material needed.
 
 ## When to Activate
 
@@ -19,54 +20,27 @@ Any mention of Roblox, Luau scripting inside experiences, building places, chara
 
 The sub-skills have very specific descriptions for precise activation. This hub is the safe default when the task is broad Roblox development.
 
-## The Specialized Skills (with direct references)
+## The Specialized Skills
 
-Load the full specialized SKILL.md when the task narrows. Then follow its "Read references/xxx.md for details" instructions for granular depth.
+The hub routes only to specialist entry points. Load the relevant specialist, then follow the reference links owned by that specialist. This keeps the hub small as the catalog grows.
 
-- **Data persistence (datastores of all types, limits, versioning, safe patterns, leaderboards, manager/observability):** [roblox-datastores/SKILL.md](../roblox-datastores/SKILL.md)  
-  Its references/ cover [types-of-datastores.md](../roblox-datastores/references/types-of-datastores.md), [core-operations-and-patterns.md](../roblox-datastores/references/core-operations-and-patterns.md), [limits-quotas-throttling-error-codes.md](../roblox-datastores/references/limits-quotas-throttling-error-codes.md), [versioning-metadata-recovery.md](../roblox-datastores/references/versioning-metadata-recovery.md), [best-practices-and-gotchas.md](../roblox-datastores/references/best-practices-and-gotchas.md) (listing/caching/advanced profiles covered in these and the main SKILL.md).
-
-- **Animation & tweening (3D rigs/Animator/Tracks/IK/markers + all UI and 3D tweening with TweenService, easing, sequences, typewriter, integration):** [roblox-animation/SKILL.md](../roblox-animation/SKILL.md)  
-  Its references/ cover [3d-animations.md](../roblox-animation/references/3d-animations.md), [ui-tweens-and-sequences.md](../roblox-animation/references/ui-tweens-and-sequences.md), [integration-and-events.md](../roblox-animation/references/integration-and-events.md) (IK and TweenService details in 3d-animations and ui-tweens).
-
-- **User interfaces (containers, positioning, interaction, and "particles in the UI" techniques):** [roblox-user-interfaces/SKILL.md](../roblox-user-interfaces/SKILL.md)  
-  Its references/ cover [gui-containers.md](../roblox-user-interfaces/references/gui-containers.md), [particles-in-ui.md](../roblox-user-interfaces/references/particles-in-ui.md). [scripts/UIParticlePool.lua](../roblox-user-interfaces/scripts/UIParticlePool.lua) is a 2D UI particle burst example.
-
-- **Monetization & gamepasses (creation, selling flow, ownership + purchase finished handlers, rules/policy changes, secure granting):** [roblox-gamepasses/SKILL.md](../roblox-gamepasses/SKILL.md)  
-  Its references/ expand on [creation-and-setup.md](../roblox-gamepasses/references/creation-and-setup.md), [purchase-flow-and-granting.md](../roblox-gamepasses/references/purchase-flow-and-granting.md), [rules-policies-and-security.md](../roblox-gamepasses/references/rules-policies-and-security.md), [policyservice.md](../roblox-gamepasses/references/policyservice.md) (per-player policy gating: `ArePaidRandomItemsRestricted`, `IsEligibleToPurchaseSubscription`, China policies, trade rules), [subscriptions.md](../roblox-gamepasses/references/subscriptions.md) (recurring monthly benefits: `GetUserSubscriptionStatusAsync`, `PromptSubscriptionPurchase`, `UserSubscriptionStatusChanged`, payout rules, migration from passes).
-
-- **Visual effects & particles (full ParticleEmitter mastery + Beams/Trails/Highlight, performance, flipbooks, shapes, marker integration):** [roblox-vfx/SKILL.md](../roblox-vfx/SKILL.md)  
-  Its references/ cover [particle-emitter-properties.md](../roblox-vfx/references/particle-emitter-properties.md), [shapes-flipbooks-and-advanced.md](../roblox-vfx/references/shapes-flipbooks-and-advanced.md).
-
-- **Core services, Luau types, and architecture (every important service, Luau primitives + tables/enums/metatables/queues/stacks, type checking, serialization, script locations, no runtime FS reality, data model):** [roblox-core/SKILL.md](../roblox-core/SKILL.md)
-  Its references/ break down [services-catalog-and-usage.md](../roblox-core/references/services-catalog-and-usage.md), [luau-data-types-and-serialization.md](../roblox-core/references/luau-data-types-and-serialization.md), [script-locations-contexts-and-architecture.md](../roblox-core/references/script-locations-contexts-and-architecture.md). Hub-level architecture principles live in [references/architecture-principles.md](references/architecture-principles.md).
-
-- **Client-server networking and security (remotes vs bindables, authority, network ownership, exploits & defenses, capabilities, secure data/monetization flows):** [roblox-networking/SKILL.md](../roblox-networking/SKILL.md)  
-  Its references/ cover [remote-and-bindable-patterns.md](../roblox-networking/references/remote-and-bindable-patterns.md), [server-authority-and-validation.md](../roblox-networking/references/server-authority-and-validation.md), [exploits-and-defenses.md](../roblox-networking/references/exploits-and-defenses.md). Cross-skill secure flows are covered in [references/cross-skill-integration.md](references/cross-skill-integration.md).
-
-- **Roblox Studio MCP server (connect AI agents to Studio via MCP, Script Sync, tool reference, security/troubleshooting):** [roblox-mcp/SKILL.md](../roblox-mcp/SKILL.md)  
-  Its references/ cover [setup-and-connection.md](../roblox-mcp/references/setup-and-connection.md), [tool-reference.md](../roblox-mcp/references/tool-reference.md), [script-sync-integration.md](../roblox-mcp/references/script-sync-integration.md), [security-and-troubleshooting.md](../roblox-mcp/references/security-and-troubleshooting.md). Diagnostic scripts are in [scripts/MCPReadyChecker.lua](../roblox-mcp/scripts/MCPReadyChecker.lua) and [scripts/StudioModelProbe.lua](../roblox-mcp/scripts/StudioModelProbe.lua).
-
-- **Rojo filesystem projects (CLI/plugin install, `.project.json`, live sync, build/upload, sourcemap, syncback, file→instance mapping):** [roblox-rojo/SKILL.md](../roblox-rojo/SKILL.md)  
-  Its references/ cover [installation-and-cli.md](../roblox-rojo/references/installation-and-cli.md), [project-format.md](../roblox-rojo/references/project-format.md), [sync-details.md](../roblox-rojo/references/sync-details.md), [workflows-and-syncback.md](../roblox-rojo/references/workflows-and-syncback.md).
-
-- **Physics and constraints (rigid bodies, assemblies, mechanical/mover constraints, network ownership, collisions, sleep system, adaptive timestepping, units, vehicles, mechanisms):** [roblox-physics/SKILL.md](../roblox-physics/SKILL.md)  
-  Its references/ cover [mechanical-constraints.md](../roblox-physics/references/mechanical-constraints.md), [mover-constraints.md](../roblox-physics/references/mover-constraints.md), [network-ownership.md](../roblox-physics/references/network-ownership.md), [collisions-and-filtering.md](../roblox-physics/references/collisions-and-filtering.md), [units-and-physical-properties.md](../roblox-physics/references/units-and-physical-properties.md). Example scripts are in [scripts/VehicleController.lua](../roblox-physics/scripts/VehicleController.lua), [scripts/DoorHinge.lua](../roblox-physics/scripts/DoorHinge.lua), [scripts/PlatformMover.lua](../roblox-physics/scripts/PlatformMover.lua), and [scripts/Suspension.lua](../roblox-physics/scripts/Suspension.lua).
-
-- **Pathfinding and NPCs (PathfindingService, modifiers/links, waypoint following, state machines, patrol/chase/follow, streaming, performance at scale):** [roblox-npcs/SKILL.md](../roblox-npcs/SKILL.md)  
-  Its references/ cover [pathfinding-service-details.md](../roblox-npcs/references/pathfinding-service-details.md), [modifiers-links-and-streaming.md](../roblox-npcs/references/modifiers-links-and-streaming.md), [npc-behavior-patterns.md](../roblox-npcs/references/npc-behavior-patterns.md), [performance-and-scaling.md](../roblox-npcs/references/performance-and-scaling.md). Example scripts are in [scripts/NPCPathFollower.lua](../roblox-npcs/scripts/NPCPathFollower.lua), [scripts/PatrolBehavior.lua](../roblox-npcs/scripts/PatrolBehavior.lua), and [scripts/PathfindingUtility.lua](../roblox-npcs/scripts/PathfindingUtility.lua).
-
-- **Testing and debugging (Developer Console, MicroProfiler, Scene Analysis, Script Profiler, logging, pcall, unit tests, common bugs and fixes):** [roblox-testing/SKILL.md](../roblox-testing/SKILL.md)  
-  Its references/ cover [testing-patterns.md](../roblox-testing/references/testing-patterns.md), [debugging-tools.md](../roblox-testing/references/debugging-tools.md), [performance-profiling.md](../roblox-testing/references/performance-profiling.md), [common-bugs-and-fixes.md](../roblox-testing/references/common-bugs-and-fixes.md). Example scripts are in [scripts/TestRunner.lua](../roblox-testing/scripts/TestRunner.lua), [scripts/Logger.lua](../roblox-testing/scripts/Logger.lua), and [scripts/DebugDraw.lua](../roblox-testing/scripts/DebugDraw.lua).
-
-- **Audio (modern modular audio graph: AudioPlayer, AudioEmitter, AudioListener, AudioDeviceOutput/Input, Wire, TTS/STT, effects; legacy Sound/SoundGroup; 2D vs 3D; acoustic simulation; performance; asset permissions):** [roblox-audio/SKILL.md](../roblox-audio/SKILL.md)  
-  Its references/ cover [audio-effects.md](../roblox-audio/references/audio-effects.md), [audio-graph-vs-sound.md](../roblox-audio/references/audio-graph-vs-sound.md). Example script in [scripts/AudioBus.lua](../roblox-audio/scripts/AudioBus.lua).
-
-- **Open Cloud (REST API for Roblox resources from outside the engine or via HttpService: API keys/OAuth2, data & memory stores, assets, universes/places, users, groups, subscriptions, webhooks, in-experience calling, rate limits, security):** [roblox-open-cloud/SKILL.md](../roblox-open-cloud/SKILL.md)  
-  Its references/ cover [auth-and-keys.md](../roblox-open-cloud/references/auth-and-keys.md), [calling-from-in-experience.md](../roblox-open-cloud/references/calling-from-in-experience.md). Example script in [scripts/OpenCloudRequest.lua](../roblox-open-cloud/scripts/OpenCloudRequest.lua).
-
-- **TeleportService and multi-place (TeleportAsync, TeleportOptions, TeleportAsyncResult, ReserveServerAsync, reserved servers, matchmaking patterns, DataStore handoff, cross-experience teleports, teleport data, custom loading screens, security, Studio limitation):** [roblox-teleport/SKILL.md](../roblox-teleport/SKILL.md)  
-  Its references/ cover [teleport-options.md](../roblox-teleport/references/teleport-options.md), [matchmaking.md](../roblox-teleport/references/matchmaking.md). Example script in [scripts/TeleportHelper.lua](../roblox-teleport/scripts/TeleportHelper.lua).
+<!-- catalog:specialists:start -->
+- **Roblox core services, Luau types, and RunContext:** [roblox-core/SKILL.md](../roblox-core/SKILL.md) — Services, Luau types, serialization, script locations, `RunContext`, the data model
+- **Roblox networking: remotes, server authority, security:** [roblox-networking/SKILL.md](../roblox-networking/SKILL.md) — Remotes, server authority, network ownership, exploit defenses, capabilities
+- **Roblox DataStores: safe saves, versioning, quotas:** [roblox-datastores/SKILL.md](../roblox-datastores/SKILL.md) — DataStores, versioning, metadata, quotas, throttling, safe save/load patterns
+- **Roblox UI: containers, responsive layouts, interaction:** [roblox-user-interfaces/SKILL.md](../roblox-user-interfaces/SKILL.md) — GUI containers, responsive layouts, interaction, particles-in-UI techniques
+- **Roblox animation: Animator, IK, TweenService, markers:** [roblox-animation/SKILL.md](../roblox-animation/SKILL.md) — `Animator`, tracks, IK, `TweenService`, UI tweens, animation markers
+- **Roblox VFX: ParticleEmitter, Beam, Trail, performance:** [roblox-vfx/SKILL.md](../roblox-vfx/SKILL.md) — `ParticleEmitter`, shapes, flipbooks, beams, trails, highlights, performance
+- **Roblox audio: modern graph, legacy Sound, 3D, effects:** [roblox-audio/SKILL.md](../roblox-audio/SKILL.md) — Modern audio graph (`AudioPlayer`/`AudioEmitter`/`Wire`/TTS/STT), legacy `Sound`, 3D audio, effects, performance
+- **Roblox monetization: game passes, products, subscriptions:** [roblox-gamepasses/SKILL.md](../roblox-gamepasses/SKILL.md) — Game passes, dev products, subscriptions, purchase flow, policy, Robux transfers, analytics
+- **Roblox Open Cloud: REST APIs, keys, in-experience calls:** [roblox-open-cloud/SKILL.md](../roblox-open-cloud/SKILL.md) — Open Cloud REST APIs: API keys/OAuth2, data stores, assets, universes, webhooks, in-experience calling
+- **Roblox TeleportService: TeleportAsync, reserved servers:** [roblox-teleport/SKILL.md](../roblox-teleport/SKILL.md) — `TeleportAsync`, `TeleportOptions`, reserved servers, multi-place, matchmaking, DataStore handoff
+- **Rojo: filesystem projects, live sync, build:** [roblox-rojo/SKILL.md](../roblox-rojo/SKILL.md) — Rojo 7: CLI/plugin, project format, live sync, build/upload, sourcemap, syncback
+- **Roblox Studio MCP: connect AI agents to Studio:** [roblox-mcp/SKILL.md](../roblox-mcp/SKILL.md) — Connect AI agents to Roblox Studio via MCP: setup, tools, Script Sync, playtesting
+- **Roblox physics: assemblies, constraints, network ownership:** [roblox-physics/SKILL.md](../roblox-physics/SKILL.md) — Rigid bodies, assemblies, mechanical/mover constraints, network ownership, vehicles
+- **Roblox NPCs: PathfindingService, AI patterns, patrol:** [roblox-npcs/SKILL.md](../roblox-npcs/SKILL.md) — PathfindingService, modifiers/links, waypoint following, patrol/chase AI patterns
+- **Roblox testing: Developer Console, MicroProfiler, TestEZ:** [roblox-testing/SKILL.md](../roblox-testing/SKILL.md) — Developer Console, MicroProfiler, Scene Analysis, tests, logging, common bug fixes
+<!-- catalog:specialists:end -->
 
 ## Overarching Principles (apply to everything)
 
@@ -154,10 +128,17 @@ Audio:
 2. Activate the most specific sub-skill(s) that match the request.
 3. Inside the sub-skill, follow the explicit "Read references/..." instructions for the exact sub-topic.
 4. Load the referenced .md file(s) for the deep tables, code samples, decision trees, and gotchas.
-5. Use the scripts/ examples as starting points (adapt the SafeDataStore wrapper, particle pools, animation loaders, etc.).
+5. Treat `scripts/` as maturity-labeled examples. Adapt and test them in a dedicated experience before production use.
 6. Cross-link: datastores + networking for secure persistence; animation + vfx + UI for synchronized VFX; gamepasses + datastores for perk application; etc.
 7. When in doubt, fall back to the Engine API reference and the llms.txt indexes.
 
 This collection is intentionally deeper and more structured than generic "Roblox scripting" advice precisely because current models have gaps in the current Roblox API surface, limits details, modern patterns (Animator, IKControl, full DataStore v2, configurable rate limits, ViewportFrame previews for 3D UI — note ViewportFrame does not render ParticleEmitter, Beam, Trail, or most 3D effects, etc.), and security realities.
 
-Use it, follow the references, and the resulting code will be correct, efficient, secure, and maintainable.
+Use it to select current APIs and safer patterns, then validate the result with static analysis, tests, and the relevant official documentation.
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [architecture-principles.md](references/architecture-principles.md)
+- [cross-skill-integration.md](references/cross-skill-integration.md)
+<!-- catalog:references:end -->

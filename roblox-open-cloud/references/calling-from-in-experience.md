@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-07-16
 ---
 
 # Calling Open Cloud from In-Experience
@@ -82,7 +82,9 @@ end
 ## Best practices (official)
 
 - **pcall everything** and handle failures with a plan (retry, degrade, alert).
-- **Exponential backoff** on recoverable errors: 2s → 4s → 8s. Gives the endpoint time to cool off and avoids congestion.
+- Retry safe reads by default, but require endpoint-specific idempotency semantics before retrying mutations. A transport error or 5xx can occur after a mutation was processed.
+- On HTTP 429, honor `retry-after` first and `x-ratelimit-reset` when available; use bounded exponential backoff only when the response supplies no delay.
+- Return the last response/error, and never sleep after the final attempt. Only send an idempotency header when both the endpoint and the in-experience header allowlist support it.
 - **Batch where possible** — aggregate per-player data into one request if a bulk endpoint exists.
 - Validate and sanitize all received data.
 - Monitor via the **Observability Dashboard** (Creator Hub → Monitoring) — Request Count and Response Time charts, filterable by request type, status, and endpoint.

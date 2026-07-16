@@ -1,6 +1,7 @@
 ---
 name: roblox-networking
-description: Server-authoritative Roblox client-server code that resists the hostile client. Covers RemoteEvent/RemoteFunction vs BindableEvent/BindableFunction, replication, network ownership, validation, rate limiting, exploit vectors, and secure flows for data and monetization. Use to place code on the correct side of the boundary and harden any datastore, UI, animation, or monetization logic.
+description: "Server-authoritative Roblox client-server code that resists the hostile client. Covers RemoteEvent/RemoteFunction vs BindableEvent/BindableFunction, replication, network ownership, validation, rate limiting, exploit vectors, and secure flows for data and monetization. Use to place code on the correct side of the boundary and harden any datastore, UI, animation, or monetization logic."
+last_reviewed: 2026-07-16
 ---
 
 # roblox-networking
@@ -80,6 +81,14 @@ Use `RunService` context checks everywhere you are unsure.
 
 ## Scripts
 
-- `scripts/RateLimiter.lua` — a per-player, per-action token-bucket rate limiter with abuse escalation for sensitive Remotes. Use `RateLimiter.new()` for a dedicated instance or `RateLimiter.default` for the shared singleton.
+- `scripts/RateLimiter.lua` — a reviewed per-player/per-action limiter with a hard minimum interval, token capacity/refill, bounded action-key allocation, and denial reasons. Call `destroy()` on dedicated instances to disconnect cleanup; `RateLimiter.default` is the shared singleton.
 
 This skill + roblox-core + the domain skills (datastores, UI, animation, etc.) produces code that is both correct in behavior and resistant to the hostile client environment that is Roblox multiplayer.
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [exploits-and-defenses.md](references/exploits-and-defenses.md)
+- [remote-and-bindable-patterns.md](references/remote-and-bindable-patterns.md)
+- [server-authority-and-validation.md](references/server-authority-and-validation.md)
+<!-- catalog:references:end -->

@@ -1,6 +1,7 @@
 ---
 name: roblox-gamepasses
-description: Rule-accurate Roblox monetization — game passes, developer products (ProcessReceipt), and subscriptions (GetUserSubscriptionStatusAsync, PromptSubscriptionPurchase). Covers the selling flow, server-authoritative granting on PlayerAdded and purchase completion, PolicyService gating (ArePaidRandomItemsRestricted, IsEligibleToPurchaseSubscription, China policies), personalization, and integration with persistent data. Use for any purchase, perk, or recurring benefit.
+description: "Rule-accurate Roblox monetization — game passes, developer products (ProcessReceipt), and subscriptions (GetUserSubscriptionStatusAsync, PromptSubscriptionPurchase). Covers the selling flow, server-authoritative granting on PlayerAdded and purchase completion, PolicyService gating (ArePaidRandomItemsRestricted, IsEligibleToPurchaseSubscription, China policies), personalization, and integration with persistent data. Use for any purchase, perk, or recurring benefit."
+last_reviewed: 2026-07-16
 ---
 
 # roblox-gamepasses
@@ -15,7 +16,7 @@ See roblox-datastores for how to store "player owns this pass" state or associat
 
 - **Game Pass**: One-time purchase. Permanent privilege for that specific experience (VIP access, permanent item, extra slot, cosmetic unlock, etc.). Roblox tracks ownership per user per experience.
 - **Developer Product**: Repeatable / consumable (currency packs, potions, revives, temporary boosts). Can be bought many times. Requires ProcessReceipt callback on the server for fulfillment.
-- As of **May 30, 2026**, cross-experience game pass and developer product sales are disabled. Design experience-specific passes or use the [Robux Transfers API](https://create.roblox.com/docs/en-us/production/monetization/robux-transfers) for donation-style flows. `MarketplaceService:PromptRobuxTransferAsync` must be called from the server. Only **Roblox Plus** subscribers can initiate transfers, amounts are clamped to **10–500 Robux** per transaction, the sender cannot equal the receiver, Roblox takes a **10% platform fee**, and the recipient receives **90%**. A `BindReceiptHandler` callback must process transfer receipts; donations are high-risk for abuse and should include anti-abuse checks (rate limits, alt detection, moderation, no quid-pro-quo rewards).
+- As of **May 30, 2026**, cross-experience game pass and developer product sales are disabled. Design experience-specific passes or use the [Robux Transfers API](https://create.roblox.com/docs/en-us/production/monetization/robux-transfers) for donation-style flows. `MarketplaceService:PromptRobuxTransferAsync` must be called from the server. Only **Roblox Plus** subscribers can initiate transfers, transfer amounts must be between **10 and 500 Robux**, and the sender cannot equal the receiver. The recipient receives **90%** and the experience earns the other **10%**; Roblox takes no transfer fee. A `BindReceiptHandler` callback must process transfer receipts. Roblox permits an experience to grant items or perks after a successful receipt; choosing not to attach rewards is an opinionated anti-abuse/design recommendation, not a platform rule.
 - You (the creator) are 100% responsible for actually delivering the benefit. Roblox only handles the transaction and the UserOwnsGamePassAsync query.
 - Passes can be used for randomized virtual items only if you follow the Paid Random Items policy.
 
@@ -101,7 +102,7 @@ Use `MarketplaceService:GetProductInfoAsync(id, Enum.InfoType.GamePass)`. Do thi
 
 ## Capability Requirements
 
-All `MarketplaceService` purchase APIs (`PromptGamePassPurchase`, `PromptPurchase`, developer-product `ProcessReceipt`, `PromptRobuxTransferAsync`, etc.) require **API Services** to be enabled for the place (Home tab → Game Settings → Security → Enable Studio Access to API Services for Studio testing; live places use the deployed configuration). Game passes and developer products also require the experience to be published.
+Game passes and developer products require a published experience. Enable **Studio Access to API Services** only when a specific API used by a dedicated test experience requires it; do not treat that Studio setting as a blanket prerequisite for every `MarketplaceService` purchase API. Verify each API's current requirements in its Engine Reference entry.
 
 ## Personalization & Recommendations (use these)
 
@@ -185,3 +186,13 @@ See the developer-products doc for the repeatable flow.
 - `scripts/PassPurchaseHelper.lua` — a client-side helper for game pass button state, price display, and prompting.
 
 This skill + roblox-datastores + roblox-networking gives you a complete, secure, modern game pass implementation that follows current rules and best practices.
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [creation-and-setup.md](references/creation-and-setup.md)
+- [policyservice.md](references/policyservice.md)
+- [purchase-flow-and-granting.md](references/purchase-flow-and-granting.md)
+- [rules-policies-and-security.md](references/rules-policies-and-security.md)
+- [subscriptions.md](references/subscriptions.md)
+<!-- catalog:references:end -->

@@ -1,6 +1,7 @@
 ---
 name: roblox-testing
-description: Testing, debugging, and profiling Roblox experiences — Developer Console, Output, logging discipline, pcall and assertion patterns, TestEZ unit tests, the MicroProfiler (client and server), Scene Analysis, Script Profiler, memory diagnostics, network debugging, Luau type checking, and connection cleanup. Use when something is broken, slow, or unreliable, or when setting up test workflows.
+description: "Testing, debugging, and profiling Roblox experiences — Developer Console, Output, logging discipline, pcall and assertion patterns, TestEZ unit tests, the MicroProfiler (client and server), Scene Analysis, Script Profiler, memory diagnostics, network debugging, Luau type checking, and connection cleanup. Use when something is broken, slow, or unreliable, or when setting up test workflows."
+last_reviewed: 2026-06-17
 ---
 
 # roblox-testing
@@ -345,3 +346,12 @@ Enable **Print Join Size Breakdown** in Studio Settings → Network to see the l
 6. Add targeted logging or tests to confirm the fix.
 7. Verify on low-end devices and with network simulation when relevant.
 8. Compare memory snapshots before and after suspected leaks.
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [common-bugs-and-fixes.md](references/common-bugs-and-fixes.md)
+- [debugging-tools.md](references/debugging-tools.md)
+- [performance-profiling.md](references/performance-profiling.md)
+- [testing-patterns.md](references/testing-patterns.md)
+<!-- catalog:references:end -->

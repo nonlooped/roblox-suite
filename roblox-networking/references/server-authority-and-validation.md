@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-07-16
 ---
 
 # Server Authority and Validation
@@ -36,17 +36,18 @@ Many teams keep a "Validator" or "ActionHandler" module on the server that all R
 
 Example structure:
 ```lua
--- Server
-local function handleAction(player, actionName, payload)
-    if not RateLimiter:canPerform(player, actionName) then return end
-    
+--!strict
+-- `actionName` is selected by server code, never copied from a client string.
+local limiter = RateLimiter.default
+
+local function handleAction(player: Player, actionName: string, payload: any)
+    local allowed = limiter:canPerform(player, actionName)
+    if not allowed then return end
+
     local validator = Validators[actionName]
     if not validator or not validator(player, payload) then return end
-    
-    -- Apply effect
-    Effects[actionName]\(player, payload\)
-    
-    -- Replicate or let normal replication handle it
+
+    Effects[actionName](player, payload)
 end
 ```
 

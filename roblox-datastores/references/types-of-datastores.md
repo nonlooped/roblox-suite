@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-07-16
 ---
 
 # Types of Data Stores
@@ -19,7 +19,7 @@ last_reviewed: 2026-06-17
   - `ListVersionsAsync(key, sortDirection?, minDate?, maxDate?, pageSize?)` → DataStoreVersionPages
   - `GetVersionAsync(key, version)`
   - `GetVersionAtTimeAsync(key, timestampMillis)`
-  - `RemoveVersionAsync(key, version)`
+  - `RemoveVersionAsync(key, version)` exists but is **deprecated**; do not use it in new guidance.
 - Full support for user-defined metadata via DataStoreSetOptions / DataStoreIncrementOptions and DataStoreKeyInfo:GetMetadata().
 - UserIds array support for RTBF/GDPR tracking (passed on write, retrievable via KeyInfo).
 - Versioning is automatic on writes (first write per UTC hour creates a snapshot; successive writes in same hour overwrite the hourly version).

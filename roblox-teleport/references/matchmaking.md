@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-07-16
 ---
 
 # Matchmaking Patterns
@@ -62,15 +62,26 @@ local PLACE_ID = game.PlaceId
 local codes = DataStoreService:GetDataStore("MatchServerCodes")
 
 local function getOrCreateCode(matchId: string): string?
-    local ok, saved = pcall(function() return codes:GetAsync("match_" .. matchId) end)
-    if ok and typeof(saved) == "string" then
-        return saved
+    local reserveOk, code = pcall(function()
+        return select(1, TeleportService:ReserveServerAsync(PLACE_ID))
+    end)
+    if not reserveOk or typeof(code) ~= "string" then return nil end
+
+    local now = os.time()
+    local candidate = { accessCode = code, expiresAt = now + 3600, state = "allocated" }
+    local publishOk, winner = pcall(function()
+        return codes:UpdateAsync("match_" .. matchId, function(current)
+            if type(current) == "table" and type(current.accessCode) == "string" and current.expiresAt > now then
+                return current
+            end
+            return candidate
+        end)
+    end)
+    if publishOk and type(winner) == "table" then
+        return winner.accessCode -- all concurrent allocators use the atomic winner
     end
-    local reserveOk, code = pcall(function() return select(1, TeleportService:ReserveServerAsync(PLACE_ID)) end)
-    if reserveOk and code then
-        pcall(function() codes:SetAsync("match_" .. matchId, code) end)
-        return code
-    end
+    -- A failed write can be ambiguous. Reconcile with GetAsync(UseCache=false)
+    -- before deciding whether allocation failed; see scripts/TeleportHelper.lua.
     return nil
 end
 
@@ -86,7 +97,7 @@ local function sendPartyToMatch(matchId: string, party: { Player })
 end
 ```
 
-Reserved servers persist across restarts (the access code stays valid); rejoining starts a new server if none is running.
+Reserved server access codes remain valid, but allocation records should carry an expiry so matchmaking state does not live forever. The source can record `teleporting` only after allocation; the destination must separately mark `arrived`. For short-lived queues and locks, prefer a TTL'd MemoryStore record.
 
 ## Pattern 3: Server browser via MemoryStoreService
 

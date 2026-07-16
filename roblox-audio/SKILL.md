@@ -1,6 +1,7 @@
 ---
 name: roblox-audio
-description: Roblox audio — the modern modular audio graph (AudioPlayer, AudioEmitter, AudioListener, Wire, AudioTextToSpeech) and the legacy Sound/SoundGroup system. Covers 2D vs 3D audio, spatial attenuation, effects (Equalizer, Compressor, Reverb, Echo, Distortion), TTS/STT, acoustic simulation, asset permissions and the 2022 privacy changes, concurrent-voice limits, preloading, and looping. Use for any sound, music, voice, or audio-driven feedback.
+description: "Roblox audio — the modern modular audio graph (AudioPlayer, AudioEmitter, AudioListener, Wire, AudioTextToSpeech) and the legacy Sound/SoundGroup system. Covers 2D vs 3D audio, spatial attenuation, effects (Equalizer, Compressor, Reverb, Echo, Distortion), TTS/STT, acoustic simulation, asset permissions and the 2022 privacy changes, concurrent-voice limits, preloading, and looping. Use for any sound, music, voice, or audio-driven feedback."
+last_reviewed: 2026-06-17
 ---
 
 # roblox-audio
@@ -237,3 +238,10 @@ To use STT without broadcasting voice to other players, disable `VoiceChatServic
 5. Preload, then trigger from events (animation markers, UI, gameplay).
 6. Profile concurrent voices and effect cost on the lowest target device.
 7. Verify asset permissions for any third-party audio.
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [audio-effects.md](references/audio-effects.md)
+- [audio-graph-vs-sound.md](references/audio-graph-vs-sound.md)
+<!-- catalog:references:end -->

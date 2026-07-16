@@ -1,0 +1,826 @@
+{
+  "schema_version": 1,
+  "groups": [
+    {
+      "id": "core",
+      "title": "Core",
+      "description": "Foundational Roblox development skills every agent should start with.",
+      "skills": [
+        "roblox",
+        "roblox-core",
+        "roblox-networking"
+      ]
+    },
+    {
+      "id": "gameplay",
+      "title": "Gameplay",
+      "description": "Skills for building characters, physics, AI, world mechanics, and moving players between places.",
+      "skills": [
+        "roblox-physics",
+        "roblox-npcs",
+        "roblox-teleport"
+      ]
+    },
+    {
+      "id": "presentation",
+      "title": "Presentation",
+      "description": "Skills for user interfaces, animation, visual effects, audio, and polish.",
+      "skills": [
+        "roblox-user-interfaces",
+        "roblox-animation",
+        "roblox-vfx",
+        "roblox-audio"
+      ]
+    },
+    {
+      "id": "systems",
+      "title": "Systems",
+      "description": "Skills for data persistence, monetization, external automation, and live ops.",
+      "skills": [
+        "roblox-datastores",
+        "roblox-gamepasses",
+        "roblox-open-cloud"
+      ]
+    },
+    {
+      "id": "quality",
+      "title": "Quality",
+      "description": "Skills for testing, debugging, and profiling experiences.",
+      "skills": [
+        "roblox-testing"
+      ]
+    },
+    {
+      "id": "agent-workflows",
+      "title": "Agent Workflows",
+      "description": "Skills for filesystem workflows (Rojo) and connecting AI agents directly to Roblox Studio.",
+      "skills": [
+        "roblox-rojo",
+        "roblox-mcp"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "slug": "roblox",
+      "title": "roblox",
+      "hub": true,
+      "oneLiner": "Architecture principles, cross-skill workflows, quick-reference patterns",
+      "displayTitle": "Roblox development hub: architecture and skill routing",
+      "overview": "Entry-point skill: server authority, client-server model, and a decision tree that routes to the right specialist. Load this first.",
+      "covers": [
+        "The single entry point: overarching architecture and server-authority principles.",
+        "Quick-reference patterns and a decision tree that routes you to the right specialized skill.",
+        "Cross-skill workflows for data, UI, animation, monetization, and networking."
+      ],
+      "sources": [
+        {
+          "label": "Engine API Reference",
+          "url": "https://create.roblox.com/docs/reference/engine",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Docs index for agents (llms.txt)",
+          "url": "https://create.roblox.com/docs/llms.txt",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Engine API index for agents",
+          "url": "https://create.roblox.com/docs/reference/engine/llms.txt",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "lower",
+      "created_at": "2026-06-16",
+      "examples": {
+        "status": "none",
+        "files": []
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-core",
+      "title": "roblox-core",
+      "oneLiner": "Services, Luau types, serialization, script locations, `RunContext`, the data model",
+      "displayTitle": "Roblox core services, Luau types, and RunContext",
+      "overview": "Services via `game:GetService`, Luau types, script locations, `RunContext`, and the client-server data model. The layer every other skill assumes.",
+      "covers": [
+        "Every important service via `game:GetService`, Luau data types and serialization rules.",
+        "Script locations and execution contexts, including modern `BaseScript.RunContext`.",
+        "The client-server data model, and the reality that there is no runtime filesystem I/O."
+      ],
+      "sources": [
+        {
+          "label": "Luau",
+          "url": "https://create.roblox.com/docs/en-us/luau",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Script locations & contexts",
+          "url": "https://create.roblox.com/docs/en-us/scripting/locations",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Services",
+          "url": "https://create.roblox.com/docs/en-us/scripting/services",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Client-server model",
+          "url": "https://create.roblox.com/docs/en-us/projects/client-server",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Engine API Reference",
+          "url": "https://create.roblox.com/docs/reference/engine",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "medium",
+      "created_at": "2026-06-16",
+      "examples": {
+        "status": "experimental",
+        "files": [
+          {
+            "path": "scripts/ServiceHelper.lua",
+            "status": "experimental"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-networking",
+      "title": "roblox-networking",
+      "oneLiner": "Remotes, server authority, network ownership, exploit defenses, capabilities",
+      "displayTitle": "Roblox networking: remotes, server authority, security",
+      "overview": "Remotes, network ownership, and server authority. Validation, rate limiting, and capability patterns that stop common exploits.",
+      "covers": [
+        "RemoteEvent/RemoteFunction vs Bindable equivalents, and RunService execution contexts.",
+        "Server authority as the foundation: validation and rate-limiting on every request.",
+        "Common exploit vectors and capability-based access control."
+      ],
+      "sources": [
+        {
+          "label": "Client-server model",
+          "url": "https://create.roblox.com/docs/projects/client-server",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Security tactics",
+          "url": "https://create.roblox.com/docs/scripting/security/security-tactics",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Engine API Reference",
+          "url": "https://create.roblox.com/docs/reference/engine",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "critical",
+      "created_at": "2026-06-16",
+      "examples": {
+        "status": "reviewed",
+        "files": [
+          {
+            "path": "scripts/RateLimiter.lua",
+            "status": "reviewed"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-datastores",
+      "title": "roblox-datastores",
+      "oneLiner": "DataStores, versioning, metadata, quotas, throttling, safe save/load patterns",
+      "displayTitle": "Roblox DataStores: safe saves, versioning, quotas",
+      "overview": "DataStore, OrderedDataStore, and MemoryStore: `UpdateAsync`, versioning, quotas, and save patterns that avoid data loss. Pair with roblox-networking.",
+      "covers": [
+        "DataStore vs OrderedDataStore vs MemoryStore Service decision tree.",
+        "`UpdateAsync` with a pure transform for contended values; hourly versioning for recovery.",
+        "Every error code, quota, and throttling strategy, with patterns that avoid data loss."
+      ],
+      "sources": [
+        {
+          "label": "Data stores",
+          "url": "https://create.roblox.com/docs/cloud-services/data-stores",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Versioning, listing & caching",
+          "url": "https://create.roblox.com/docs/cloud-services/data-stores/versioning-listing-and-caching",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Error codes & limits",
+          "url": "https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits",
+          "verified_at": "2026-07-16"
+        },
+        {
+          "label": "Best practices",
+          "url": "https://create.roblox.com/docs/cloud-services/data-stores/best-practices",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Engine API Reference",
+          "url": "https://create.roblox.com/docs/reference/engine",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "critical",
+      "created_at": "2026-06-16",
+      "examples": {
+        "status": "experimental",
+        "files": [
+          {
+            "path": "scripts/BudgetMonitor.lua",
+            "status": "experimental"
+          },
+          {
+            "path": "scripts/SafeDataStore.lua",
+            "status": "reviewed"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-user-interfaces",
+      "title": "roblox-user-interfaces",
+      "oneLiner": "GUI containers, responsive layouts, interaction, particles-in-UI techniques",
+      "displayTitle": "Roblox UI: containers, responsive layouts, interaction",
+      "overview": "ScreenGui, SurfaceGui, BillboardGui, and building blocks. Scale+offset layouts, Activated vs mouse events, and particles-in-UI limits.",
+      "covers": [
+        "Every GUI container (ScreenGui, SurfaceGui, BillboardGui) and building block.",
+        "Scale + offset responsive layouts tested across target screen sizes.",
+        "Particles-in-UI techniques, and the truth that 3D ParticleEmitters don't render in ViewportFrame."
+      ],
+      "sources": [
+        {
+          "label": "In-experience containers",
+          "url": "https://create.roblox.com/docs/en-us/ui/in-experience-containers",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "On-screen containers",
+          "url": "https://create.roblox.com/docs/en-us/ui/on-screen-containers",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Engine API Reference",
+          "url": "https://create.roblox.com/docs/reference/engine",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "lower",
+      "created_at": "2026-06-16",
+      "examples": {
+        "status": "experimental",
+        "files": [
+          {
+            "path": "scripts/UIParticlePool.lua",
+            "status": "experimental"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-animation",
+      "title": "roblox-animation",
+      "oneLiner": "`Animator`, tracks, IK, `TweenService`, UI tweens, animation markers",
+      "displayTitle": "Roblox animation: Animator, IK, TweenService, markers",
+      "overview": "`Animator` / `AnimationTrack` / `IKControl` for characters; `TweenService` for UI and 3D. Replaces deprecated `Humanoid:LoadAnimation`.",
+      "covers": [
+        "Animator-based loading with proper track lifecycle and marker-driven gameplay.",
+        "`IKControl` for procedural posing; CurveAnimation vs KeyframeSequence.",
+        "`TweenService` for UI and 3D, sequences, chaining, and typewriter effects."
+      ],
+      "sources": [
+        {
+          "label": "Animation",
+          "url": "https://create.roblox.com/docs/animation",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Inverse kinematics",
+          "url": "https://create.roblox.com/docs/animation/inverse-kinematics",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "UI animation",
+          "url": "https://create.roblox.com/docs/ui/animation",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Engine API Reference",
+          "url": "https://create.roblox.com/docs/reference/engine",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "lower",
+      "created_at": "2026-06-16",
+      "examples": {
+        "status": "experimental",
+        "files": [
+          {
+            "path": "scripts/AnimationLoader.lua",
+            "status": "experimental"
+          },
+          {
+            "path": "scripts/IKSetup.lua",
+            "status": "experimental"
+          },
+          {
+            "path": "scripts/TweenHelper.lua",
+            "status": "experimental"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-vfx",
+      "title": "roblox-vfx",
+      "oneLiner": "`ParticleEmitter`, shapes, flipbooks, beams, trails, highlights, performance",
+      "displayTitle": "Roblox VFX: ParticleEmitter, Beam, Trail, performance",
+      "overview": "`ParticleEmitter`, `Beam`, `Trail`, `Highlight` - emission patterns, flipbooks, and LOD so effects don't tank FPS.",
+      "covers": [
+        "ParticleEmitter properties, sequences, shapes, and flipbooks.",
+        "Beam, Trail, Highlight, plus one-shot vs continuous emission.",
+        "Performance: LOD-aware patterns that degrade gracefully on low-end devices."
+      ],
+      "sources": [
+        {
+          "label": "Particle emitters",
+          "url": "https://create.roblox.com/docs/en-us/effects/particle-emitters",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Engine API Reference",
+          "url": "https://create.roblox.com/docs/reference/engine",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "lower",
+      "created_at": "2026-06-16",
+      "examples": {
+        "status": "experimental",
+        "files": [
+          {
+            "path": "scripts/EffectBurst.lua",
+            "status": "experimental"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-audio",
+      "title": "roblox-audio",
+      "oneLiner": "Modern audio graph (`AudioPlayer`/`AudioEmitter`/`Wire`/TTS/STT), legacy `Sound`, 3D audio, effects, performance",
+      "displayTitle": "Roblox audio: modern graph, legacy Sound, 3D, effects",
+      "overview": "Modern audio graph (`AudioPlayer`, `AudioEmitter`, `Wire`, TTS/STT) vs legacy `Sound`. 2D/3D, effects, and mobile caps.",
+      "covers": [
+        "The modern modular audio graph: AudioPlayer, AudioEmitter, Wire, TTS, STT.",
+        "Legacy Sound/SoundGroup: discouraged for new work, and when to still use it.",
+        "2D vs 3D audio, effect chains, and mobile performance caps."
+      ],
+      "sources": [
+        {
+          "label": "Audio objects",
+          "url": "https://create.roblox.com/docs/en-us/audio/objects",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Audio effects",
+          "url": "https://create.roblox.com/docs/en-us/audio/effects",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Sound (legacy) class",
+          "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/Sound",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Engine API Reference",
+          "url": "https://create.roblox.com/docs/en-us/reference/engine",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "lower",
+      "created_at": "2026-06-17",
+      "examples": {
+        "status": "experimental",
+        "files": [
+          {
+            "path": "scripts/AudioBus.lua",
+            "status": "experimental"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-gamepasses",
+      "title": "roblox-gamepasses",
+      "oneLiner": "Game passes, dev products, subscriptions, purchase flow, policy, Robux transfers, analytics",
+      "displayTitle": "Roblox monetization: game passes, products, subscriptions",
+      "overview": "Game passes, developer products (`ProcessReceipt`), and subscriptions - server-side grants, idempotency, and current policy dates.",
+      "covers": [
+        "Game passes, developer products (`ProcessReceipt`), and subscriptions.",
+        "Server-authoritative granting with idempotency guards and `PlayerAdded` re-verification.",
+        "Current policy: cross-experience sales disabled (May 30 2026); Creator Rewards replaced Premium Payouts."
+      ],
+      "sources": [
+        {
+          "label": "Passes (monetization)",
+          "url": "https://create.roblox.com/docs/en-us/production/monetization/passes",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Creator Rewards",
+          "url": "https://create.roblox.com/docs/en-us/creator-rewards",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Robux transfers",
+          "url": "https://create.roblox.com/docs/en-us/production/monetization/robux-transfers",
+          "verified_at": "2026-07-16"
+        }
+      ],
+      "risk": "critical",
+      "created_at": "2026-06-16",
+      "examples": {
+        "status": "experimental",
+        "files": [
+          {
+            "path": "scripts/PassPurchaseHelper.lua",
+            "status": "experimental"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-open-cloud",
+      "title": "roblox-open-cloud",
+      "oneLiner": "Open Cloud REST APIs: API keys/OAuth2, data stores, assets, universes, webhooks, in-experience calling",
+      "displayTitle": "Roblox Open Cloud: REST APIs, keys, in-experience calls",
+      "overview": "Open Cloud REST APIs for data stores, assets, universes, and more. Keys, OAuth2, scopes, Secrets Store, and in-experience `HttpService`.",
+      "covers": [
+        "REST APIs for data stores, assets, universes, and more, from outside the engine or in-experience via HttpService.",
+        "API keys, OAuth2, least-privilege scopes, and the 60-day key auto-expiry rule.",
+        "Secrets Store + `HttpService:GetSecret` so keys never sit in scripts."
+      ],
+      "sources": [
+        {
+          "label": "Open Cloud",
+          "url": "https://create.roblox.com/docs/en-us/cloud",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "API keys",
+          "url": "https://create.roblox.com/docs/en-us/cloud/auth/api-keys",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "OAuth2 overview",
+          "url": "https://create.roblox.com/docs/cloud/auth/oauth2-overview",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "HttpService (in-experience)",
+          "url": "https://create.roblox.com/docs/en-us/cloud-services/http-service",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Secrets",
+          "url": "https://create.roblox.com/docs/en-us/cloud-services/secrets",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Rate limits",
+          "url": "https://create.roblox.com/docs/en-us/cloud/reference/rate-limits",
+          "verified_at": "2026-07-16"
+        }
+      ],
+      "risk": "critical",
+      "created_at": "2026-06-17",
+      "examples": {
+        "status": "reviewed",
+        "files": [
+          {
+            "path": "scripts/OpenCloudRequest.lua",
+            "status": "reviewed"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-teleport",
+      "title": "roblox-teleport",
+      "oneLiner": "`TeleportAsync`, `TeleportOptions`, reserved servers, multi-place, matchmaking, DataStore handoff",
+      "displayTitle": "Roblox TeleportService: TeleportAsync, reserved servers",
+      "overview": "`TeleportAsync` (replaces legacy teleport methods), reserved servers, multi-place handoff, and spoofable teleport-data caveats.",
+      "covers": [
+        "The unified `TeleportAsync` API that replaces the deprecated teleport methods.",
+        "`TeleportOptions`, reserved servers, and `TeleportAsyncResult` error handling.",
+        "Multi-place architecture, DataStore handoff, and matchmaking patterns."
+      ],
+      "sources": [
+        {
+          "label": "Teleport",
+          "url": "https://create.roblox.com/docs/en-us/projects/teleport",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "TeleportService",
+          "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportService",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "TeleportOptions",
+          "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportOptions",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "TeleportAsyncResult",
+          "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportAsyncResult",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "critical",
+      "created_at": "2026-06-17",
+      "examples": {
+        "status": "reviewed",
+        "files": [
+          {
+            "path": "scripts/TeleportHelper.lua",
+            "status": "reviewed"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-rojo",
+      "title": "roblox-rojo",
+      "oneLiner": "Rojo 7: CLI/plugin, project format, live sync, build/upload, sourcemap, syncback",
+      "displayTitle": "Rojo: filesystem projects, live sync, build",
+      "overview": "Rojo 7 project workflows: install CLI/plugin, `.project.json`, live sync, build/upload, sourcemaps, and `syncback` for place→files.",
+      "covers": [
+        "Install CLI + Studio plugin (Rokit, GitHub, cargo) and connect with `rojo serve`.",
+        "Project format, file→instance mapping (`.server.luau` / `.client.luau` / modules), meta files.",
+        "`rojo build` / `upload` / `sourcemap` / `syncback`; live-sync limits and two-way caveats."
+      ],
+      "sources": [
+        {
+          "label": "Rojo docs (v7)",
+          "url": "https://rojo.space/docs/v7/",
+          "verified_at": "2026-07-09"
+        },
+        {
+          "label": "Installation",
+          "url": "https://rojo.space/docs/v7/getting-started/installation/",
+          "verified_at": "2026-07-09"
+        },
+        {
+          "label": "Project format",
+          "url": "https://rojo.space/docs/v7/project-format/",
+          "verified_at": "2026-07-09"
+        },
+        {
+          "label": "Sync details",
+          "url": "https://rojo.space/docs/v7/sync-details/",
+          "verified_at": "2026-07-09"
+        },
+        {
+          "label": "Rojo releases",
+          "url": "https://github.com/rojo-rbx/rojo/releases",
+          "verified_at": "2026-07-09"
+        }
+      ],
+      "risk": "medium",
+      "created_at": "2026-07-09",
+      "examples": {
+        "status": "none",
+        "files": []
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-mcp",
+      "title": "roblox-mcp",
+      "oneLiner": "Connect AI agents to Roblox Studio via MCP: setup, tools, Script Sync, playtesting",
+      "displayTitle": "Roblox Studio MCP: connect AI agents to Studio",
+      "overview": "Official Studio MCP server: read/write scripts, run Luau, playtest, capture viewport. Setup for Cursor, VS Code, Claude, Codex + Script Sync.",
+      "covers": [
+        "Connect AI agents to Roblox Studio via the official MCP server.",
+        "Read and write scripts, explore the data model, run Luau, and capture the viewport.",
+        "Combine with Script Sync for a file-based workflow."
+      ],
+      "sources": [
+        {
+          "label": "Studio MCP",
+          "url": "https://create.roblox.com/docs/en-us/studio/mcp",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Build with AI",
+          "url": "https://create.roblox.com/docs/en-us/ai/build",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Script Sync",
+          "url": "https://create.roblox.com/docs/en-us/scripting/sync",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "medium",
+      "created_at": "2026-06-16",
+      "examples": {
+        "status": "experimental",
+        "files": [
+          {
+            "path": "scripts/MCPReadyChecker.lua",
+            "status": "experimental"
+          },
+          {
+            "path": "scripts/StudioModelProbe.lua",
+            "status": "experimental"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-physics",
+      "title": "roblox-physics",
+      "oneLiner": "Rigid bodies, assemblies, mechanical/mover constraints, network ownership, vehicles",
+      "displayTitle": "Roblox physics: assemblies, constraints, network ownership",
+      "overview": "Assemblies, welds, mechanical/mover constraints (replacing BodyMovers), network ownership for vehicles, and sleep/timestepping.",
+      "covers": [
+        "Assemblies, root parts, anchoring, and WeldConstraint vs RigidConstraint.",
+        "Mechanical and mover constraints, the modern replacements for deprecated BodyMovers.",
+        "Network ownership for vehicles, the sleep system, and adaptive timestepping."
+      ],
+      "sources": [
+        {
+          "label": "Physics",
+          "url": "https://create.roblox.com/docs/physics",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Mechanical constraints",
+          "url": "https://create.roblox.com/docs/physics/mechanical-constraints",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Mover constraints",
+          "url": "https://create.roblox.com/docs/physics/mover-constraints",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Network ownership",
+          "url": "https://create.roblox.com/docs/physics/network-ownership",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Engine API Reference",
+          "url": "https://create.roblox.com/docs/reference/engine",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "medium",
+      "created_at": "2026-06-16",
+      "examples": {
+        "status": "experimental",
+        "files": [
+          {
+            "path": "scripts/DoorHinge.lua",
+            "status": "experimental"
+          },
+          {
+            "path": "scripts/PlatformMover.lua",
+            "status": "experimental"
+          },
+          {
+            "path": "scripts/Suspension.lua",
+            "status": "experimental"
+          },
+          {
+            "path": "scripts/VehicleController.lua",
+            "status": "experimental"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-npcs",
+      "title": "roblox-npcs",
+      "oneLiner": "PathfindingService, modifiers/links, waypoint following, patrol/chase AI patterns",
+      "displayTitle": "Roblox NPCs: PathfindingService, AI patterns, patrol",
+      "overview": "`PathfindingService`, modifiers/links, and NPC patterns (state machines, patrol/chase) that scale.",
+      "covers": [
+        "PathfindingService, agent parameters, and blocked-path handling.",
+        "PathfindingModifier and PathfindingLink, with material and region costs.",
+        "State machines, behavior trees, and patrol/chase patterns at scale."
+      ],
+      "sources": [
+        {
+          "label": "Pathfinding (characters)",
+          "url": "https://create.roblox.com/docs/en-us/characters/pathfinding",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Streaming (workspace)",
+          "url": "https://create.roblox.com/docs/en-us/workspace/streaming",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Engine API Reference",
+          "url": "https://create.roblox.com/docs/reference/engine",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "medium",
+      "created_at": "2026-06-16",
+      "examples": {
+        "status": "experimental",
+        "files": [
+          {
+            "path": "scripts/NPCPathFollower.lua",
+            "status": "experimental"
+          },
+          {
+            "path": "scripts/PathfindingUtility.lua",
+            "status": "experimental"
+          },
+          {
+            "path": "scripts/PatrolBehavior.lua",
+            "status": "experimental"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    },
+    {
+      "slug": "roblox-testing",
+      "title": "roblox-testing",
+      "oneLiner": "Developer Console, MicroProfiler, Scene Analysis, tests, logging, common bug fixes",
+      "displayTitle": "Roblox testing: Developer Console, MicroProfiler, TestEZ",
+      "overview": "Developer Console, MicroProfiler, Scene Analysis, TestEZ, and a method for isolating bugs and perf issues.",
+      "covers": [
+        "Developer Console, Output discipline, and pcall/assert patterns.",
+        "MicroProfiler, Scene Analysis, and the Script Profiler.",
+        "TestEZ unit tests, memory diagnostics, and a methodology for isolating issues."
+      ],
+      "sources": [
+        {
+          "label": "MicroProfiler",
+          "url": "https://create.roblox.com/docs/en-us/performance-optimization/microprofiler",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Scene Analysis",
+          "url": "https://create.roblox.com/docs/en-us/performance-optimization/scene-analysis",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Developer Console",
+          "url": "https://create.roblox.com/docs/en-us/studio/developer-console",
+          "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Script Profiler",
+          "url": "https://create.roblox.com/docs/en-us/studio/optimization/scriptprofiler",
+          "verified_at": "2026-06-17"
+        }
+      ],
+      "risk": "medium",
+      "created_at": "2026-06-16",
+      "examples": {
+        "status": "experimental",
+        "files": [
+          {
+            "path": "scripts/DebugDraw.lua",
+            "status": "experimental"
+          },
+          {
+            "path": "scripts/Logger.lua",
+            "status": "experimental"
+          },
+          {
+            "path": "scripts/TestRunner.lua",
+            "status": "experimental"
+          }
+        ]
+      },
+      "last_changed_at": "2026-07-16"
+    }
+  ]
+}

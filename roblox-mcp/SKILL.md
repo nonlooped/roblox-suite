@@ -1,6 +1,7 @@
 ---
 name: roblox-mcp
-description: Roblox Studio MCP server for connecting AI agents directly to Studio — read and write scripts, explore the data model, execute Luau, run playtests, capture the viewport, and control Studio. Covers prerequisites, enabling Studio as an MCP server, quick-connect vs JSON/CLI configuration for Cursor/VS Code/Claude/Codex, every available MCP tool, combining MCP with Script Sync for a file-based workflow, multi-instance handling, and security boundaries. Use when connecting an AI coding tool to Roblox Studio.
+description: "Roblox Studio MCP server for connecting AI agents directly to Studio — read and write scripts, explore the data model, execute Luau, run playtests, capture the viewport, and control Studio. Covers prerequisites, enabling Studio as an MCP server, quick-connect vs JSON/CLI configuration for Cursor/VS Code/Claude/Codex, every available MCP tool, combining MCP with Script Sync for a file-based workflow, multi-instance handling, and security boundaries. Use when connecting an AI coding tool to Roblox Studio."
+last_reviewed: 2026-06-17
 ---
 
 # roblox-mcp
@@ -127,3 +128,12 @@ See [references/security-and-troubleshooting.md](references/security-and-trouble
 3. Verify the connection with a simple tree-read or `execute_luau` call.
 4. If using a file-based workflow, set up Script Sync per [references/script-sync-integration.md](references/script-sync-integration.md).
 5. Use the tool reference to craft precise agent prompts and the security guide to keep the workflow safe.
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [script-sync-integration.md](references/script-sync-integration.md)
+- [security-and-troubleshooting.md](references/security-and-troubleshooting.md)
+- [setup-and-connection.md](references/setup-and-connection.md)
+- [tool-reference.md](references/tool-reference.md)
+<!-- catalog:references:end -->

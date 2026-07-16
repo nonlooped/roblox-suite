@@ -24,13 +24,13 @@ Causes:
 - DataStore call from client/LocalScript.
 - Non-serializable value (function, metatable, cycle, inf/nan).
 - Missing `pcall` around call.
-- Studio API access disabled on test place or enabled on live place.
+- Studio backend access disabled for a test experience, or enabled against production data.
 
 Fixes:
 - Always call DataStores from server `Script`.
 - Test serialization with `HttpService:JSONEncode`.
 - Wrap every call in `pcall`.
-- Keep API services off in production.
+- Do not let Studio sessions access production backend data; use a separate test experience.
 
 ## Remote events not working
 

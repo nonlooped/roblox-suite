@@ -1,6 +1,7 @@
 ---
 name: roblox-vfx
-description: Roblox ParticleEmitter, Beam, Trail, and Highlight effects with production-grade performance discipline. Covers sequences, shapes, flipbooks, one-shot vs continuous emission, marker-driven bursts, lighting interaction, and fill-rate budgets. Use for any visual effect — never set Rate and Size blindly. Pairs with roblox-animation for marker-driven bursts.
+description: "Roblox ParticleEmitter, Beam, Trail, and Highlight effects with performance-aware guidance. Covers sequences, shapes, flipbooks, one-shot vs continuous emission, marker-driven bursts, lighting interaction, and fill-rate budgets. Use for any visual effect — never set Rate and Size blindly. Pairs with roblox-animation for marker-driven bursts."
+last_reviewed: 2026-06-17
 ---
 
 # roblox-vfx
@@ -110,3 +111,10 @@ Use these together with the roblox-animation skill's marker system and the roblo
 ## Scripts
 
 - `scripts/EffectBurst.lua` — clone-and-destroy helper for one-shot particle bursts. Clones every ParticleEmitter under a template Attachment/BasePart, emits a burst locally, and schedules cleanup after the maximum lifetime. Safe for continuous emitters because the original emitters are never mutated.
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [particle-emitter-properties.md](references/particle-emitter-properties.md)
+- [shapes-flipbooks-and-advanced.md](references/shapes-flipbooks-and-advanced.md)
+<!-- catalog:references:end -->

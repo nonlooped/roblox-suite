@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-07-16
 ---
 
 # Versioning, Metadata, and Recovery
@@ -43,7 +43,7 @@ On UpdateAsync the transform receives the current KeyInfo as the second argument
 
 - `GetVersionAtTimeAsync(key, timestampMillis)` → the version that was current at (or the closest before) the given time. Extremely useful for "the player says the bug happened around 3:42 UTC on the 12th".
 
-- `RemoveVersionAsync(key, versionString)` → permanently deletes that specific historical version. It does *not* affect the current value or other versions, and it does *not* create a tombstone.
+- `RemoveVersionAsync(key, versionString)` is **deprecated** in the current Engine API. Do not use it in new code or treat it as the normal version-cleanup path. Preserve version history for recovery.
 
 Normal `RemoveAsync(key)` creates a new tombstone *current* version (GetAsync returns nil) while leaving all previous versions intact for recovery.
 
@@ -145,4 +145,4 @@ Permissions (group experiences): View Data Stores, Edit Data Stores, Delete Data
 - Document the schema version inside metadata so that on restore you know whether the old data is still compatible with current code.
 - For very large experiences, combine versioning with the Batch Processor / Open Cloud for bulk recovery or inspection when the Manager becomes impractical (experiences with >100 data stores may hide some aggregate numbers).
 
-Versioning is one of the strongest safety nets Roblox gives you for free. Use the List/Get/RemoveVersion and GetVersionAtTime APIs, the Manager UI, and snapshots proactively rather than only after a disaster.
+Versioning is an important recovery tool. Use `ListVersionsAsync`, `GetVersionAsync`, `GetVersionAtTimeAsync`, the Manager UI, and snapshots proactively rather than only after a disaster; restore by writing a new current version.

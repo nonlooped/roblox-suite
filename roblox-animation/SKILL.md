@@ -1,6 +1,7 @@
 ---
 name: roblox-animation
-description: Modern Roblox animation and tweening — Animator/AnimationTrack over deprecated Humanoid:LoadAnimation, IKControl for procedural posing, marker-driven events, and TweenService for UI and 3D properties. Covers priorities, caching, the Animation Editor workflow, UI scale/AnchorPoint best practices, typewriter effects, and performance. Use for character locomotion, emotes, object motion, and any animated UI.
+description: "Modern Roblox animation and tweening — Animator/AnimationTrack over deprecated Humanoid:LoadAnimation, IKControl for procedural posing, marker-driven events, and TweenService for UI and 3D properties. Covers priorities, caching, the Animation Editor workflow, UI scale/AnchorPoint best practices, typewriter effects, and performance. Use for character locomotion, emotes, object motion, and any animated UI."
+last_reviewed: 2026-06-17
 ---
 
 # roblox-animation
@@ -200,3 +201,11 @@ When implementing:
 This skill + the roblox-user-interfaces and roblox-vfx skills will let you create motion that feels intentional, responsive, and polished rather than "it moves."
 
 For the latest property or enum behavior, always verify in the Engine API reference: https://create.roblox.com/docs/reference/engine (Animator, AnimationTrack, TweenService, IKControl, etc.).
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [3d-animations.md](references/3d-animations.md)
+- [integration-and-events.md](references/integration-and-events.md)
+- [ui-tweens-and-sequences.md](references/ui-tweens-and-sequences.md)
+<!-- catalog:references:end -->

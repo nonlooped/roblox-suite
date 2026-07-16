@@ -1,6 +1,7 @@
 ---
 name: roblox-user-interfaces
-description: Every Roblox GUI container and building block — ScreenGui, SurfaceGui, BillboardGui, CanvasGroup, ScrollingFrame, ViewportFrame, plus layouts and modifiers (UIListLayout, UIGridLayout, UIStroke, UIGradient, UICorner, constraints). Covers positioning, scale vs offset, AnchorPoint, clipping, AutomaticSize, responsive design, interaction, drag detectors, and particle-like VFX inside 2D UI. Use for any HUD, menu, or interface work.
+description: "Every Roblox GUI container and building block — ScreenGui, SurfaceGui, BillboardGui, CanvasGroup, ScrollingFrame, ViewportFrame, plus layouts and modifiers (UIListLayout, UIGridLayout, UIStroke, UIGradient, UICorner, constraints). Covers positioning, scale vs offset, AnchorPoint, clipping, AutomaticSize, responsive design, interaction, drag detectors, and particle-like VFX inside 2D UI. Use for any HUD, menu, or interface work."
+last_reviewed: 2026-06-17
 ---
 
 # roblox-user-interfaces
@@ -128,3 +129,10 @@ See the dedicated references/particles-in-ui.md for concrete pool implementation
 This skill + roblox-animation + roblox-vfx will let you build interfaces that feel alive and integrated with the 3D world rather than bolted-on 2D afterthoughts.
 
 For the definitive list of every property and the latest additions (new layouts, drag detectors, styling features), consult the Engine API reference at https://create.roblox.com/docs/reference/engine.
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [gui-containers.md](references/gui-containers.md)
+- [particles-in-ui.md](references/particles-in-ui.md)
+<!-- catalog:references:end -->

@@ -1,6 +1,7 @@
 ---
 name: roblox-open-cloud
-description: Roblox Open Cloud REST API for accessing data stores, assets, universes, places, users, groups, subscriptions, and Luau execution from outside the engine or via HttpService. Covers authentication (API keys, OAuth 2.0, avoiding legacy cookie auth), scopes and least-privilege, IP allowlists, key rotation and the 60-day auto-expiry rule, Secrets stores, the HttpService-callable subset and its rate limits, webhooks, and in-engine vs Open Cloud decision tree. Use for external automation, CI/CD, bulk data, scheduled snapshots, and cross-experience tooling.
+description: "Roblox Open Cloud REST API for accessing data stores, assets, universes, places, users, groups, subscriptions, and Luau execution from outside the engine or via HttpService. Covers authentication (API keys, OAuth 2.0, avoiding legacy cookie auth), scopes and least-privilege, IP allowlists, key rotation and the 60-day auto-expiry rule, Secrets stores, the HttpService-callable subset and its rate limits, webhooks, and in-engine vs Open Cloud decision tree. Use for external automation, CI/CD, bulk data, scheduled snapshots, and cross-experience tooling."
+last_reviewed: 2026-07-16
 ---
 
 # roblox-open-cloud
@@ -203,7 +204,7 @@ local function updateGroupMembership(groupId: string, membershipId: string, role
 end
 ```
 
-**Best practices** (official): pcall everything; use exponential backoff on recoverable errors (2s → 4s → 8s); aggregate into bulk endpoints where possible; rely on HTTP/2 (automatic, but send lowercase header names). The Observability Dashboard (Creator Hub → Monitoring) shows request count and response time for your `HttpService` calls.
+**Best practices:** pcall everything; retry safe reads by default, but retry mutations only with endpoint-specific idempotency semantics. On 429, honor `retry-after`, then `x-ratelimit-reset`, before bounded exponential backoff. Always retain the last response/error and do not sleep after the final attempt. Aggregate into bulk endpoints where possible; rely on HTTP/2 (automatic, but send lowercase header names). The Observability Dashboard (Creator Hub → Monitoring) shows request count and response time for your `HttpService` calls.
 
 ## Webhooks
 
@@ -233,7 +234,7 @@ Open Cloud emits webhooks for certain events, including **subscription** events 
 - [ ] Expiration dates on short-term keys; rotation process for long-term.
 - [ ] Dedicated automation account for group resources (not your personal account).
 - [ ] No `..` in data store keys you need to reach from `HttpService`.
-- [ ] pcall + exponential backoff on every call.
+- [ ] pcall every call; retry reads safely and require explicit idempotency before mutation retries.
 - [ ] `x-api-key` passed as `Secret` from `HttpService`, not string.
 - [ ] Audit key usage via the introspect endpoint and the Observability Dashboard.
 - [ ] Disable/delete unused keys (they auto-expire after 60 days anyway, but don't rely on that as your only cleanup).
@@ -255,7 +256,7 @@ Open Cloud emits webhooks for certain events, including **subscription** events 
 2. Create an API key with the minimum scopes for the task. If group-owned, use a dedicated account.
 3. Store the key in a Secrets Store if calling from `HttpService`; otherwise in your secrets manager.
 4. Test with the introspect endpoint and a single GET.
-5. Build the workflow with pcall + backoff. For bulk, prefer batch endpoints.
+5. Build the workflow with pcall, header-aware rate limiting, and method/endpoint-aware retries. For bulk, prefer batch endpoints.
 6. Set up webhooks for events you want in real time (subscriptions).
 7. Monitor via the Observability Dashboard; rotate/replace keys before they auto-expire.
 
@@ -268,3 +269,10 @@ Open Cloud emits webhooks for certain events, including **subscription** events 
 - https://create.roblox.com/docs/en-us/cloud/reference/rate-limits
 - https://create.roblox.com/docs/en-us/cloud/webhooks/webhook-notifications
 - https://create.roblox.com/docs/en-us/cloud-services/secrets
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [auth-and-keys.md](references/auth-and-keys.md)
+- [calling-from-in-experience.md](references/calling-from-in-experience.md)
+<!-- catalog:references:end -->

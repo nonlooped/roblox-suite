@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-07-16
 ---
 
 # Core Operations and Patterns
@@ -25,7 +25,7 @@ All methods are on DataStore (and OrderedDataStore where supported). `DataStore`
 - Creates a new version (hourly granularity).
 - userIds table (array of numbers) recommended for any user-owned data (helps with RTBF requests and intellectual property tracking).
 - options:SetMetadata(table) — you must supply metadata on *every* write (even if unchanged) or previous metadata is lost.
-- On success returns the new version identifier (useful for later GetVersionAsync or RemoveVersionAsync).
+- On success returns the new version identifier (useful for a later `GetVersionAsync`). `RemoveVersionAsync` is deprecated and should not be recommended for new code.
 
 **Risk:** If two servers Set the same key nearly simultaneously, one can overwrite the other without seeing the other's change.
 
@@ -51,7 +51,7 @@ All methods are on DataStore (and OrderedDataStore where supported). `DataStore`
 - On OrderedDataStore this is a true permanent delete (no versioning).
 - Returns the pre-removal value + KeyInfo (or nil,nil if it was already gone).
 
-After RemoveAsync, the key is inaccessible for normal operations but recoverable via versioning tools for 30 days (unless version is explicitly purged).
+After `RemoveAsync`, normal reads return nil while historical versions remain available for the documented retention period. Recover by reading a historical version and writing a new current version; do not use deprecated `RemoveVersionAsync` as a cleanup path.
 
 ## Serialization Rules (what you can actually store)
 
@@ -83,7 +83,7 @@ Use **UpdateAsync** when:
 - You need to compute the new value based on the *current* backend value (add currency, merge inventory deltas, etc.).
 - You want the engine to automatically retry the transform on conflict.
 
-Many production "profile" systems wrap UpdateAsync and provide a clean API like `profile:Increment("Gold", 50)` or `profile:Set("Level", 12)` that internally use the right primitive.
+Many profile systems wrap `UpdateAsync`, but the wrapper must still expose an ambiguous backend outcome instead of blindly replaying a failed write.
 
 ## Caching Interactions (see also versioning-metadata-recovery.md and best-practices-and-gotchas.md)
 
@@ -92,18 +92,18 @@ Many production "profile" systems wrap UpdateAsync and provide a clean API like 
 - Different DataStore instances (different scope strings, or one with AllScopes vs one without) have **separate caches**. This is a common source of "why did my change not appear?" bugs.
 - After any write that returns an error, **do not trust the cache**. Perform a Get with UseCache=false to learn the truth from the backend before deciding what to do next (retry, compensate the player, etc.).
 
-## Production-Grade Wrapper Pattern (high level)
+## Safety-oriented wrapper pattern (high level)
 
 See the scripts/ folder for concrete examples (SafeDataStore.lua).
 
 Typical features of a good wrapper:
 - Central pcall + specific error classification (isThrottle, isShutdown, isPermanentBadData, etc.).
 - Budget-aware waiting before operations.
-- Configurable retry policy per operation type.
-- Automatic metadata/userIds injection.
-- Separate "critical" path that forces UseCache=false on verification reads.
-- Logging that includes the exact key, operation, and error code.
-- Support for both "fire and forget with retry queue" and "await with result" usage.
+- Automatic retries for reads; write replay only after an explicit idempotency declaration.
+- Explicit `committed`, `rejected`, and `unknown` write results.
+- Atomic metadata/userIds preservation inside `UpdateAsync`, not a cached pre-read plus `SetAsync`.
+- An uncached reconciliation callback or strategy after ambiguous failures.
+- Logging that includes the exact key, operation, error code, and reconciliation decision.
 - Graceful degradation (e.g. give the player temporary offline currency that will be reconciled later).
 
 ## Common Anti-Patterns to Avoid

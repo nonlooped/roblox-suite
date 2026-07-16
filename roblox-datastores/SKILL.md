@@ -1,6 +1,7 @@
 ---
 name: roblox-datastores
-description: Production-grade Roblox DataStore patterns that prevent data loss, throttling, races, and quota exhaustion. Covers DataStore vs OrderedDataStore, UpdateAsync for atomic writes, versioning and metadata for recovery, budgets and rate limits, player profile and session-locking patterns, leaderboards, RTBF, and integration with Open Cloud. Use for any persistent player data, stats, inventory, settings, or cross-server state.
+description: "Safety-oriented Roblox DataStore guidance for reducing data loss, throttling, races, and quota exhaustion. Covers DataStore vs OrderedDataStore, UpdateAsync for atomic writes, versioning and metadata for recovery, budgets and rate limits, player profile and session-locking patterns, leaderboards, RTBF, and integration with Open Cloud. Use for any persistent player data, stats, inventory, settings, or cross-server state."
+last_reviewed: 2026-07-16
 ---
 
 # roblox-datastores
@@ -20,7 +21,7 @@ This skill delivers the authoritative, detailed knowledge required to implement 
 **Progressive disclosure in this skill:**
 - Start here in SKILL.md for high-level decision making, recommended workflows, and checklists.
 - Read specific files in `references/` for exhaustive technical details, tables, code samples, and edge cases when you need to implement or debug a particular aspect.
-- Use scripts/ for ready-to-adapt wrapper modules and utilities.
+- Treat `scripts/` as maturity-labeled examples; adapt and test them in a dedicated experience.
 
 ## When to use this skill
 
@@ -51,7 +52,7 @@ Cross-reference:
 2. Do you need sorted numeric queries for leaderboards or rankings?  
    → Use **OrderedDataStore** (via GetOrderedDataStore). Values **must** be integers. No versioning/metadata. Special GetSortedAsync + DataStorePages iteration. Limits differ (see references/limits...).
 
-3. Do you need versioning for recovery/audit, user-defined metadata, key listing, or the richer DataStore API (ListKeys, ListVersions, GetVersionAtTime, RemoveVersion)?  
+3. Do you need versioning for recovery/audit, user-defined metadata, key listing, or the richer DataStore API (`ListKeysAsync`, `ListVersionsAsync`, `GetVersionAsync`, `GetVersionAtTimeAsync`)?
    → Use the full **DataStore** created via `GetDataStore` with `DataStoreOptions` (this returns the modern DataStore class). Preferred for serious player data.
 
 4. Simple key-value persistent storage without the above needs?  
@@ -59,9 +60,9 @@ Cross-reference:
 
 **Scopes vs prefixes (modern recommendation):** For new work, prefer key prefixes (e.g. "profiles/User_1234") + ListKeysAsync filtering over legacy scopes. Scopes prepend to keys automatically. Use DataStoreOptions.AllScopes=true + empty scope string for cross-scope listing (see references).
 
-**Studio access:** Never enable "Enable Studio Access to API Services" on production places. Use dedicated test experiences/universes.
+**Studio access:** If Studio needs backend APIs, use a dedicated test experience. Do not enable Studio sessions to read or write production data.
 
-## Recommended production workflows
+## Recommended safety workflows
 
 ### Player data profile pattern (most common)
 
@@ -109,7 +110,7 @@ Every Set/Update/Increment on a standard DataStore (not Ordered) creates hourly-
 
 - ListVersionsAsync(key, sort, minDate?, maxDate?, pageSize?)
 - GetVersionAsync(key, version)
-- RemoveVersionAsync(key, version) (permanent for that version)
+- `RemoveVersionAsync` is **deprecated**. Do not present it as a current cleanup API; retain versions for recovery and use `ListVersionsAsync`, `GetVersionAsync`, or `GetVersionAtTimeAsync` to inspect them.
 - GetVersionAtTimeAsync(key, timestampMillis) — find the version current at a specific past time.
 - To revert: read the desired version, then SetAsync the value + metadata back (this creates a new current version).
 
@@ -117,7 +118,7 @@ Also use the daily Snapshot Data Stores Open Cloud API before risky publishes.
 
 The Data Stores Manager in Creator Hub lets you browse keys, view metadata/version history, compare versions, and revert (with proper permissions).
 
-See references/versioning-metadata-recovery.md for complete code samples including the "revert to time of incident" pattern.
+See [references/versioning-metadata-recovery.md](references/versioning-metadata-recovery.md) for complete code samples including the "revert to time of incident" pattern.
 
 ### Caching control
 
@@ -157,10 +158,12 @@ Data Stores Manager shows total size vs storage limit (based on lifetime users),
 
 On failure:
 - Log the specific error code/message.
-- Decide: retry with backoff (exponential + jitter), skip, or take compensating action (e.g. refund virtual currency if a purchase-related write failed).
-- For writes that may have partially succeeded on backend, use fresh Get (UseCache=false) to discover truth.
+- Retry reads with bounded exponential backoff and jitter.
+- Treat an invoked write that returns an error as **unknown**, not rejected: reconcile with a fresh `GetAsync` using `UseCache = false`.
+- Replay a write only when the caller has proved the entire operation idempotent. Never automatically replay `IncrementAsync`.
+- Return explicit `committed`, `rejected`, or `unknown` status so purchase/recovery code cannot mistake ambiguity for failure.
 
-Never assume a failed Set/Update means "no change occurred."
+Never assume a failed Set/Update/Increment means "no change occurred." `UpdateAsync` transforms can run multiple times and must not yield or produce external side effects.
 
 RemoveAsync creates a "tombstone" (Get returns nil) but older versions remain queryable for 30 days (unless explicitly removed).
 
@@ -176,9 +179,9 @@ See references/versioning-metadata-recovery.md (covers listing/caching) and the 
 
 ## Checklists
 
-**Before any production write:**
-- [ ] Wrapped in pcall
-- [ ] Using UpdateAsync where races possible
+**Before any critical write:**
+- [ ] Wrapped in pcall with explicit committed/rejected/unknown handling
+- [ ] Using UpdateAsync where races are possible, with a pure transform
 - [ ] Providing userIds array for RTBF/GDPR tracking where appropriate
 - [ ] Metadata supplied on every write (even if unchanged) when using full DataStore
 - [ ] Value is serializable (test with JSONEncode during dev)
@@ -215,11 +218,11 @@ See references/versioning-metadata-recovery.md (covers listing/caching) and the 
 
 ## Scripts folder usage
 
-The `scripts/` directory contains example ModuleScripts you can require or copy/adapt:
-- SafeDataStore.lua — a robust wrapper with budget-aware waits, automatic retries, logging, and separate read/write paths.
-- BudgetMonitor.lua — utilities to inspect and configure per-request-type budgets at startup.
+The `scripts/` directory contains maturity-labeled examples:
+- `SafeDataStore.lua` — reviewed example with automatic read retries, explicit write states, opt-in idempotent replay, and uncached reconciliation.
+- `BudgetMonitor.lua` — experimental budget-inspection example.
 
-Load them via `require` from your own modules when building production systems.
+Adapt and validate them in a dedicated test experience; this directory is not a versioned production library.
 
 ## How to proceed in practice
 
@@ -229,6 +232,16 @@ Load them via `require` from your own modules when building production systems.
 4. Add observability and alerts early.
 5. Profile storage growth with the Manager/Dashboard.
 
-This skill, combined with the other Roblox skills in the toolset, will produce correct, efficient, maintainable, and resilient data persistence code.
+Combine this guidance with static analysis, focused tests, Studio integration, observability, and current official sources before trusting a persistence system.
 
 For the authoritative class/property reference for any specific method, always cross-check https://create.roblox.com/docs/reference/engine (search for DataStoreService, GlobalDataStore, etc.).
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [best-practices-and-gotchas.md](references/best-practices-and-gotchas.md)
+- [core-operations-and-patterns.md](references/core-operations-and-patterns.md)
+- [limits-quotas-throttling-error-codes.md](references/limits-quotas-throttling-error-codes.md)
+- [types-of-datastores.md](references/types-of-datastores.md)
+- [versioning-metadata-recovery.md](references/versioning-metadata-recovery.md)
+<!-- catalog:references:end -->

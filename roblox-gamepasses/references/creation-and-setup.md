@@ -57,7 +57,7 @@ When publishing the animation or pass:
 
 ## Testing Setup
 
-- Enable **Game Settings → Security → Enable Studio Access to API Services** only on a dedicated test place; never enable it on a live production place.
+- If a backend API used in Studio requires it, enable **Studio Access to API Services** only for a dedicated test experience. Do not grant Studio sessions access to production data.
 - Create a separate test experience/universe that mirrors your production one.
 - Test the full flow: prompt → purchase (use small test Robux if possible, or Roblox test accounts).
 - Verify `UserOwnsGamePassAsync` returns true after purchase on new servers.

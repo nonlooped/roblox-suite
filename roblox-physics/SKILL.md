@@ -1,6 +1,7 @@
 ---
 name: roblox-physics
-description: Roblox rigid-body physics for vehicles, mechanisms, doors, platforms, and dynamic objects. Covers assemblies, root parts, anchoring, WeldConstraint vs RigidConstraint, mechanical constraints (hinge, spring, prismatic, rope), mover constraints (AlignPosition, LinearVelocity, VectorForce), network ownership, collision filtering, the sleep system, adaptive timestepping, and units. Use for anything that moves or connects under physics simulation.
+description: "Roblox rigid-body physics for vehicles, mechanisms, doors, platforms, and dynamic objects. Covers assemblies, root parts, anchoring, WeldConstraint vs RigidConstraint, mechanical constraints (hinge, spring, prismatic, rope), mover constraints (AlignPosition, LinearVelocity, VectorForce), network ownership, collision filtering, the sleep system, adaptive timestepping, and units. Use for anything that moves or connects under physics simulation."
+last_reviewed: 2026-06-17
 ---
 
 # roblox-physics
@@ -154,3 +155,13 @@ See [references/units-and-physical-properties.md](references/units-and-physical-
 3. Set network ownership for multiplayer responsiveness.
 4. Tune forces/velocities using units and physical properties.
 5. Profile with MicroProfiler and watch sleep/ownership visualizations.
+
+<!-- catalog:references:start -->
+## Reference index
+
+- [collisions-and-filtering.md](references/collisions-and-filtering.md)
+- [mechanical-constraints.md](references/mechanical-constraints.md)
+- [mover-constraints.md](references/mover-constraints.md)
+- [network-ownership.md](references/network-ownership.md)
+- [units-and-physical-properties.md](references/units-and-physical-properties.md)
+<!-- catalog:references:end -->

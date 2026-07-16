@@ -55,7 +55,7 @@ This reference collects the cross-cutting principles that apply no matter which 
 
 ## Testing & Deployment Hygiene
 
-- Studio "Enable Studio Access to API Services" only on dedicated test experiences, never production.
+- Grant Studio backend access only to dedicated test experiences; do not point Studio sessions at production data.
 - Use multiple places or a staging universe for testing data changes.
 - Take snapshots before risky publishes that touch data logic.
 - Monitor Data Stores Dashboard + Manager + general performance stats after every meaningful update.
