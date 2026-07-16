@@ -1,0 +1,28 @@
+name: Sync repository labels
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/sync-labels.yml"
+
+permissions:
+  issues: write
+
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create or update trust labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh label create accuracy --repo "$REPO" --color D73A4A --description "Incorrect or misleading technical guidance" --force
+          gh label create deprecated-api --repo "$REPO" --color B60205 --description "Deprecated API presented or discussed" --force
+          gh label create script-bug --repo "$REPO" --color E99695 --description "Behavioral defect in a Luau example" --force
+          gh label create source-drift --repo "$REPO" --color FBCA04 --description "Official source changed, moved, or contradicts guidance" --force
+          gh label create site --repo "$REPO" --color 1D76DB --description "Website, catalog, or deployment" --force
+          gh label create good-first-issue --repo "$REPO" --color 7057FF --description "Suitable for a first contribution" --force

@@ -1,15 +1,15 @@
 # 🎮 Roblox Suite
 
-### Stop shipping outdated Luau. Start shipping production-grade code.
+### Stop shipping outdated Luau. Start with source-grounded guidance.
 
-An opinionated set of battle-tested skills for AI agents writing Roblox Luau. Each skill tells your agent which Roblox APIs are current, which are deprecated, and where the official docs say so — accountable to the [Roblox Engine API Reference](https://create.roblox.com/docs/reference/engine), not to stale memory.
+An opinionated set of source-grounded skills for AI agents writing Roblox Luau. Each skill tells your agent which Roblox APIs are current, which are deprecated, and where the official docs say so — accountable to the [Roblox Engine API Reference](https://create.roblox.com/docs/reference/engine), not to stale memory.
 
 [![installs](https://shieldcn.dev/skills/installs/nonlooped/roblox-suite/roblox.svg?variant=branded)](https://www.skills.sh/nonlooped/roblox-suite/roblox)
 [![Luau](https://shieldcn.dev/badge/Luau-Official-00A2FF.svg?logo=luau&variant=branded)](https://create.roblox.com/docs/luau)
 [![Docs](https://shieldcn.dev/badge/Docs-Engine_Reference-10B981.svg?logo=ri:GoBook&variant=branded)](https://create.roblox.com/docs/reference/engine)
 [![License](https://shieldcn.dev/badge/License-MIT-6366F1.svg?logo=ri:GoLaw&variant=branded)](LICENSE)
 
-🌐 **[nonlooped.github.io/roblox-suite](https://nonlooped.github.io/roblox-suite/)** — the full catalog, what each skill covers, what your agent stops doing, and the official sources behind every claim. **Start there.**
+🌐 **[nonlooped.github.io/roblox-suite](https://nonlooped.github.io/roblox-suite/)** — the full catalog, what each skill covers, what your agent stops doing, and the official sources used to review each skill. **Start there.**
 
 ---
 
@@ -27,9 +27,22 @@ npx skills add nonlooped/roblox-suite --skill roblox-datastores
 
 ## Why
 
-Roblox deprecates APIs and changes policy on a rolling basis. Agents trained on old content confidently emit code that was deprecated years ago — `Humanoid:LoadAnimation`, bare `SetAsync`, `BodyMover`s, legacy `Teleport` variants. Roblox Suite keeps the agent current, and every recommendation links back to the official doc it came from.
+Roblox deprecates APIs and changes policy on a rolling basis. Agents trained on old content confidently emit deprecated APIs such as `Humanoid:LoadAnimation`, `BodyMover`s, and legacy `Teleport` variants, as well as risky patterns such as bare `SetAsync` for contended data. Roblox Suite routes agents toward current documentation and lists the official sources used to review each skill.
 
-For the full pitch — what's inside, what your agent stops doing, and how it stays accurate — see the [site](https://nonlooped.github.io/roblox-suite/).
+For the catalog and visible proof, see the [site](https://nonlooped.github.io/roblox-suite/), its [verification evidence](https://nonlooped.github.io/roblox-suite/evidence/) page, and the [first paired evaluation report](evals/reports/2026-07-16-codex-gpt-5.6-sol.md). Script files are maturity-labeled examples, not a versioned production library.
+
+## Manage the installation
+
+```sh
+npx skills list
+npx skills update
+npx skills remove roblox-datastores   # one skill
+npx skills remove --all               # all installed skills, with confirmation rules from the CLI
+```
+
+The Skills CLI supports agent-specific installation with `--agent` and global installation with `--global`; consult the [current CLI options](https://vercel-labs-skills.mintlify.app/api/cli-options) rather than relying on a hardcoded client list.
+
+If an agent does not discover the suite, run `npx skills list`, confirm the intended project/global scope and agent target, then restart the agent so it reloads skill files. Re-run `npx skills update` before reporting stale guidance.
 
 ## Skill structure
 
@@ -37,9 +50,9 @@ For the full pitch — what's inside, what your agent stops doing, and how it st
 skill-name/
 ├── SKILL.md        ← overview, decision trees, quick patterns
 ├── references/     ← deep technical docs for specific problems
-└── scripts/        ← reusable, commented Luau you can copy or adapt
+└── scripts/        ← maturity-labeled examples to adapt and test
 ```
 
 ## License & Contributing
 
-MIT — see [LICENSE](LICENSE). Pull requests that keep the suite accurate and current are welcome; read [CONTRIBUTING.md](CONTRIBUTING.md) first.
+MIT — see [LICENSE](LICENSE). Found a stale or unsafe claim? [Report an inaccuracy](https://github.com/nonlooped/roblox-suite/issues/new?template=inaccuracy.yml). Pull requests are welcome; read [CONTRIBUTING.md](CONTRIBUTING.md) and [REVIEW_POLICY.md](REVIEW_POLICY.md) first.

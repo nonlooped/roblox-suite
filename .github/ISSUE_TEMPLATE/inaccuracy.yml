@@ -1,0 +1,45 @@
+name: Report an inaccuracy
+description: Flag stale, deprecated, unsafe, or incorrectly sourced Roblox guidance.
+title: "[accuracy] "
+labels: ["accuracy"]
+body:
+  - type: input
+    id: skill
+    attributes:
+      label: Skill slug
+      placeholder: roblox-datastores
+    validations:
+      required: true
+  - type: textarea
+    id: claim
+    attributes:
+      label: Affected claim or example
+      description: Quote the claim and include its file path or page URL.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Current primary source URL
+      placeholder: https://create.roblox.com/docs/...
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Incorrect factual claim
+        - Deprecated API presented as current
+        - Unsafe script behavior
+        - Source drift or broken source
+        - Website/catalog mismatch
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: Expected correction
+      description: Explain what should change and why.
+    validations:
+      required: true

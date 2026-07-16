@@ -4,7 +4,7 @@ This is an agent skill set. Contributions should keep each skill self-contained 
 
 ## Accuracy is the contract
 
-This suite's entire value proposition is "actually current, production-grade Roblox guidance." Inaccurate or stale content is worse than no content — it trains models to emit wrong code confidently. Before contributing:
+This suite's value proposition is opinionated, source-grounded Roblox guidance whose currentness can be measured. Inaccurate or stale content is worse than no content — it trains models to emit wrong code confidently. Before contributing:
 
 1. **Ground every claim in current official Roblox docs.** Primary sources:
    - https://create.roblox.com/docs/reference/engine (Engine API Reference — source of truth for classes/properties/methods)
@@ -24,7 +24,7 @@ Every skill follows the same layout so agents always know where to look:
 skill-name/
 ├── SKILL.md        ← overview, decision trees, quick patterns, pointers to references
 ├── references/     ← deep technical docs for specific problems
-└── scripts/        ← reusable, commented Luau you can copy or adapt
+└── scripts/        ← maturity-labeled examples to adapt and test
 ```
 
 1. **SKILL.md first.** Each skill's `SKILL.md` is the entry point. Keep it focused on decision-making, quick patterns, and pointers to `references/`. Don't dump exhaustive tables in SKILL.md — put them in a reference.
@@ -35,7 +35,7 @@ skill-name/
    ---
    ```
    `last_reviewed` is the date the content was last verified against official docs. Update it when you re-verify, not when you merely edit.
-3. **Reusable code goes in `scripts/`.** Scripts must be commented, self-contained ModuleScripts, and safe to copy/adapt.
+3. **Example code goes in `scripts/`.** Scripts must be commented and self-contained. Every script must declare `experimental`, `reviewed`, or `tested` maturity, its verification date, test coverage, and that callers must adapt it before production.
 
 ## Luau script requirements
 
@@ -47,35 +47,33 @@ skill-name/
 - Type-annotate module exports and public functions.
 - Never ship keys, secrets, or credentials in scripts. Use the Secrets Store and `HttpService:GetSecret`.
 
-## Cross-linking
+## Catalog, routing, and generated artifacts
 
-- Use relative markdown links so agents can follow the chain (`../roblox-datastores/SKILL.md`, `references/foo.md`).
-- Use correct skill names and paths. The hub (`roblox/SKILL.md`) lists every skill; update it when adding a skill.
-- Update `skills.sh.json` when adding a skill so the directory grouping stay correct.
+`catalog.json` is authoritative for skill identity, risk, groups, site summaries, source verification, and script maturity. The site imports it directly. `skills.sh.json` and the hub's specialist block are generated artifacts.
 
-## skills.sh manifest (`skills.sh.json`)
-
-The manifest at repo root drives how skills are grouped on the [skills.sh](https://skills.sh) directory. The `groupings` field is load-bearing — it renders as categories on the skill's directory page and powers the [site's](https://nonlooped.github.io/roblox-suite/) domain index. When adding a skill:
-
-1. Add the skill name to the appropriate `groupings[].skills` array (create a new grouping only if no existing one fits).
-2. Keep `notGrouped: "bottom"` (skills not in any grouping sort to the bottom of the page).
-3. The manifest validates against `https://skills.sh/schemas/skills.sh.schema.json` in CI.
+- The hub routes only to specialist `SKILL.md` files; do not add every deep reference to the hub.
+- Each specialist owns links to its own references through its generated reference index.
+- Edit `catalog.json`, then run `node scripts/generate-catalog-artifacts.mjs`.
+- Never hand-edit content between `catalog:*` markers.
+- `node scripts/check-hub-refs.mjs` rejects missing skills, orphan references, broken ownership, and hub-to-deep-reference links.
 
 ## The website (`site/`)
 
-The marketing/docs site at `site/` (an Astro project) is the public gateway to the suite. It builds from the same `skills-meta.ts` / `groups.ts` data modules that mirror `skills.sh.json`, so the catalog stays in sync with the repo. The site deploys automatically to GitHub Pages on push to `main` via `.github/workflows/deploy.yml`. To run it locally:
+The Astro site imports `catalog.json` and computes strict per-file verification coverage at build time. Malformed or unreadable frontmatter fails the build. Root content changes that affect metadata trigger Pages deployment.
 
 ```sh
-cd site && npm install && npm run dev
+cd site
+npm ci
+npm run dev
 ```
 
-When adding or changing a skill, update `site/src/data/skills-meta.ts` and `site/src/data/groups.ts` to match `skills.sh.json` so the site reflects the change.
+Set `PUBLIC_GOATCOUNTER_CODE` in the deploy environment only after the owner chooses a GoatCounter site. When configured, the site records aggregate page views, install copies, single-skill copies, correction reports, and GitHub/skills.sh outbound clicks.
 
 ## Maintenance and freshness
 
 Roblox moves fast. The suite's value depends on staying current.
 
-- **`last_reviewed` discipline.** Every reference carries a `last_reviewed` date. A quarterly sweep should re-verify each reference against its cited official docs and bump the date. A reference older than ~6 months is a candidate for review.
+- **`last_reviewed` discipline.** Every `SKILL.md` and reference carries a verification date. Editing does not reset it. Trust uses the oldest date and coverage across the skill. CI limits critical content to 120 days and other content to 180 days.
 - **Watch for deprecations.** Roblox deprecates APIs over time (e.g. `Sound`/`SoundGroup` → audio graph; `Teleport*` variants → `TeleportAsync`; Engagement-Based Payouts → Creator Rewards, discontinued July 2025). When a deprecation lands, update the affected skill and add a "Common mistakes this skill prevents" entry if useful.
 - **Watch for policy changes.** Monetization policy shifts (e.g. cross-experience sales disabled May 30, 2026; Premium Payouts replaced by Creator Rewards July 24, 2025). These are date-sensitive and must be verified at contribution time.
 - **Each SKILL.md lists its official sources.** Re-check those URLs when updating.
@@ -84,21 +82,27 @@ Roblox moves fast. The suite's value depends on staying current.
 
 - [ ] Every claim verified against current official Roblox docs at contribution time.
 - [ ] Source URLs listed in the affected SKILL.md / reference.
-- [ ] New/edited references carry `last_reviewed: YYYY-MM-DD` frontmatter.
+- [ ] New/edited `SKILL.md` and references carry valid `last_reviewed: YYYY-MM-DD` frontmatter.
 - [ ] New/edited scripts start with `--!strict`, use 4-space indent, and use modern APIs.
 - [ ] No deprecated APIs introduced (`Humanoid:LoadAnimation`, `BodyMover`, `wait`/`spawn`/`delay`, legacy `Teleport*` variants, etc.) unless explicitly documenting the legacy API for migration context.
 - [ ] No secrets/keys in scripts.
 - [ ] Cross-references use correct skill names and relative paths.
-- [ ] If adding a skill: hub `roblox/SKILL.md` and `skills.sh.json` updated, and `site/src/data/skills-meta.ts` + `site/src/data/groups.ts` updated to match.
+- [ ] `catalog.json` is updated and `node scripts/generate-catalog-artifacts.mjs` has synchronized generated files.
 - [ ] No broken markdown links (CI checks this).
 - [ ] `skills.sh.json` validates against the official schema (CI checks this).
 - [ ] No new typos (CI runs `typos`).
 
 ## Running checks locally
 
-- **Links:** `lychee --max-retries 3 --retry-wait-time 5 --accept 200,429,503 --exclude 'rbxassetid://.*' --exclude 'mailto:.*' '**/*.md'` (or rely on CI).
-- **Manifest:** `ajv validate -s https://skills.sh/schemas/skills.sh.schema.json -d skills.sh.json --strict=false --spec=draft2020`.
-- **Spelling:** `typos` (install via your package manager or `cargo install typos-cli`).
-- **Hub references:** `node scripts/check-hub-refs.mjs` — every `references/*.md` must be linked from the hub (`roblox/SKILL.md`) and vice versa. CI runs this.
-- **Site:** `cd site && npm run build` (build) or `npm run dev` (dev server).
-- **Luau syntax/types:** `luau-lsp analyze --platform roblox <file>` for ad-hoc checks (not yet wired into CI).
+Install the pinned Luau tools with Rokit, then run:
+
+```sh
+node scripts/generate-catalog-artifacts.mjs --check
+cd site && npm ci && npm test
+stylua --check roblox-*/scripts/*.lua
+selene roblox-*/scripts/*.lua
+rojo sourcemap default.project.json --output sourcemap.json
+luau-lsp analyze --platform roblox --sourcemap sourcemap.json roblox-*/scripts/*.lua
+```
+
+CI additionally checks Markdown links and spelling. The skills.sh schema is vendored under `schemas/` so validation does not depend on a mutable network download.

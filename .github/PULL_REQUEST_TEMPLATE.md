@@ -1,28 +1,38 @@
-# Pull Request Checklist
+# Pull request
 
-Thank you for helping keep Roblox Suite accurate and current!
+## What changed
 
-Please fill out this template and ensure the following before requesting review:
+<!-- Summarize the behavior/content change and link related issues. -->
 
-- [ ] All claims and code patterns verified against the latest [Roblox Engine API Reference](https://create.roblox.com/docs/reference/engine) and official guides.
-- [ ] No new typos, broken internal relative links, or broken links to official docs.
-- [ ] Any new or modified `.lua` scripts are syntactically valid Luau (tested via Roblox Studio or `luau-lsp` / `luau`).
-- [ ] Cross-skill references and paths in SKILL.md / references are correct and use the expected `../skill-name/...` form.
-- [ ] Root `README.md` and/or `skills.sh.json` updated if new skills were added or groupings changed.
-- [ ] Scripts follow the project's conventions: server authority first, pcall + error handling, budget awareness where relevant, clear usage comments in the header, and `require` examples.
+## Risk
 
-## Description of changes
+- Skill(s):
+- Catalog risk tier: critical / medium / lower
+- User-visible failure mode if wrong:
 
-<!-- Summarize what this PR does. Link any related issues. -->
+## Evidence
 
-## Testing performed
+- Official source URL(s):
+- Verification date:
+- Platform requirement or opinionated recommendation? Explain:
 
-<!-- How did you validate the changes? (Studio playtest, luau check, manual review of links, etc.) -->
+## Validation
 
-## Related skills / files
+- [ ] `cd site && npm test`
+- [ ] `stylua --check` passes for changed Luau.
+- [ ] `selene` and `luau-lsp analyze --platform roblox` pass for changed examples.
+- [ ] Behavioral regressions were added or updated for script behavior changes.
+- [ ] Studio/integration validation is described below, or the script remains explicitly experimental/reviewed.
+- [ ] Catalog, source dates, maturity metadata, and generated artifacts are synchronized.
+- [ ] No credentials or private data are included.
+- [ ] Critical changes have a second reviewer under `REVIEW_POLICY.md`.
 
-<!-- e.g. roblox-data-persistence, references/limits-quotas-....md -->
+## Tests performed
 
----
+<!-- Include commands, Studio setup, fixtures, and results. -->
 
-By submitting this PR you agree that your contributions are licensed under the MIT License.
+## Known limitations
+
+<!-- Be explicit. "None" is acceptable only after considering ambiguous cloud outcomes and concurrency. -->
+
+By submitting this pull request, you agree that your contribution is licensed under the MIT License.
