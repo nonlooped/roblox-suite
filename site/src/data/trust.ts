@@ -1,5 +1,5 @@
-// Site-wide constants + the "show trust, don't assert it" evidence.
-// Every value here is sourced from the repo, not invented.
+import { catalog } from "./catalog";
+import { getRepositoryVerification } from "./skill-frontmatter";
 
 export const repoUrl = "https://github.com/nonlooped/roblox-suite";
 export const skillsShUrl = "https://www.skills.sh/nonlooped/roblox-suite/roblox";
@@ -12,28 +12,39 @@ export const skillGithubUrl = (slug: string) =>
   `${repoUrl}/tree/main/${slug}/SKILL.md`;
 export const skillRefsGithubUrl = (slug: string) =>
   `${repoUrl}/tree/main/${slug}/references`;
-
-export const freshness = {
-  // Every reference file in the repo carries this frontmatter date.
-  lastReviewed: "2026-06-17",
-  referenceCount: 48,
-  policyNotes: [
-    {
-      date: "May 30, 2026",
-      text: "Cross-experience game pass and developer product sales are disabled.",
-    },
-    {
-      date: "July 24, 2025",
-      text: "Engagement-Based Payouts (Premium Payouts) were discontinued and replaced by Creator Rewards.",
-    },
-  ],
-  // From .github/workflows/validate.yml - accuracy is enforced, not asserted.
-  ciChecks: [
-    "lychee link-checks every Markdown file so broken docs links fail the build",
-    "ajv validates skills.sh.json against the official skills.sh schema",
-    "typos spell-checks the whole repo",
-  ],
+export const reportInaccuracyUrl = (slug: string) => {
+  const query = new URLSearchParams({
+    template: "inaccuracy.yml",
+    title: `[accuracy] ${slug}: `,
+    skill: slug,
+  });
+  return `${repoUrl}/issues/new?${query}`;
 };
+
+export async function loadFreshness() {
+  const verification = await getRepositoryVerification(
+    catalog.skills.map((skill) => skill.slug),
+  );
+  return {
+    ...verification,
+    policyNotes: [
+      {
+        date: "May 30, 2026",
+        text: "Cross-experience game pass and developer product sales are disabled.",
+      },
+      {
+        date: "July 24, 2025",
+        text: "Engagement-Based Payouts were discontinued and replaced by Creator Rewards.",
+      },
+    ],
+    ciChecks: [
+      "Luau examples are formatted, linted, and statically analyzed with a pinned toolchain",
+      "catalog, frontmatter, references, and deprecated-API rules are schema-validated",
+      "the Astro site type-checks, builds, and passes generated-route smoke tests",
+      "Markdown links and spelling are checked with pinned actions",
+    ],
+  };
+}
 
 export const officialSources = [
   {

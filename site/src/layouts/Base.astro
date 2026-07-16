@@ -4,7 +4,8 @@ import "@fontsource/spline-sans-mono/latin-400.css";
 import "@fontsource/spline-sans-mono/latin-500.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import { repoUrl, skillsShUrl, freshness } from "../data/trust";
+import Analytics from "../components/Analytics.astro";
+import { repoUrl, skillsShUrl, loadFreshness } from "../data/trust";
 import { skillCount } from "../data/skills-meta";
 
 interface Props {
@@ -18,14 +19,16 @@ interface Props {
   section?: string;
   /** Article tags. */
   tags?: string[];
-  /** Article published/modified ISO dates. */
+  /** Article publication and content-specific modification dates. */
   publishedAt?: string;
+  modifiedAt?: string;
   /** Prevent indexing of this page. */
   noindex?: boolean;
 }
 
 const siteName = "Roblox Suite";
-const { title, description, ogImage, article, section, tags, publishedAt, noindex } = Astro.props;
+const { title, description, ogImage, article, section, tags, publishedAt, modifiedAt, noindex } = Astro.props;
+const freshness = await loadFreshness();
 
 const base = import.meta.env.BASE_URL;
 const siteOrigin = (Astro.site ?? "https://nonlooped.github.io").toString().replace(/\/$/, "");
@@ -35,7 +38,7 @@ const fullTitle = title
   : `Roblox Luau skills for AI agents · ${siteName}`;
 const desc =
   description ??
-  `${skillCount} Roblox Luau skills for AI agents. Every API recommendation is cited to the official Engine API Reference.`;
+  `${skillCount} source-grounded Roblox Luau skills for AI agents, with official sources and measurable verification coverage.`;
 
 // Canonical - strip trailing index/default.html noise, normalize trailing slash.
 const canonical = new URL(Astro.url.pathname, siteOrigin).toString();
@@ -142,7 +145,7 @@ const websiteSchema = {
     {article && <meta property="article:publisher" content={repoUrl} />}
     {article && section && <meta property="article:section" content={section} />}
     {article && publishedAt && <meta property="article:published_time" content={publishedAt} />}
-    {article && <meta property="article:modified_time" content={freshness.lastReviewed} />}
+    {article && <meta property="article:modified_time" content={modifiedAt ?? `${freshness.newestVerifiedAt}T00:00:00Z`} />}
     {article && tags && tags.map((t) => <meta property="article:tag" content={t} />)}
 
     {/* Twitter - large image summary card for richer shares */}
@@ -169,6 +172,7 @@ const websiteSchema = {
       <slot />
     </main>
     <Footer />
+    <Analytics />
 
     <script>
       // Scroll-reveal: native IntersectionObserver + Web Animations API.
@@ -182,6 +186,12 @@ const websiteSchema = {
       const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
       const ease = "cubic-bezier(0.22, 1, 0.36, 1)";
       const DURATION = 620;
+      const track = (event: string, title: string) => {
+        const analytics = (window as Window & {
+          goatcounter?: { count: (event: { path: string; title: string; event: boolean }) => void };
+        }).goatcounter;
+        analytics?.count({ path: event, title, event: true });
+      };
 
       const reveal = (el: HTMLElement) => {
         if (reduce) {
@@ -240,9 +250,8 @@ const websiteSchema = {
       }
 
       // Delegated copy handler for [data-copy] buttons. Uses the async
-      // Clipboard API when available; falls back to execCommand on a temp
-      // selection for insecure/old contexts; surfaces failure honestly
-      // instead of flashing "Copied" when nothing was copied.
+      // Clipboard API and surfaces unavailable/denied access honestly instead
+      // of flashing "Copied" when nothing was copied.
       document.addEventListener("click", (e) => {
         const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-copy]");
         if (!btn) return;
@@ -253,6 +262,7 @@ const websiteSchema = {
         const label = btn.querySelector<HTMLElement>("[data-copy-label]");
         const orig = label && btn.dataset.copyLabel ? btn.dataset.copyLabel : label?.textContent;
         const succeed = () => {
+          track(text.includes(" --skill ") ? "copy/single-skill" : "copy/install-suite", text);
           if (label) label.textContent = "Copied";
           btn.classList.add("is-copied");
           window.setTimeout(() => {
@@ -261,29 +271,28 @@ const websiteSchema = {
           }, 1600);
         };
         const fail = () => {
-          if (label) label.textContent = "Copy failed - select & \u2318C";
+          if (label) label.textContent = "Copy failed — select and copy";
           window.setTimeout(() => {
             if (label && orig) label.textContent = orig;
           }, 2600);
         };
         const w = navigator.clipboard?.writeText?.bind(navigator.clipboard);
-        if (w) {
-          w(text).then(succeed, fail);
-        } else {
-          // execCommand fallback for non-secure contexts (http) / old browsers.
-          const ta = document.createElement("textarea");
-          ta.value = text;
-          ta.setAttribute("readonly", "");
-          ta.style.position = "fixed";
-          ta.style.top = "0";
-          ta.style.left = "0";
-          ta.style.opacity = "0";
-          document.body.appendChild(ta);
-          ta.select();
-          let ok = false;
-          try { ok = document.execCommand("copy"); } catch { ok = false; }
-          document.body.removeChild(ta);
-          if (ok) succeed(); else fail();
+        if (w) w(text).then(succeed, fail);
+        else fail();
+      });
+
+      document.addEventListener("click", (event) => {
+        const anchor = (event.target as HTMLElement).closest<HTMLAnchorElement>("a[href]");
+        if (!anchor) return;
+        try {
+          const url = new URL(anchor.href, location.href);
+          if (url.hostname === "github.com") track("outbound/github", anchor.href);
+          if (url.hostname === "www.skills.sh" || url.hostname === "skills.sh") {
+            track("outbound/skills-sh", anchor.href);
+          }
+          if (anchor.href.includes("/issues/new")) track("correction/report", anchor.href);
+        } catch {
+          // Ignore malformed links; the build-time crawler reports them.
         }
       });
     </script>

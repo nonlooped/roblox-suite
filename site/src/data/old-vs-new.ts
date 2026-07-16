@@ -18,14 +18,20 @@ export const oldVsNew: OldVsNewRow[] = [
   },
   {
     slug: "roblox-datastores",
-    old: "Race conditions from bare SetAsync",
-    new: "Queue-based save patterns with retry and exponential backoff",
-    note: "UpdateAsync with a pure transform reads-then-writes atomically",
+    old: "Blindly retrying an ambiguous DataStore write",
+    new: "Explicit committed / rejected / unknown results plus uncached reconciliation",
+    note: "UpdateAsync transforms must be pure; replay writes only when the operation is declared idempotent",
+  },
+  {
+    slug: "roblox-datastores",
+    old: "RemoveVersionAsync (deprecated)",
+    new: "List/Get historical versions and restore by writing a new current version",
+    note: "preserve version history for recovery",
   },
   {
     slug: "roblox-user-interfaces",
     old: "Pixel-offset UI that breaks on mobile",
-    new: "Scale + offset responsive layouts that survive every screen size",
+    new: "Scale + offset responsive layouts tested across target screen sizes",
   },
   {
     slug: "roblox-vfx",
@@ -35,7 +41,7 @@ export const oldVsNew: OldVsNewRow[] = [
   {
     slug: "roblox-gamepasses",
     old: "Monetization flows that violate current Roblox policy",
-    new: "ToS-compliant purchase handling with proper receipts",
+    new: "Source-checked, server-authoritative purchase and receipt handling",
   },
   {
     slug: "roblox-audio",

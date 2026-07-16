@@ -1,0 +1,73 @@
+---
+import Base from "../layouts/Base.astro";
+import { loadSkills } from "../data/skills-meta";
+import { loadFreshness, repoUrl } from "../data/trust";
+
+const skills = await loadSkills();
+const freshness = await loadFreshness();
+const percent = Math.round(freshness.verificationCoverage * 100);
+---
+
+<Base
+  title="Verification evidence and known limitations"
+  description="Per-skill verification coverage, example maturity, CI evidence, and known limitations for Roblox Suite."
+>
+  <section class="section">
+    <div class="wrap">
+      <header class="mb-10 max-w-[54rem]">
+        <p class="eyebrow">Trust surface</p>
+        <h1>Verification evidence</h1>
+        <p class="lede mt-4">
+          Currentness is measured per guidance file. The badge uses the oldest verification in a skill, not the newest edit.
+        </p>
+      </header>
+
+      <div class="grid gap-4 mb-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="border border-border rounded-lg p-5 bg-surface"><strong>{percent}%</strong><p class="text-muted">repository verification coverage</p></div>
+        <div class="border border-border rounded-lg p-5 bg-surface"><strong>{freshness.oldestVerifiedAt}</strong><p class="text-muted">oldest verification</p></div>
+        <div class="border border-border rounded-lg p-5 bg-surface"><strong>{freshness.verifiedFiles}/{freshness.totalFiles}</strong><p class="text-muted">guidance files with valid dates</p></div>
+        <div class="border border-border rounded-lg p-5 bg-surface"><strong>6/10 → 10/10</strong><p class="text-muted">first paired Codex evaluation</p></div>
+      </div>
+
+      <div class="overflow-x-auto mb-12">
+        <table class="w-full text-left text-sm">
+          <thead><tr class="border-b border-border"><th class="py-3">Skill</th><th>Risk</th><th>Oldest verified</th><th>Coverage</th><th>Examples</th></tr></thead>
+          <tbody>
+            {skills.map((skill) => (
+              <tr class="border-b border-border">
+                <td class="py-3"><a class="link" href={`${import.meta.env.BASE_URL}skills/${skill.slug}`}>{skill.slug}</a></td>
+                <td>{skill.risk}</td>
+                <td>{skill.oldestVerifiedAt}</td>
+                <td>{skill.verifiedFiles}/{skill.totalFiles}</td>
+                <td>{skill.exampleStatus}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid gap-10 md:grid-cols-2">
+        <section>
+          <h2>Enforced now</h2>
+          <ul class="mt-4 flex flex-col gap-2 text-ink-soft">
+            {freshness.ciChecks.map((check) => <li>— {check}</li>)}
+          </ul>
+        </section>
+        <section>
+          <h2>Known limitations</h2>
+          <ul class="mt-4 flex flex-col gap-2 text-ink-soft">
+            <li>— Reviewed examples still require Studio integration in a dedicated test experience.</li>
+            <li>— The published evaluation is one paired run on one model; it does not establish general performance.</li>
+            <li>— Static checks cannot prove Roblox backend behavior or policy compliance.</li>
+            <li>— Public issues and branch protection depend on repository-owner settings.</li>
+          </ul>
+        </section>
+      </div>
+
+      <p class="mt-10 text-sm text-muted">
+        Review the <a class="link" href={`${repoUrl}/blob/main/REVIEW_POLICY.md`}>review policy</a>,
+        <a class="link" href={`${repoUrl}/blob/main/evals/reports/2026-07-16-codex-gpt-5.6-sol.md`}>first evaluation report</a>, and correction history on GitHub.
+      </p>
+    </div>
+  </section>
+</Base>

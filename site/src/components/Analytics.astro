@@ -1,0 +1,13 @@
+---
+const code = import.meta.env.PUBLIC_GOATCOUNTER_CODE;
+const endpoint = code ? `https://${code}.goatcounter.com/count` : undefined;
+---
+
+{endpoint && (
+  <script
+    is:inline
+    data-goatcounter={endpoint}
+    async
+    src="//gc.zgo.at/count.js"
+  />
+)}

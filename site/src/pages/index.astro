@@ -17,7 +17,7 @@ const appSchema = {
   name: "Roblox Suite",
   applicationCategory: "DeveloperApplication",
   operatingSystem: "Any (cross-platform via skills.sh CLI)",
-  description: `${skillCount} Roblox Luau skills for AI agents. Every API recommendation is cited to the official Engine API Reference.`,
+  description: `${skillCount} source-grounded Roblox Luau skills for AI agents, with official sources and measurable verification coverage.`,
   url: `${siteOrigin}${base}`.replace(/\/+$/, "/"),
   downloadUrl: repoUrl,
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -32,10 +32,10 @@ const appSchema = {
   },
   featureList: [
     `${skillCount} curated Roblox Luau skills`,
-    "Every API recommendation cited to the official Engine API Reference",
-    "Deprecated-vs-current guidance per skill",
+    "Official source lists and per-source verification dates",
+    "Risky-or-legacy versus recommended guidance per skill",
     "Installs via the skills.sh CLI as plain Markdown",
-    "CI link-checks, schema validation, and spell-checks keep docs accurate",
+    "CI validates content structure, Luau examples, site routes, links, and spelling",
   ],
 };
 ---

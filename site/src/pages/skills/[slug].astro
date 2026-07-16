@@ -9,6 +9,7 @@ import {
   skillGithubUrl,
   skillRefsGithubUrl,
   installSingleSkill,
+  reportInaccuracyUrl,
   repoUrl,
 } from "../../data/trust";
 
@@ -17,9 +18,7 @@ export function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-// Use the enriched map so lastReviewed comes from the skill's own
-// SKILL.md `last_reviewed` frontmatter - a single-skill update flows
-// through to this page's schema and badge without a manual bump.
+// Load strict per-file verification metrics before rendering trust data.
 const enriched = await loadSkillsBySlug();
 const skill = enriched.get(slug)!;
 const pairs = oldVsNew.filter((r) => r.slug === slug);
@@ -63,8 +62,7 @@ const breadcrumb = {
 };
 
 // TechArticle JSON-LD - signals "this is a reference doc" to search engines.
-// Uses the per-skill lastReviewed for datePublished/dateModified so a
-// single-skill update propagates without a site-wide freshness bump.
+// Publication, content change, and verification dates are intentionally separate.
 const techArticle = {
   "@context": "https://schema.org",
   "@type": "TechArticle",
@@ -77,8 +75,8 @@ const techArticle = {
     url: repoUrl,
     logo: { "@type": "ImageObject", url: `${siteOrigin}${base}favicon.svg` },
   },
-  datePublished: `${skill.lastReviewed}T00:00:00Z`,
-  dateModified: `${skill.lastReviewed}T00:00:00Z`,
+  datePublished: `${skill.createdAt}T00:00:00Z`,
+  dateModified: `${skill.lastChangedAt}T00:00:00Z`,
   inLanguage: "en",
   mainEntityOfPage: skillUrl,
   image: `${siteOrigin}${base}${skillOgImage}`,
@@ -98,8 +96,8 @@ const pairsText = pairs.length
   ? pairs.map((p) => `Stop: ${p.old}. Use: ${p.new}${p.note ? ` (${p.note})` : ""}.`).join(" ")
   : "";
 
-// ISO datetime for article:published_time (schema uses T00:00:00Z above).
-const publishedIso = `${skill.lastReviewed}T00:00:00Z`;
+const publishedIso = `${skill.createdAt}T00:00:00Z`;
+const modifiedIso = `${skill.lastChangedAt}T00:00:00Z`;
 ---
 
 <Base
@@ -109,6 +107,7 @@ const publishedIso = `${skill.lastReviewed}T00:00:00Z`;
   section={section}
   tags={tags}
   publishedAt={publishedIso}
+  modifiedAt={modifiedIso}
 >
   <article class="section" aria-labelledby="skill-title">
     <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumb)} />
@@ -120,7 +119,7 @@ const publishedIso = `${skill.lastReviewed}T00:00:00Z`;
     <p class="sr-only">
       {skill.displayTitle} is a Roblox Suite skill: {plainLiner}. It belongs to the
       {section} domain. What it covers: {skill.covers.map((c, i) => (i === 0 ? c : `. ${c}`)).join("")}.
-      {pairsText ? ` Current-vs-deprecated guidance: ${pairsText}` : ""}. The
+      {pairsText ? ` Risky-or-legacy versus recommended guidance: ${pairsText}` : ""}. The
       official sources for this skill are taken verbatim from its SKILL.md and
       point to the Roblox Engine API Reference and related create.roblox.com
       documentation. The full reference set is available in the references/
@@ -175,14 +174,14 @@ const publishedIso = `${skill.lastReviewed}T00:00:00Z`;
             pairs.length > 0 && (
               <section class="mb-10">
                 <h2 class="text-[0.8125rem] font-semibold text-muted mb-4">
-                  Deprecated → current
+                  Risky / legacy → recommended
                 </h2>
                 <ul class="flex flex-col gap-5">
                   {pairs.map((p) => (
                     <li class="grid grid-rows-[auto_auto] gap-2 pb-5 border-b border-border last:border-b-0 last:pb-0">
                       <div class="grid grid-cols-[1.3em_1fr] gap-3 items-start">
                         <span class="text-muted text-[0.95rem] leading-[1.5]" aria-hidden="true">✕</span>
-                        <p class="text-ink-soft"><span class="sr-only">Deprecated: </span>{p.old}</p>
+                        <p class="text-ink-soft"><span class="sr-only">Avoid or reconsider: </span>{p.old}</p>
                       </div>
                       <div class="grid grid-cols-[1.3em_1fr] gap-3 items-start">
                         <span class="text-crimson font-bold text-[0.95rem] leading-[1.5]" aria-hidden="true">✓</span>
@@ -234,6 +233,7 @@ const publishedIso = `${skill.lastReviewed}T00:00:00Z`;
                     <a class="link text-[0.9375rem]" href={s.url} target="_blank" rel="noopener noreferrer">
                       {s.label}
                     </a>
+                    <span class="text-muted text-xs"> · verified {s.verifiedAt}</span>
                   </li>
                 ))
               }
@@ -251,12 +251,20 @@ const publishedIso = `${skill.lastReviewed}T00:00:00Z`;
             class="inline-flex items-center gap-2 text-xs font-semibold text-ink-soft bg-surface border border-border px-[0.85em] py-[0.45em] rounded-full tracking-[-0.005em] self-start"
           >
             <span class="w-[7px] h-[7px] rounded-full bg-crimson flex-none" aria-hidden="true"></span>
-            Last reviewed {skill.lastReviewed}
+            Oldest verification {skill.oldestVerifiedAt}
           </p>
+          <div class="text-xs text-muted leading-relaxed">
+            <p>{skill.verifiedFiles}/{skill.totalFiles} guidance files verified ({Math.round(skill.verificationCoverage * 100)}%)</p>
+            <p>Examples: {skill.exampleStatus}</p>
+            <p>Risk tier: {skill.risk}</p>
+          </div>
           <div class="flex flex-col gap-3">
             <a class="btn-primary" href={`${base}#install`}>Add the suite</a>
             <a class="btn-ghost" href={skillGithubUrl(skill.slug)} target="_blank" rel="noopener noreferrer">
               SKILL.md on GitHub
+            </a>
+            <a class="btn-ghost" href={reportInaccuracyUrl(skill.slug)} target="_blank" rel="noopener noreferrer">
+              Report an inaccuracy
             </a>
           </div>
           <div class="flex flex-col gap-3 pt-5 border-t border-border">

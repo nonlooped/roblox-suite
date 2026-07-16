@@ -4,9 +4,11 @@ import { repoUrl } from "../data/trust";
 const base = import.meta.env.BASE_URL;
 const here = Astro.url.pathname.replace(/\/+$/, "");
 const skillsPath = `${base}skills`.replace(/\/+$/, "");
+const evidencePath = `${base}evidence`.replace(/\/+$/, "");
 
 const nav = [
   { label: "Skills", href: `${base}skills`, active: here === skillsPath },
+  { label: "Evidence", href: `${base}evidence`, active: here === evidencePath },
   { label: "Install", href: `${base}#install`, active: false },
 ];
 

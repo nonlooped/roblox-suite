@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills.sh/schemas/skills.sh.schema.json",
+  "title": "skills.sh repo page configuration",
+  "description": "Configuration for customizing a repository page on skills.sh. Place this file at the repository root as skills.sh.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "JSON schema URL for editor autocomplete and validation."
+    },
+    "schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "Legacy schema URL field. Prefer $schema."
+    },
+    "notGrouped": {
+      "type": "string",
+      "enum": ["top", "bottom"],
+      "default": "bottom",
+      "description": "Where to place skills that are not listed in any group."
+    },
+    "groupings": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "description": "Sections to show on the repo page.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "skills"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "description": "The section title shown on the repo page."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "A short sentence that explains what the group is for."
+          },
+          "skills": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "description": "Skill names or slugs to include in this group.",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["groupings"]
+}

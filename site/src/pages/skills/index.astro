@@ -13,7 +13,7 @@ const hub = skillsBySlug.get("roblox")!;
 
 <Base
   title={`All ${skillCount} Roblox Luau skills, by domain`}
-  description={`${skillCount} Luau skills for AI agents, grouped by domain. Each page lists official Engine API Reference sources and deprecated→current pairs.`}
+  description={`${skillCount} Luau skills for AI agents, grouped by domain. Each page lists official sources and risky-or-legacy → recommended guidance.`}
   article
   section="Skills"
   tags={["Roblox skills catalog", "Luau", "Roblox Engine API", "AI agent skills", "skills.sh"]}
@@ -64,7 +64,7 @@ const hub = skillsBySlug.get("roblox")!;
   >
     <div class="wrap">
       <h2 class="text-[clamp(1.25rem,0.8rem+1.2vw,1.5rem)] mb-8" data-reveal>
-        Deprecated → current
+        Risky / legacy → recommended
       </h2>
 
       <ol
@@ -82,7 +82,7 @@ const hub = skillsBySlug.get("roblox")!;
                   <div class="grid grid-cols-[1.3em_1fr] gap-3 items-start min-w-0">
                     <span class="text-muted text-[0.95rem] leading-[1.4]" aria-hidden="true">✕</span>
                     <span class="text-ink-soft leading-[1.4] break-words">
-                      <span class="sr-only">Deprecated: </span>{p.old}
+                      <span class="sr-only">Avoid or reconsider: </span>{p.old}
                     </span>
                   </div>
                   <div class="text-crimson font-semibold text-center max-[720px]:text-left max-[720px]:pl-[1.3em]" aria-hidden="true">
