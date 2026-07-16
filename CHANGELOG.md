@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.3 — 2026-07-16
+
+### CI
+
+- Allowlisted the Roblox-specific terms “LOD” and “unparented” in the spelling checker.
+
 ## 1.6.2 — 2026-07-16
 
 ### CI
