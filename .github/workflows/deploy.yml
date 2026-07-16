@@ -5,16 +5,20 @@ on:
     branches: [main]
     paths:
       - "site/**"
+      - "catalog.json"
+      - "skills.sh.json"
+      - "roblox/**"
+      - "roblox-*/**"
+      - "scripts/**"
+      - "schemas/**"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
-# Allow this job to clone the repo and create a page deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
 concurrency:
   group: pages
   cancel-in-progress: true
@@ -23,14 +27,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your repository using git
-        uses: actions/checkout@v7
-
-      - name: Install, build, and upload your site
-        uses: withastro/action@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          path: site
           node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - name: Install dependencies
+        working-directory: site
+        run: npm ci
+      - name: Validate and build
+        working-directory: site
+        run: npm test
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: site/dist
 
   deploy:
     needs: build
@@ -39,6 +51,34 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
+
+  smoke:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - name: Verify live catalog routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://nonlooped.github.io/roblox-suite"
+          count=$(node -p "require('./catalog.json').skills.length")
+          for attempt in 1 2 3 4 5; do
+            home=$(curl -fsSL "$base/")
+            skills=$(curl -fsSL "$base/skills/")
+            if grep -q "$count skills" <<<"$home" && grep -q "$count skills" <<<"$skills"; then
+              break
+            fi
+            if [ "$attempt" = 5 ]; then
+              echo "deployed counts do not match catalog ($count)" >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          node -e "for (const skill of require('./catalog.json').skills) console.log(skill.slug)" |
+          while read -r slug; do
+            curl -fsSL --retry 3 "$base/skills/$slug/" >/dev/null
+          done

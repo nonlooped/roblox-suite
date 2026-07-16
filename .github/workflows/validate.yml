@@ -4,24 +4,76 @@ on:
   push:
     branches: [main]
   pull_request:
-  workflow_dispatch: # Allow manual runs from Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  validate:
+  content-and-site:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
-      - name: Check Markdown links (internal + external)
-        uses: lycheeverse/lychee-action@v2
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          # Roblox's Creator Hub (create.roblox.com) intermittently returns
-          # 503/429 at check time — these are transient server-side errors,
-          # not broken doc links. Retrying + tolerating them avoids false
-          # failures on a flaky upstream.
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install pinned site/content dependencies
+        working-directory: site
+        run: npm ci
+
+      - name: Validate catalog, manifest, frontmatter, routing, and deprecations
+        working-directory: site
+        run: npm run check:content
+
+      - name: Type-check Astro
+        working-directory: site
+        run: npm run check
+
+      - name: Build site
+        working-directory: site
+        run: npm run build
+
+      - name: Smoke-test generated catalog and internal routes
+        working-directory: site
+        run: npm run check:dist
+
+  luau:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Install pinned Roblox toolchain
+        uses: paradoxum-games/setup-rokit@de192a6439925d4e06ba9f87334d4f48417e7876 # v2
+        with:
+          cache: true
+
+      - name: Check Luau formatting
+        run: find roblox* tests -type f \( -name '*.lua' -o -name '*.luau' \) -print0 | xargs -0 stylua --check
+
+      - name: Lint Luau examples
+        run: find roblox* tests -type f -name '*.lua' -print0 | xargs -0 selene
+
+      - name: Build controlled Studio regression fixture
+        run: rojo build default.project.json --output regression-fixture.rbxlx
+
+      - name: Generate Roblox sourcemap
+        run: rojo sourcemap default.project.json --output sourcemap.json
+
+      - name: Analyze every Luau example and regression fixture in Roblox mode
+        run: find roblox* tests -type f -name '*.lua' -print0 | xargs -0 luau-lsp analyze --platform roblox --definitions:@roblox=types/globalTypes.None.d.luau --sourcemap sourcemap.json
+
+  links-and-spelling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Check Markdown links
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2
+        with:
           args: |
             --verbose
             --no-progress
@@ -33,23 +85,5 @@ jobs:
             "**/*.md"
           fail: true
 
-      - name: Validate skills.sh.json against official schema
-        run: |
-          npm install -g ajv-cli ajv-formats 2>&1 | tail -1
-          curl -sL https://skills.sh/schemas/skills.sh.schema.json -o /tmp/skills.schema.json
-          ajv validate \
-            -s /tmp/skills.schema.json \
-            -d skills.sh.json \
-            --strict=false \
-            --spec=draft2020 \
-            --errors=text
-
-      - name: Hub-vs-disk reference consistency
-        # Enforces that every skill's references/*.md is linked from the hub
-        # (roblox/SKILL.md) and vice versa. lychee catches broken links; this
-        # catches the inverse — a reference file that exists but is invisible
-        # to agents following the hub's routing. Pure Node, no deps.
-        run: node scripts/check-hub-refs.mjs
-
-      - name: Spell check (typos)
-        uses: crate-ci/typos@master
+      - name: Spell check
+        uses: crate-ci/typos@c800866e89196d05f89da828ff4475a412014efd # v1.35.0
