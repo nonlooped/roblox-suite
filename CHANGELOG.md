@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.4 — 2026-07-16
+
+### CI
+
+- Allowlisted the opaque Google site-verification token in spelling checks.
+
 ## 1.6.3 — 2026-07-16
 
 ### CI

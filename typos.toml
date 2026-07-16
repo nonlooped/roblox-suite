@@ -5,3 +5,6 @@ extend-exclude = ["types/globalTypes.None.d.luau"]
 [default.extend-words]
 lod = "lod"
 unparented = "unparented"
+
+[default.extend-identifiers]
+grl63lB2HzFOQv_Xq2OfDJqAbwZCpIUmr7tijM15jLU = "grl63lB2HzFOQv_Xq2OfDJqAbwZCpIUmr7tijM15jLU"
