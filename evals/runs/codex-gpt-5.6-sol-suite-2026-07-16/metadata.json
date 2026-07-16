@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "agent": "Codex subagent",
+  "model": "gpt-5.6-sol",
+  "commit": "2b9aa2a69175c9804e3f4b9b99fd0b3bff256de0",
+  "task_sha256": "35cd7cd667e1829dbfb74f064bc0750b1adf16ccc933dc8f9ce08a787c1ec29c",
+  "run_date": "2026-07-16",
+  "reasoning_effort": "medium",
+  "notes": "Two five-task batches per arm; outputs preserved verbatim. Same harness/model/effort; baseline agents were instructed not to inspect the suite.",
+  "run_id": "codex-gpt-5.6-sol-suite-2026-07-16",
+  "suite_enabled": true,
+  "suite_context_sha256": "c7dd20230d6a5b8edcf434ae637a0b3d7ea1dc6f7c1f833a753e3f61ead37e1f",
+  "tool_access": "normal Codex subagent tools; same availability in both arms",
+  "protocol": "Fresh task prompts plus the listed specialist SKILL.md and reference files as context."
+}

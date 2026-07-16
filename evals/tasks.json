@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "secure-remote-purchase",
+      "specialists": [
+        "roblox-networking",
+        "roblox-gamepasses"
+      ],
+      "prompt": "Write server-side Luau for a RemoteEvent that lets a player request an in-game coin purchase. Validate item id, price, balance, proximity, and request rate; never trust client-provided price or balance.",
+      "checks": {
+        "require": [
+          "OnServerEvent",
+          "UserId",
+          "rate|limiter|cooldown",
+          "server|authoritative"
+        ],
+        "forbid": [
+          "OnClientEvent.*balance",
+          "clientPrice",
+          "clientBalance"
+        ]
+      }
+    },
+    {
+      "id": "concurrent-datastore-mutation",
+      "specialists": [
+        "roblox-datastores"
+      ],
+      "prompt": "Implement a concurrent-safe DataStore mutation that adds 100 coins while preserving existing metadata and userIds. Explain callback constraints and ambiguous failure handling.",
+      "checks": {
+        "require": [
+          "UpdateAsync",
+          "GetMetadata",
+          "GetUserIds",
+          "must not yield|no yield",
+          "unknown|ambiguous",
+          "UseCache.*false|UseCache = false"
+        ],
+        "forbid": [
+          "SetAsync.*Coins",
+          "IncrementAsync.*retry"
+        ]
+      }
+    },
+    {
+      "id": "ambiguous-write-recovery",
+      "specialists": [
+        "roblox-datastores"
+      ],
+      "prompt": "Design recovery for a failed DataStore write whose backend outcome may be unknown. Return explicit states and avoid duplicate effects.",
+      "checks": {
+        "require": [
+          "committed",
+          "rejected",
+          "unknown",
+          "UseCache.*false|UseCache = false",
+          "idempot|operation.?id"
+        ],
+        "forbid": [
+          "retry until success",
+          "always retry"
+        ]
+      }
+    },
+    {
+      "id": "developer-product-idempotency",
+      "specialists": [
+        "roblox-gamepasses",
+        "roblox-datastores"
+      ],
+      "prompt": "Implement a developer-product ProcessReceipt flow that cannot grant the same purchase twice and safely handles DataStore uncertainty.",
+      "checks": {
+        "require": [
+          "ProcessReceipt",
+          "PurchaseId",
+          "PurchaseGranted",
+          "NotProcessedYet",
+          "UpdateAsync",
+          "idempot"
+        ],
+        "forbid": [
+          "PromptProductPurchaseFinished.*grant",
+          "return.*PurchaseGranted.*before.*persist"
+        ]
+      }
+    },
+    {
+      "id": "reserved-server-matchmaking",
+      "specialists": [
+        "roblox-teleport",
+        "roblox-datastores"
+      ],
+      "prompt": "Allocate one reserved server for a match id when two live servers race, then teleport players and track initiation separately from arrival.",
+      "checks": {
+        "require": [
+          "ReserveServerAsync",
+          "UpdateAsync",
+          "winner|winning|existing",
+          "TeleportAsync",
+          "arrival|arrived",
+          "expir"
+        ],
+        "forbid": [
+          "GetAsync[\\s\\S]*SetAsync"
+        ]
+      }
+    },
+    {
+      "id": "open-cloud-429",
+      "specialists": [
+        "roblox-open-cloud"
+      ],
+      "prompt": "Write an in-experience Open Cloud request helper that handles 429 and 5xx without duplicating mutations.",
+      "checks": {
+        "require": [
+          "retry-after",
+          "x-ratelimit-reset",
+          "idempot",
+          "GET|safe method",
+          "last response|lastResponse"
+        ],
+        "forbid": [
+          "POST.*retry.*default",
+          "task.wait.*final attempt"
+        ]
+      }
+    },
+    {
+      "id": "current-animation-loading",
+      "specialists": [
+        "roblox-animation"
+      ],
+      "prompt": "Load and play a Roblox character animation using the current API and trigger gameplay from an animation marker.",
+      "checks": {
+        "require": [
+          "Animator",
+          "LoadAnimation",
+          "GetMarkerReachedSignal"
+        ],
+        "forbid": [
+          "Humanoid:LoadAnimation",
+          "wait\\("
+        ]
+      }
+    },
+    {
+      "id": "modern-physics-constraints",
+      "specialists": [
+        "roblox-physics"
+      ],
+      "prompt": "Move an assembly toward a target with modern Roblox physics APIs and discuss network ownership.",
+      "checks": {
+        "require": [
+          "AlignPosition|LinearVelocity",
+          "SetNetworkOwner|network owner",
+          "assembly"
+        ],
+        "forbid": [
+          "BodyPosition",
+          "BodyVelocity",
+          "BodyGyro"
+        ]
+      }
+    },
+    {
+      "id": "rojo-project-setup",
+      "specialists": [
+        "roblox-rojo"
+      ],
+      "prompt": "Provide a minimal Rojo 7 project setup, commands for live sync and build, and explain the directionality of sync.",
+      "checks": {
+        "require": [
+          "rojo serve",
+          "rojo build",
+          "project.json",
+          "source of truth|filesystem"
+        ],
+        "forbid": [
+          "two-way sync is reliable",
+          "Studio.*source of truth"
+        ]
+      }
+    },
+    {
+      "id": "studio-mcp-workflow-selection",
+      "specialists": [
+        "roblox-mcp",
+        "roblox-rojo"
+      ],
+      "prompt": "Choose when an AI agent should use Studio MCP versus Rojo/Script Sync for a Roblox task, including security and playtest boundaries.",
+      "checks": {
+        "require": [
+          "MCP",
+          "Rojo|Script Sync",
+          "playtest",
+          "security|permission",
+          "filesystem"
+        ],
+        "forbid": [
+          "expose.*API key",
+          "MCP.*public network"
+        ]
+      }
+    }
+  ]
+}

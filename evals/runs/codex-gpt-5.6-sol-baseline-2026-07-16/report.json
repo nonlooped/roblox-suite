@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "agent": "Codex subagent",
+  "model": "gpt-5.6-sol",
+  "commit": "2b9aa2a69175c9804e3f4b9b99fd0b3bff256de0",
+  "task_sha256": "35cd7cd667e1829dbfb74f064bc0750b1adf16ccc933dc8f9ce08a787c1ec29c",
+  "run_date": "2026-07-16",
+  "reasoning_effort": "medium",
+  "notes": "Two five-task batches per arm; outputs preserved verbatim. Same harness/model/effort; baseline agents were instructed not to inspect the suite.",
+  "run_id": "codex-gpt-5.6-sol-baseline-2026-07-16",
+  "suite_enabled": false,
+  "suite_context_sha256": "c7dd20230d6a5b8edcf434ae637a0b3d7ea1dc6f7c1f833a753e3f61ead37e1f",
+  "tool_access": "normal Codex subagent tools; same availability in both arms",
+  "protocol": "Fresh task prompts; explicitly instructed not to inspect or use Roblox Suite content.",
+  "passed": 6,
+  "total": 10,
+  "pass_rate": 0.6,
+  "results": [
+    {
+      "id": "secure-remote-purchase",
+      "passed": false,
+      "failures": [
+        "missing required pattern: UserId"
+      ],
+      "response_sha256": "7b7ef8d35f92dffbd43cd91ca677805a7b4eb3a30c1308555936fa2709b95de7"
+    },
+    {
+      "id": "concurrent-datastore-mutation",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "9112b7fa20577fe8ea1f64e55da234f805f213ca5f1ea2db8b47ca5e623d91f3"
+    },
+    {
+      "id": "ambiguous-write-recovery",
+      "passed": false,
+      "failures": [
+        "missing required pattern: committed",
+        "missing required pattern: rejected"
+      ],
+      "response_sha256": "8615c083ef4a3c6a754b16ca985f539897c0ed6a5cbc4607c6028d23c6c27fea"
+    },
+    {
+      "id": "developer-product-idempotency",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "70c851957cb3f3e0f6cbae0c07a5cccbdbb636aa9fd15666026f621bfdbb0359"
+    },
+    {
+      "id": "reserved-server-matchmaking",
+      "passed": false,
+      "failures": [
+        "missing required pattern: winner|winning|existing",
+        "matched forbidden code pattern: GetAsync[\\s\\S]*SetAsync"
+      ],
+      "response_sha256": "e7bc803c2154251e7e6557051ec3ef4244e0ac6a07ced2934fdbc94c3e546e98"
+    },
+    {
+      "id": "open-cloud-429",
+      "passed": false,
+      "failures": [
+        "missing required pattern: x-ratelimit-reset",
+        "missing required pattern: last response|lastResponse"
+      ],
+      "response_sha256": "9a0f09af066e963094d5e1e18a2120077a496037d6f8019797558e2b41f3fb43"
+    },
+    {
+      "id": "current-animation-loading",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "1205fda0e9986f47ae6791b928bce066c2420614d2dd52b5a9c56986090563c2"
+    },
+    {
+      "id": "modern-physics-constraints",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "5dba32254eaa42a62eeee53c78cf900b51ec3aca094a53e4588b99194f37362d"
+    },
+    {
+      "id": "rojo-project-setup",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "a92936a76711378fc7ce3c5f22f1008e784877b48b528c31a57d8d93bfe56745"
+    },
+    {
+      "id": "studio-mcp-workflow-selection",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "b898e4d05254c5866e803598784337496c34edae628e037dc6107c77ea9be6fd"
+    }
+  ]
+}

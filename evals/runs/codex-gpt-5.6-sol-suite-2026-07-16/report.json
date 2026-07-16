@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "agent": "Codex subagent",
+  "model": "gpt-5.6-sol",
+  "commit": "2b9aa2a69175c9804e3f4b9b99fd0b3bff256de0",
+  "task_sha256": "35cd7cd667e1829dbfb74f064bc0750b1adf16ccc933dc8f9ce08a787c1ec29c",
+  "run_date": "2026-07-16",
+  "reasoning_effort": "medium",
+  "notes": "Two five-task batches per arm; outputs preserved verbatim. Same harness/model/effort; baseline agents were instructed not to inspect the suite.",
+  "run_id": "codex-gpt-5.6-sol-suite-2026-07-16",
+  "suite_enabled": true,
+  "suite_context_sha256": "c7dd20230d6a5b8edcf434ae637a0b3d7ea1dc6f7c1f833a753e3f61ead37e1f",
+  "tool_access": "normal Codex subagent tools; same availability in both arms",
+  "protocol": "Fresh task prompts plus the listed specialist SKILL.md and reference files as context.",
+  "passed": 10,
+  "total": 10,
+  "pass_rate": 1,
+  "results": [
+    {
+      "id": "secure-remote-purchase",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "8862fd2ba58bf635bbfd4ef42137150f918b7ad68c474edf54e18afeb05b70c5"
+    },
+    {
+      "id": "concurrent-datastore-mutation",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "16d3bd24b52cb7d6ca2e73c4594b078828497c47103530cc71f47dab406fdf00"
+    },
+    {
+      "id": "ambiguous-write-recovery",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "55e5c97f54a39b9179ba970a1f9cedeefdc917e9b42843af5bc7845ff59653f0"
+    },
+    {
+      "id": "developer-product-idempotency",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "5e661848a97f3990a3b4c7db98a5717c57cceac41162f0ba44837b525e39aa64"
+    },
+    {
+      "id": "reserved-server-matchmaking",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "a5ecbf742a851b78f2710e5e0b2c9f9c439779bb32d708b8e0780ff7bbface0f"
+    },
+    {
+      "id": "open-cloud-429",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "f9acab56625ee3da0fedc69846556630ed7848b90e417ad48cf128af5b8bf745"
+    },
+    {
+      "id": "current-animation-loading",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "e81a006473113be7ae2264ded1ea994a90658f6e5fef5f1f749ca44ed68eadda"
+    },
+    {
+      "id": "modern-physics-constraints",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "8297347d6795cff56196978c0a9f57a3677efd9ae3f89f3782c77b9899baebdf"
+    },
+    {
+      "id": "rojo-project-setup",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "9d369df1d84098e8307903c60d835f9efd9f9e27a9861dfc16b109c55210da50"
+    },
+    {
+      "id": "studio-mcp-workflow-selection",
+      "passed": true,
+      "failures": [],
+      "response_sha256": "e6211a87b40a1eef31c20df98f150acf2ead6dd0822c977aa4dbb302b9aa6cce"
+    }
+  ]
+}
