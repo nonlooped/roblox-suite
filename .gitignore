@@ -23,4 +23,17 @@ sourcemap.json
 # Local AI Tooling
 .agents
 .claude
+.codex
+.impeccable
+.opencode/*
+!.opencode/skills/
+!.opencode/skills/**
+.playwright-mcp
 skills-lock.json
+
+# Local scratch / assessment artifacts
+assessment-*.png
+*-regressions.png
+scratch_*.mjs
+plans/
+i-have-adhd/
