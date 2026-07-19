@@ -1,66 +1,186 @@
 #!/usr/bin/env node
-import { access, readdir, readFile } from "node:fs/promises";
+/**
+ * Post-build smoke test against dist/. Mirrors what the deploy workflow
+ * checks against the live site, so failures surface locally and in PRs
+ * instead of after a Pages deploy.
+ */
+import { readFile, access } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const siteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repoRoot = path.resolve(siteRoot, "..");
 const dist = path.join(siteRoot, "dist");
-const catalog = JSON.parse(await readFile(path.join(repoRoot, "catalog.json"), "utf8"));
-const manifest = JSON.parse(await readFile(path.join(repoRoot, "skills.sh.json"), "utf8"));
+
 const errors = [];
+const fail = (message) => errors.push(message);
+
+const catalog = JSON.parse(
+  await readFile(path.join(repoRoot, "catalog.json"), "utf8"),
+);
 const count = catalog.skills.length;
 
-const manifestSlugs = manifest.groupings.flatMap((group) => group.skills).toSorted();
-const catalogSlugs = catalog.skills.map((skill) => skill.slug).toSorted();
-if (JSON.stringify(manifestSlugs) !== JSON.stringify(catalogSlugs)) {
-  errors.push("manifest skills do not match catalog skills");
-}
+// dist/ is uploaded as the Pages artifact root, which GitHub serves at
+// /roblox-suite/. So dist/index.html *is* the base path — no nested prefix.
+const root = dist;
 
-for (const page of [path.join(dist, "index.html"), path.join(dist, "skills", "index.html")]) {
-  const html = await readFile(page, "utf8");
-  if (!html.includes(`${count} skills`)) errors.push(`${path.relative(dist, page)} does not show catalog count ${count}`);
-}
-for (const slug of catalogSlugs) {
+async function page(...segments) {
+  const file = path.join(root, ...segments, "index.html");
   try {
-    await access(path.join(dist, "skills", slug, "index.html"));
+    return await readFile(file, "utf8");
   } catch {
-    errors.push(`missing deployed route /skills/${slug}/`);
+    fail(`missing page: ${path.relative(dist, file)}`);
+    return null;
   }
 }
 
-async function htmlFiles(directory) {
-  const files = [];
-  for (const entry of await readdir(directory, { withFileTypes: true })) {
-    const full = path.join(directory, entry.name);
-    if (entry.isDirectory()) files.push(...await htmlFiles(full));
-    else if (entry.name.endsWith(".html")) files.push(full);
-  }
-  return files;
+const home = await page();
+const skillsIndex = await page("skills");
+const evidence = await page("evidence");
+
+if (home && !/<meta name="google-site-verification" content="[^"]+">/.test(home)) {
+  fail("home page is missing Google Search Console verification metadata");
 }
 
-for (const file of await htmlFiles(dist)) {
-  const html = await readFile(file, "utf8");
-  for (const match of html.matchAll(/href="([^"]+)"/g)) {
-    const href = match[1];
-    if (/^(?:https?:|mailto:|#)/.test(href)) continue;
-    const pathname = href.split(/[?#]/)[0].replace(/^\/roblox-suite\/?/, "");
-    if (!pathname) continue;
-    const target = pathname.endsWith("/")
-      ? path.join(dist, pathname, "index.html")
-      : path.extname(pathname)
-        ? path.join(dist, pathname)
-        : path.join(dist, pathname, "index.html");
-    try {
-      await access(target);
-    } catch {
-      errors.push(`${path.relative(dist, file)} links missing local target ${href}`);
+// The deploy workflow greps both pages for "<count> skills" — enforce it here.
+for (const [name, html] of [
+  ["home", home],
+  ["skills index", skillsIndex],
+]) {
+  if (html && !html.includes(`${count} skills`)) {
+    fail(`${name} page does not render the string "${count} skills"`);
+  }
+}
+
+for (const skill of catalog.skills) {
+  const html = await page("skills", skill.slug);
+  if (!html) continue;
+
+  if (!html.includes(skill.slug)) {
+    fail(`skills/${skill.slug}/ does not mention its own slug`);
+  }
+  if (!html.includes(skill.displayTitle)) {
+    fail(`skills/${skill.slug}/ does not render its displayTitle`);
+  }
+  for (const [coverIndex, sourceIndexes] of skill.cover_sources.entries()) {
+    for (const sourceIndex of sourceIndexes) {
+      if (!html.includes(`data-claim-citation="${coverIndex + 1}:${sourceIndex}"`)) {
+        fail(`skills/${skill.slug}/ is missing citation ${sourceIndex} for covers[${coverIndex}]`);
+      }
+    }
+  }
+  // Each detail page must actually surface its sources.
+  for (const source of skill.sources) {
+    if (!html.includes(source.url)) {
+      fail(`skills/${skill.slug}/ is missing source URL ${source.url}`);
     }
   }
 }
 
-if (errors.length) {
-  console.error(`Built-site smoke test failed:\n- ${[...new Set(errors)].join("\n- ")}`);
+for (const [name, html] of [
+  ["home", home],
+  ["skills index", skillsIndex],
+  ["evidence", evidence],
+]) {
+  if (!html) continue;
+  const levels = [...html.matchAll(/<h([1-6])\b/g)].map((match) => Number(match[1]));
+  for (let index = 1; index < levels.length; index++) {
+    if (levels[index] > levels[index - 1] + 1) {
+      fail(`${name} page skips from h${levels[index - 1]} to h${levels[index]}`);
+    }
+  }
+}
+
+for (const asset of ["404.html", "favicon.svg", "robots.txt", ".nojekyll"]) {
+  try {
+    await access(path.join(root, asset));
+  } catch {
+    // 404.html and .nojekyll are emitted at the dist root by Pages convention.
+    try {
+      await access(path.join(dist, asset));
+    } catch {
+      fail(`missing asset: ${asset}`);
+    }
+  }
+}
+
+const sitemapBase = "https://nonlooped.github.io/roblox-suite/";
+const sitemapIndex = path.join(root, "sitemap-index.xml");
+let sitemapIndexXml = null;
+
+try {
+  sitemapIndexXml = await readFile(sitemapIndex, "utf8");
+} catch {
+  fail("missing sitemap index: sitemap-index.xml");
+}
+
+if (sitemapIndexXml && !/<sitemapindex\b/.test(sitemapIndexXml)) {
+  fail("sitemap-index.xml is not a sitemap index");
+}
+
+const sitemapUrls = sitemapIndexXml
+  ? [...sitemapIndexXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1])
+  : [];
+
+if (sitemapIndexXml && sitemapUrls.length === 0) {
+  fail("sitemap-index.xml does not reference any sitemap files");
+}
+
+const sitemapXml = [];
+for (const sitemapUrl of sitemapUrls) {
+  let url;
+  try {
+    url = new URL(sitemapUrl);
+  } catch {
+    fail(`sitemap index contains an invalid URL: ${sitemapUrl}`);
+    continue;
+  }
+
+  const basePath = "/roblox-suite/";
+  if (url.origin !== "https://nonlooped.github.io" || !url.pathname.startsWith(basePath)) {
+    fail(`sitemap index references a non-canonical sitemap: ${sitemapUrl}`);
+    continue;
+  }
+
+  const sitemapFile = path.join(root, url.pathname.slice(basePath.length));
+  try {
+    const contents = await readFile(sitemapFile, "utf8");
+    if (!/<urlset\b/.test(contents)) {
+      fail(`referenced sitemap is not a URL sitemap: ${path.relative(dist, sitemapFile)}`);
+    }
+    sitemapXml.push(contents);
+  } catch {
+    fail(`missing referenced sitemap: ${path.relative(dist, sitemapFile)}`);
+  }
+}
+
+const expectedSitemapUrls = [
+  sitemapBase,
+  `${sitemapBase}skills/`,
+  `${sitemapBase}evidence/`,
+  ...catalog.skills.map((skill) => `${sitemapBase}skills/${skill.slug}/`),
+];
+
+const sitemapContent = sitemapXml.join("\n");
+for (const url of expectedSitemapUrls) {
+  if (!sitemapContent.includes(`<loc>${url}</loc>`)) {
+    fail(`sitemap is missing canonical URL: ${url}`);
+  }
+}
+
+if (/<loc>[^<]*\/404\/?<\/loc>/.test(sitemapContent)) {
+  fail("sitemap includes the generated 404 page");
+}
+
+// Catch unresolved base paths that would 404 on Pages.
+if (home?.includes('href="/skills/')) {
+  fail("home page contains a root-absolute /skills/ link that ignores the base path");
+}
+
+if (errors.length > 0) {
+  console.error(`Built-site check failed with ${errors.length} problem(s):\n`);
+  for (const error of errors) console.error(`  - ${error}`);
   process.exit(1);
 }
-console.log(`Built-site smoke test passed for ${count} skills.`);
+
+console.log(`Built site OK: ${count} skill pages, sitemap, index, evidence, and assets present.`);

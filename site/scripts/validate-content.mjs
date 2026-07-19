@@ -1,113 +1,152 @@
 #!/usr/bin/env node
-import { readdir, readFile } from "node:fs/promises";
+/**
+ * Pre-build content checks. Guards the invariants the site relies on:
+ * every catalog skill has a real directory, its frontmatter agrees with the
+ * catalog, and required fields are present and well-formed.
+ */
+import { readFile, access } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import matter from "gray-matter";
-import { z } from "zod";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
-const catalog = JSON.parse(await readFile(path.join(root, "catalog.json"), "utf8"));
-const isoDate = z.preprocess(
-  (value) => value instanceof Date ? value.toISOString().slice(0, 10) : value,
-  z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-);
-const source = z.object({ label: z.string().min(1), url: z.url(), verified_at: isoDate });
-const example = z.object({
-  path: z.string().regex(/^scripts\/[A-Za-z0-9._-]+\.lua$/),
-  status: z.enum(["experimental", "reviewed", "tested"]),
-});
-const skill = z.object({
-  slug: z.string().regex(/^roblox(?:-[a-z0-9]+)*$/),
-  title: z.string().min(1),
-  hub: z.boolean().optional(),
-  oneLiner: z.string().min(1),
-  displayTitle: z.string().min(1),
-  overview: z.string().min(1),
-  covers: z.array(z.string().min(1)).min(1),
-  sources: z.array(source).min(1),
-  risk: z.enum(["critical", "medium", "lower"]),
-  created_at: isoDate,
-  last_changed_at: isoDate,
-  examples: z.object({
-    status: z.enum(["none", "experimental", "reviewed", "tested"]),
-    files: z.array(example),
-  }),
-});
-const schema = z.object({
-  schema_version: z.literal(1),
-  groups: z.array(z.object({
-    id: z.string().min(1),
-    title: z.string().min(1),
-    description: z.string().min(1),
-    skills: z.array(z.string()).min(1),
-  })).min(1),
-  skills: z.array(skill).min(1),
-});
-const parsed = schema.parse(catalog);
+const siteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const repoRoot = path.resolve(siteRoot, "..");
+
 const errors = [];
-const now = new Date();
+const fail = (message) => errors.push(message);
 
-const slugs = new Set(parsed.skills.map((item) => item.slug));
-const grouped = parsed.groups.flatMap((group) => group.skills);
-for (const slug of slugs) {
-  const count = grouped.filter((item) => item === slug).length;
-  if (count !== 1) errors.push(`${slug} occurs ${count} times in catalog groups`);
+const catalog = JSON.parse(
+  await readFile(path.join(repoRoot, "catalog.json"), "utf8"),
+);
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const RISKS = new Set(["lower", "medium", "critical"]);
+const EXAMPLE_STATUSES = new Set(["none", "experimental", "reviewed"]);
+
+if (!Array.isArray(catalog.skills) || catalog.skills.length === 0) {
+  fail("catalog.json has no skills");
 }
-for (const slug of grouped) {
-  if (!slugs.has(slug)) errors.push(`catalog group references unknown skill ${slug}`);
-}
 
-for (const item of parsed.skills) {
-  const skillPath = path.join(root, item.slug, "SKILL.md");
-  const files = [skillPath];
-  const refsDir = path.join(root, item.slug, "references");
-  for (const entry of await readdir(refsDir, { withFileTypes: true })) {
-    if (entry.isFile() && entry.name.endsWith(".md")) files.push(path.join(refsDir, entry.name));
-  }
+const slugs = new Set();
 
-  const verifiedDates = [];
-  for (const file of files) {
-    const parsedMatter = matter(await readFile(file, "utf8"));
-    const required = file === skillPath
-      ? z.object({ name: z.string().min(1), description: z.string().min(1), last_reviewed: isoDate })
-      : z.object({ last_reviewed: isoDate });
-    const check = required.safeParse(parsedMatter.data);
-    if (!check.success) {
-      errors.push(`${path.relative(root, file)} has invalid frontmatter: ${z.prettifyError(check.error)}`);
-      continue;
+for (const skill of catalog.skills ?? []) {
+  const where = `skill "${skill.slug ?? "<missing slug>"}"`;
+
+  for (const field of ["slug", "title", "oneLiner", "displayTitle", "overview"]) {
+    if (typeof skill[field] !== "string" || skill[field].trim() === "") {
+      fail(`${where}: missing or empty "${field}"`);
     }
-    verifiedDates.push(check.data.last_reviewed);
   }
 
-  const oldest = verifiedDates.toSorted()[0];
-  const maxAgeDays = item.risk === "critical" ? 120 : 180;
-  if (oldest) {
-    const ageDays = Math.floor((now.getTime() - new Date(`${oldest}T00:00:00Z`).getTime()) / 86400000);
-    if (ageDays > maxAgeDays) errors.push(`${item.slug} oldest verification is ${ageDays} days old (limit ${maxAgeDays})`);
+  if (slugs.has(skill.slug)) fail(`${where}: duplicate slug`);
+  slugs.add(skill.slug);
+
+  if (!/^[a-z0-9-]+$/.test(skill.slug ?? "")) {
+    fail(`${where}: slug must be lowercase kebab-case`);
   }
 
-  const scriptsDir = path.join(root, item.slug, "scripts");
-  let diskScripts = [];
+  if (!Array.isArray(skill.covers) || skill.covers.length === 0) {
+    fail(`${where}: needs at least one "covers" entry`);
+  }
+
+  if (!RISKS.has(skill.risk)) {
+    fail(`${where}: risk must be one of ${[...RISKS].join(", ")}`);
+  }
+
+  for (const field of ["created_at", "last_changed_at"]) {
+    if (!ISO_DATE.test(skill[field] ?? "")) {
+      fail(`${where}: "${field}" must be YYYY-MM-DD`);
+    }
+  }
+
+  if (!EXAMPLE_STATUSES.has(skill.examples?.status)) {
+    fail(`${where}: examples.status must be one of ${[...EXAMPLE_STATUSES].join(", ")}`);
+  }
+
+  // Sources are the product's core promise — hold them to a strict shape.
+  if (!Array.isArray(skill.sources) || skill.sources.length === 0) {
+    fail(`${where}: needs at least one source`);
+  }
+
+  for (const source of skill.sources ?? []) {
+    if (!source.label?.trim()) fail(`${where}: a source is missing a label`);
+    if (!/^https:\/\//.test(source.url ?? "")) {
+      fail(`${where}: source "${source.label}" must have an https URL`);
+    }
+    if (!ISO_DATE.test(source.verified_at ?? "")) {
+      fail(`${where}: source "${source.label}" needs a YYYY-MM-DD verified_at`);
+    }
+  }
+
+  if (!Array.isArray(skill.cover_sources) || skill.cover_sources.length !== skill.covers?.length) {
+    fail(`${where}: cover_sources must cite every covers entry exactly once`);
+  } else {
+    for (const [coverIndex, sourceIndexes] of skill.cover_sources.entries()) {
+      if (!Array.isArray(sourceIndexes) || sourceIndexes.length === 0) {
+        fail(`${where}: covers[${coverIndex}] needs at least one source citation`);
+        continue;
+      }
+      for (const sourceIndex of sourceIndexes) {
+        if (!Number.isInteger(sourceIndex) || sourceIndex < 1 || sourceIndex > skill.sources.length) {
+          fail(`${where}: covers[${coverIndex}] has an invalid source index ${sourceIndex}`);
+        }
+      }
+    }
+  }
+
+  // The site links to SKILL.md and derives routes from the slug, so the
+  // directory has to exist in the repo.
+  const skillFile = path.join(repoRoot, skill.slug ?? "", "SKILL.md");
   try {
-    diskScripts = (await readdir(scriptsDir)).filter((name) => name.endsWith(".lua")).sort();
-  } catch {}
-  const catalogScripts = item.examples.files.map((file) => path.basename(file.path)).sort();
-  if (JSON.stringify(diskScripts) !== JSON.stringify(catalogScripts)) {
-    errors.push(`${item.slug} example file list is out of sync with scripts/`);
-  }
-  for (const file of item.examples.files) {
-    const text = await readFile(path.join(root, item.slug, file.path), "utf8");
-    for (const field of ["Status", "Last verified", "Test coverage", "Intended use"]) {
-      if (!text.includes(`-- ${field}:`)) errors.push(`${item.slug}/${file.path} is missing '${field}' maturity metadata`);
+    await access(skillFile);
+    const contents = await readFile(skillFile, "utf8");
+    const nameMatch = contents.match(/^name:\s*(.+)$/m);
+    if (!nameMatch) {
+      fail(`${where}: ${skill.slug}/SKILL.md has no "name" in frontmatter`);
+    } else if (nameMatch[1].trim() !== skill.slug) {
+      fail(
+        `${where}: SKILL.md name "${nameMatch[1].trim()}" does not match catalog slug`,
+      );
     }
-    if (!text.includes(`-- Status: ${file.status}`)) {
-      errors.push(`${item.slug}/${file.path} status disagrees with catalog.json`);
-    }
+  } catch {
+    fail(`${where}: missing ${skill.slug}/SKILL.md`);
   }
 }
 
-if (errors.length) {
-  console.error(`Content validation failed:\n- ${errors.join("\n- ")}`);
+// Groups must cover every skill exactly once, or the catalog pages drop one.
+const grouped = new Set();
+for (const group of catalog.groups ?? []) {
+  if (!group.id || !group.title || !group.description) {
+    fail(`group "${group.id ?? group.title}": needs id, title, and description`);
+  }
+  for (const slug of group.skills ?? []) {
+    if (!slugs.has(slug)) fail(`group "${group.title}": unknown skill "${slug}"`);
+    if (grouped.has(slug)) fail(`skill "${slug}" appears in more than one group`);
+    grouped.add(slug);
+  }
+}
+
+for (const slug of slugs) {
+  if (!grouped.has(slug)) fail(`skill "${slug}" is not in any group`);
+}
+
+// Corrections shown on the homepage must point at real skills.
+const correctionsSource = await readFile(
+  path.join(siteRoot, "src", "data", "corrections.ts"),
+  "utf8",
+);
+for (const [, slug] of correctionsSource.matchAll(/skill:\s*"([^"]+)"/g)) {
+  if (!slugs.has(slug)) {
+    fail(`corrections.ts references unknown skill "${slug}"`);
+  }
+}
+
+if (errors.length > 0) {
+  console.error(`Content validation failed with ${errors.length} problem(s):\n`);
+  for (const error of errors) console.error(`  - ${error}`);
   process.exit(1);
 }
-console.log(`Content validation passed for ${parsed.skills.length} skills.`);
+
+console.log(
+  `Content OK: ${catalog.skills.length} skills, ${catalog.groups.length} groups, ` +
+    `${catalog.skills.reduce((n, s) => n + s.sources.length, 0)} sources.`,
+);

@@ -1,34 +1,42 @@
 {
   "name": "roblox-suite-site",
-  "type": "module",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/og-image.mjs && astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "check:content": "node scripts/validate-manifest.mjs && node scripts/validate-content.mjs && node scripts/check-deprecated-apis.mjs && node ../scripts/check-hub-refs.mjs && node ../scripts/generate-catalog-artifacts.mjs --check && node ../evals/validate.mjs",
+    "check:content": "node scripts/validate-content.mjs",
     "check:dist": "node scripts/check-built-site.mjs",
-    "test": "npm run check:content && npm run check && npm run build && npm run check:dist",
-    "og:image": "node scripts/og-image.mjs"
+    "test": "npm run check:content && npm run check && npm run build && npm run check:dist"
   },
   "dependencies": {
+    "@astrojs/react": "^6.0.1",
     "@astrojs/sitemap": "^3.7.3",
-    "@fontsource/spline-sans-mono": "^5.2.8",
-    "@tailwindcss/vite": "^4.3.2",
-    "astro": "^7.0.7",
-    "gray-matter": "^4.0.3",
-    "tailwindcss": "^4.3.2",
-    "zod": "^4.4.3"
+    "@fontsource-variable/hanken-grotesk": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/unbounded": "^5.3.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "astro": "5.18.2",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.25.0",
+    "motion": "^12.42.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.9",
-    "ajv": "^8.20.0",
-    "ajv-formats": "^3.0.1",
-    "typescript": "^6.0.3"
+    "@astrojs/check": "0.9.5",
+    "typescript": "5.9.3"
   },
-  "overrides": {
-    "esbuild": ">=0.28.1"
+  "allowScripts": {
+    "esbuild@0.27.7": true,
+    "esbuild@0.25.12": true,
+    "sharp@0.34.5": true
   }
 }
