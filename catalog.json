@@ -73,6 +73,7 @@
         "Quick-reference patterns and a decision tree that routes you to the right specialized skill.",
         "Cross-skill workflows for data, UI, animation, monetization, and networking."
       ],
+      "cover_sources": [[1], [2], [2, 3]],
       "sources": [
         {
           "label": "Engine API Reference",
@@ -109,6 +110,7 @@
         "Script locations and execution contexts, including modern `BaseScript.RunContext`.",
         "The client-server data model, and the reality that there is no runtime filesystem I/O."
       ],
+      "cover_sources": [[1, 3], [2], [4]],
       "sources": [
         {
           "label": "Luau",
@@ -160,6 +162,7 @@
         "Server authority as the foundation: validation and rate-limiting on every request.",
         "Common exploit vectors and capability-based access control."
       ],
+      "cover_sources": [[1, 3], [2], [2]],
       "sources": [
         {
           "label": "Client-server model",
@@ -201,6 +204,7 @@
         "`UpdateAsync` with a pure transform for contended values; hourly versioning for recovery.",
         "Every error code, quota, and throttling strategy, with patterns that avoid data loss."
       ],
+      "cover_sources": [[1], [1, 2], [3, 4]],
       "sources": [
         {
           "label": "Data stores",
@@ -256,6 +260,7 @@
         "Scale + offset responsive layouts tested across target screen sizes.",
         "Particles-in-UI techniques, and the truth that 3D ParticleEmitters don't render in ViewportFrame."
       ],
+      "cover_sources": [[1, 2], [2], [3]],
       "sources": [
         {
           "label": "In-experience containers",
@@ -297,6 +302,7 @@
         "`IKControl` for procedural posing; CurveAnimation vs KeyframeSequence.",
         "`TweenService` for UI and 3D, sequences, chaining, and typewriter effects."
       ],
+      "cover_sources": [[1], [2, 4], [3]],
       "sources": [
         {
           "label": "Animation",
@@ -351,6 +357,7 @@
         "Beam, Trail, Highlight, plus one-shot vs continuous emission.",
         "Performance: LOD-aware patterns that degrade gracefully on low-end devices."
       ],
+      "cover_sources": [[1], [1, 2], [1]],
       "sources": [
         {
           "label": "Particle emitters",
@@ -387,6 +394,7 @@
         "Legacy Sound/SoundGroup: discouraged for new work, and when to still use it.",
         "2D vs 3D audio, effect chains, and mobile performance caps."
       ],
+      "cover_sources": [[1], [1, 3], [1, 2]],
       "sources": [
         {
           "label": "Audio objects",
@@ -433,6 +441,7 @@
         "Server-authoritative granting with idempotency guards and `PlayerAdded` re-verification.",
         "Current policy: cross-experience sales disabled (May 30 2026); Creator Rewards replaced Premium Payouts."
       ],
+      "cover_sources": [[1], [1], [2, 3]],
       "sources": [
         {
           "label": "Passes (monetization)",
@@ -474,6 +483,7 @@
         "API keys, OAuth2, least-privilege scopes, and the 60-day key auto-expiry rule.",
         "Secrets Store + `HttpService:GetSecret` so keys never sit in scripts."
       ],
+      "cover_sources": [[1, 4], [2, 3], [5]],
       "sources": [
         {
           "label": "Open Cloud",
@@ -530,6 +540,7 @@
         "`TeleportOptions`, reserved servers, and `TeleportAsyncResult` error handling.",
         "Multi-place architecture, DataStore handoff, and matchmaking patterns."
       ],
+      "cover_sources": [[1, 2], [2, 3, 4], [1]],
       "sources": [
         {
           "label": "Teleport",
@@ -576,6 +587,7 @@
         "Project format, file→instance mapping (`.server.luau` / `.client.luau` / modules), meta files.",
         "`rojo build` / `upload` / `sourcemap` / `syncback`; live-sync limits and two-way caveats."
       ],
+      "cover_sources": [[1, 2], [3], [1, 4, 5]],
       "sources": [
         {
           "label": "Rojo docs (v7)",
@@ -622,6 +634,7 @@
         "Read and write scripts, explore the data model, run Luau, and capture the viewport.",
         "Combine with Script Sync for a file-based workflow."
       ],
+      "cover_sources": [[1], [1], [2, 3]],
       "sources": [
         {
           "label": "Studio MCP",
@@ -667,6 +680,7 @@
         "Mechanical and mover constraints, the modern replacements for deprecated BodyMovers.",
         "Network ownership for vehicles, the sleep system, and adaptive timestepping."
       ],
+      "cover_sources": [[1, 5], [2, 3], [1, 4]],
       "sources": [
         {
           "label": "Physics",
@@ -730,6 +744,7 @@
         "PathfindingModifier and PathfindingLink, with material and region costs.",
         "State machines, behavior trees, and patrol/chase patterns at scale."
       ],
+      "cover_sources": [[1], [1], [1, 2]],
       "sources": [
         {
           "label": "Pathfinding (characters)",
@@ -777,8 +792,9 @@
       "covers": [
         "Developer Console, Output discipline, and pcall/assert patterns.",
         "MicroProfiler, Scene Analysis, and the Script Profiler.",
-        "TestEZ unit tests, memory diagnostics, and a methodology for isolating issues."
+        "Unit-test patterns, memory diagnostics, and a methodology for isolating issues."
       ],
+      "cover_sources": [[3], [1, 2, 4], [3]],
       "sources": [
         {
           "label": "MicroProfiler",
