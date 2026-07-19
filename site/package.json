@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
-    "typescript": "5.9.3"
+    "typescript": "7.0.2"
   },
   "allowScripts": {
     "sharp@0.34.5": true,
