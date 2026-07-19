@@ -1,0 +1,84 @@
+---
+import { installCommand, skillCount } from "../data/catalog";
+
+/*
+ * The sequence is shown as three real artifacts at three different sizes:
+ * the command you type, the file your agent reaches for, the code you get
+ * back. Deliberately not three identical icon-and-number cards.
+ */
+---
+
+<section class="bg-paper py-20 text-on-paper sm:py-28">
+  <div class="mx-auto max-w-6xl px-6">
+    <h2 class="text-title max-w-2xl">Three steps, then forget it exists</h2>
+    <p class="measure mt-5 text-lead text-on-paper-muted">
+      There is no config file, no prompt to maintain, and nothing to set up per project.
+    </p>
+
+    <div class="mt-14 grid gap-5 lg:grid-cols-3">
+      <!-- Step one is wide and short: it is one line of typing. -->
+      <div class="min-w-0 lg:col-span-2">
+        <h3 class="text-heading">You run one command</h3>
+        <p class="mt-2.5 text-on-paper-muted">
+          Drops all {skillCount} skills into your agent. Takes a few seconds.
+        </p>
+        <div class="panel mt-5 bg-ink px-5 py-4 font-mono text-small text-on-ink">
+          <span class="text-toy-green" aria-hidden="true">$</span>
+          <span class="ml-2.5">{installCommand}</span>
+        </div>
+      </div>
+
+      <!-- Step two is tall: a list of candidates with one chosen. -->
+      <div class="min-w-0 lg:row-span-2">
+        <h3 class="text-heading">It picks what it needs</h3>
+        <p class="mt-2.5 text-on-paper-muted">
+          Ask for a save system and it loads the datastore skill, not all {skillCount}.
+        </p>
+        <div class="panel mt-5 overflow-hidden bg-ink font-mono text-[0.8125rem]">
+          <div class="border-b border-ink-soft px-4 py-2.5 text-on-ink-muted">
+            "make saving not lose progress"
+          </div>
+          <ul class="divide-y divide-ink-soft">
+            {
+              [
+                { name: "roblox-datastores", picked: true },
+                { name: "roblox-networking", picked: false },
+                { name: "roblox-physics", picked: false },
+                { name: "roblox-animation", picked: false },
+              ].map((row) => (
+                <li
+                  class:list={[
+                    "flex items-center gap-2.5 px-4 py-2.5",
+                    row.picked ? "bg-toy-green text-ink" : "text-on-ink-muted",
+                  ]}
+                >
+                  <span aria-hidden="true">{row.picked ? "▸" : " "}</span>
+                  <span>{row.name}</span>
+                  {row.picked && <span class="ml-auto font-medium">loaded</span>}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      <!-- Step three is medium: the payoff, as actual code. -->
+      <div class="min-w-0 lg:col-span-2">
+        <h3 class="text-heading">You get current API guidance</h3>
+        <p class="mt-2.5 text-on-paper-muted">
+          A current animation pattern, with the Roblox documentation that supports the migration. <a
+            href="https://create.roblox.com/docs/reference/engine/classes/Humanoid#LoadAnimation"
+            rel="noopener"
+            class="text-brand underline underline-offset-4 hover:no-underline">Read the source</a
+          >.
+        </p>
+        <div class="panel mt-5 overflow-x-auto bg-ink px-5 py-4 font-mono text-small text-on-ink">
+          <pre class="whitespace-pre"><span class="text-on-ink-muted">-- Humanoid:LoadAnimation is deprecated. Use Animator:LoadAnimation.</span>
+<span class="text-toy-yellow">local</span> animator = humanoid:FindFirstChildOfClass(<span class="text-toy-green">"Animator"</span>)
+<span class="text-toy-yellow">local</span> track = animator:LoadAnimation(anim)
+track:Play()</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

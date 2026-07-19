@@ -1,0 +1,52 @@
+---
+import { groupedSkills, plainLabel } from "../data/catalog";
+
+interface Props {
+  base: string;
+}
+
+const { base } = Astro.props;
+---
+
+<!--
+  A grouped index, not a card grid. Full-width rows with rules between them
+  read as a catalog you scan, which is what this actually is; sixteen equal
+  boxes would say nothing about how the skills relate.
+-->
+<div class="divide-y divide-on-brand/20 border-y border-on-brand/20">
+  {
+    groupedSkills.map((group) => (
+      <section
+        id={group.id}
+        class="grid scroll-mt-20 gap-x-10 gap-y-4 py-8 lg:grid-cols-[minmax(0,15rem)_1fr]"
+      >
+        <div>
+          <h2 class="font-display text-lead font-bold text-toy-yellow">{group.title}</h2>
+          <p class="mt-1.5 text-small text-on-brand-muted">{group.description}</p>
+        </div>
+
+        <ul class="divide-y divide-on-brand/15 border-t border-on-brand/15 lg:border-t-0">
+          {group.entries.map((skill) => {
+            const label = plainLabel(skill.slug);
+            return (
+              <li>
+                <a
+                  href={`${base}/skills/${skill.slug}/`}
+                  class="group flex flex-wrap items-baseline gap-x-4 gap-y-1 px-3 py-3.5 transition-colors duration-150 hover:bg-toy-yellow hover:text-ink focus-visible:bg-toy-yellow focus-visible:text-ink"
+                >
+                  <span class="font-display text-base font-bold">{label.name}</span>
+                  <span class="text-small text-on-brand-muted group-hover:text-ink/70 group-focus-visible:text-ink/70">
+                    {label.blurb}
+                  </span>
+                  <span class="ml-auto font-mono text-[0.8125rem] text-on-brand-muted group-hover:text-ink/70 group-focus-visible:text-ink/70">
+                    {skill.sources.length} sources
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    ))
+  }
+</div>

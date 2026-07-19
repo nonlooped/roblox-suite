@@ -1,280 +1,217 @@
 ---
+import type { GetStaticPaths } from "astro";
 import Base from "../../layouts/Base.astro";
-import Inline from "../../components/Inline.astro";
-import CodeChip from "../../components/CodeChip.astro";
-import { skills, loadSkillsBySlug } from "../../data/skills-meta";
-import { oldVsNew } from "../../data/old-vs-new";
-import { groups } from "../../data/groups";
 import {
-  skillGithubUrl,
-  skillRefsGithubUrl,
-  installSingleSkill,
-  reportInaccuracyUrl,
-  repoUrl,
-} from "../../data/trust";
+  breakableUrl,
+  groupedSkills,
+  plainLabel,
+  skills,
+  skillSourceUrl,
+  withCode,
+  type Skill,
+} from "../../data/catalog";
 
-export function getStaticPaths() {
-  return skills.map((s) => ({ params: { slug: s.slug } }));
+export const getStaticPaths = (() =>
+  skills.map((skill) => ({
+    params: { slug: skill.slug },
+    props: { skill },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  skill: Skill;
 }
 
-const { slug } = Astro.params;
-// Load strict per-file verification metrics before rendering trust data.
-const enriched = await loadSkillsBySlug();
-const skill = enriched.get(slug)!;
-const pairs = oldVsNew.filter((r) => r.slug === slug);
-const base = import.meta.env.BASE_URL;
-const plainLiner = skill.oneLiner.replace(/`/g, "");
+const { skill } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const label = plainLabel(skill.slug);
 
-// Find the group (domain) this skill belongs to - used for article:section.
-const group = groups.find((g) => g.skills.includes(slug));
-const section = group?.title ?? "Skills";
+const group = groupedSkills.find((candidate) => candidate.skills.includes(skill.slug));
+const siblings = (group?.entries ?? []).filter((entry) => entry.slug !== skill.slug);
+const sourcesForCover = (coverIndex: number) =>
+  skill.cover_sources[coverIndex].map((sourceIndex) => ({
+    sourceIndex,
+    source: skill.sources[sourceIndex - 1]!,
+  }));
 
-// Tags: derive from the skill's source labels + covers keywords.
-const tags = [
-  skill.title,
-  "Roblox",
-  "Roblox Luau",
-  "Roblox Engine API",
-  "AI coding agent skill",
-  ...skill.sources.map((s) => s.label),
-];
-
-// Per-skill OG image path (we reuse the branded default; could be per-skill later).
-const skillOgImage = "og.png";
-
-const siteOrigin = (Astro.site ?? "https://nonlooped.github.io").toString().replace(/\/$/, "");
-const skillUrl = new URL(Astro.url.pathname, siteOrigin).toString();
-const refsGithub = skillRefsGithubUrl(skill.slug);
-
-// SEO title: use the keyword-leading displayTitle, not the raw slug.
-const seoTitle = skill.displayTitle;
-
-// BreadcrumbList JSON-LD: Home › Skills › {Section} › {Skill}
-const breadcrumb = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Roblox Suite", item: `${siteOrigin}${base}`.replace(/\/+$/, "/") },
-    { "@type": "ListItem", position: 2, name: "Skills", item: `${siteOrigin}${base}skills/` },
-    ...(group ? [{ "@type": "ListItem", position: 3, name: group.title, item: `${siteOrigin}${base}skills/#g-${group.id}` }] : []),
-    { "@type": "ListItem", position: group ? 4 : 3, name: skill.displayTitle, item: skillUrl },
-  ],
+const riskCopy: Record<Skill["risk"], string> = {
+  lower: "Easy to spot if it goes wrong",
+  medium: "Problems show up later, under load",
+  critical: "Get this wrong and players lose data or money",
 };
 
-// TechArticle JSON-LD - signals "this is a reference doc" to search engines.
-// Publication, content change, and verification dates are intentionally separate.
-const techArticle = {
-  "@context": "https://schema.org",
-  "@type": "TechArticle",
-  headline: `${skill.displayTitle}: ${plainLiner}`,
-  description: skill.overview,
-  author: { "@type": "Person", name: "nonlooped", url: repoUrl },
-  publisher: {
-    "@type": "Organization",
-    name: "Roblox Suite",
-    url: repoUrl,
-    logo: { "@type": "ImageObject", url: `${siteOrigin}${base}favicon.svg` },
-  },
-  datePublished: `${skill.createdAt}T00:00:00Z`,
-  dateModified: `${skill.lastChangedAt}T00:00:00Z`,
-  inLanguage: "en",
-  mainEntityOfPage: skillUrl,
-  image: `${siteOrigin}${base}${skillOgImage}`,
-  isPartOf: { "@type": "CreativeWork", name: "Roblox Suite" },
-  about: {
-    "@type": "SoftwareApplication",
-    name: "Roblox Studio",
-    applicationCategory: "DeveloperApplication",
-    operatingSystem: "Windows, macOS",
-  },
-  citation: skill.sources.map((s) => ({ "@type": "CreativeWork", name: s.label, url: s.url })),
+/*
+ * Risk is carried by the label text as well as the fill, never by colour
+ * alone. All three use ink: paper on toy-red measures 3.54:1, under AA for
+ * this text size, while ink on toy-red clears it at 4.88:1.
+ */
+const riskClass: Record<Skill["risk"], string> = {
+  lower: "bg-toy-green text-ink",
+  critical: "bg-toy-red text-ink",
+  medium: "bg-toy-yellow text-ink",
 };
-
-// A compact text version of "what you stop doing" for the article body -
-// helps search engines see real, substantive content vs. a thin page.
-const pairsText = pairs.length
-  ? pairs.map((p) => `Stop: ${p.old}. Use: ${p.new}${p.note ? ` (${p.note})` : ""}.`).join(" ")
-  : "";
-
-const publishedIso = `${skill.createdAt}T00:00:00Z`;
-const modifiedIso = `${skill.lastChangedAt}T00:00:00Z`;
 ---
 
+{/* The catalog writes overviews for agents, so they carry markdown code spans.
+    Left raw they reached the meta description as literal backticks. */}
 <Base
-  title={seoTitle}
-  description={skill.overview}
-  article
-  section={section}
-  tags={tags}
-  publishedAt={publishedIso}
-  modifiedAt={modifiedIso}
+  title={`${skill.displayTitle} — Roblox Suite`}
+  description={skill.overview.replace(/`/g, "")}
 >
-  <article class="section" aria-labelledby="skill-title">
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumb)} />
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(techArticle)} />
+  <article>
+    <section class="py-14 sm:py-16">
+      <div class="mx-auto max-w-4xl px-6">
+        <nav class="flex items-center gap-2 text-small text-on-brand-muted" aria-label="Breadcrumb">
+          <a href={`${base}/skills/`} class="transition-colors hover:text-on-brand">Skills</a>
+          {group && <span aria-hidden="true">/</span>}
+          {
+            group && (
+              <a href={`${base}/skills/#${group.id}`} class="transition-colors hover:text-on-brand">
+                {group.title}
+              </a>
+            )
+          }
+        </nav>
 
-    {/* Visually-hidden, crawlable SEO abstract: gives each skill page
-        unique, substantive prose for indexers without affecting the
-        visual layout. Supplements (not replaces) the visible overview. */}
-    <p class="sr-only">
-      {skill.displayTitle} is a Roblox Suite skill: {plainLiner}. It belongs to the
-      {section} domain. What it covers: {skill.covers.map((c, i) => (i === 0 ? c : `. ${c}`)).join("")}.
-      {pairsText ? ` Risky-or-legacy versus recommended guidance: ${pairsText}` : ""}. The
-      official sources for this skill are taken verbatim from its SKILL.md and
-      point to the Roblox Engine API Reference and related create.roblox.com
-      documentation. The full reference set is available in the references/
-      directory on GitHub ({refsGithub}).
-    </p>
-    <div class="wrap">
-      <nav
-        class="flex flex-wrap items-center gap-1.5 text-[0.9375rem] text-ink-soft mb-10"
-        aria-label="Breadcrumb"
-      >
-        <a
-          class="link inline-flex items-center gap-1.5 group"
-          href={`${base}skills`}
-        >
-          <span aria-hidden="true" class="transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-x-1">←</span>
-          All skills
-        </a>
-        {group && (
-          <>
-            <span class="text-muted" aria-hidden="true">/</span>
-            <a class="link" href={`${base}skills#g-${group.id}`}>{group.title}</a>
-          </>
-        )}
-      </nav>
+        <h1 class="text-title mt-6">{skill.displayTitle}</h1>
+        <p class="measure mt-4 text-lead text-on-brand-muted">{label.blurb}</p>
 
-      <div class="grid grid-cols-[minmax(0,1fr)_19rem] gap-[clamp(2rem,5vw,4.5rem)] items-start max-[860px]:grid-cols-1 max-[860px]:gap-6 max-[860px]:pt-0">
-        <div class="min-w-0">
-          <header class="flex flex-col gap-3 mb-8">
-            <h1
-              id="skill-title"
-              class="text-[clamp(2rem,1rem+3vw,2.75rem)] font-mono font-semibold tracking-[-0.02em]"
-            >
-              {skill.displayTitle}
-            </h1>
-            <div class="flex flex-wrap gap-2">
-              <span class="font-mono text-[0.8125rem] text-muted">{skill.slug}</span>
-              {skill.hub && (
-                <span class="text-[0.6875rem] font-bold text-on-crimson bg-crimson px-[0.55em] py-[0.15em] rounded-full">
-                  hub · entry point
-                </span>
-              )}
-            </div>
-          </header>
-
-          <p
-            class="lede overview mb-10 max-w-[52ch] text-[clamp(1.0625rem,0.4rem+0.85vw,1.1875rem)] leading-[1.55] text-ink-soft font-normal"
+        <div class="mt-7 flex flex-wrap items-center gap-2.5">
+          <span
+            class={`rounded-full border-2 border-ink px-3 py-1 text-[0.8125rem] font-medium ${riskClass[skill.risk]}`}
           >
-            <Inline text={skill.overview} />
+            {riskCopy[skill.risk]}
+          </span>
+          <span
+            class="rounded-full border-2 border-on-brand/30 px-3 py-1 font-mono text-[0.8125rem] text-on-brand-muted"
+          >
+            {skill.slug}
+          </span>
+          <span
+            class="rounded-full border-2 border-on-brand/30 px-3 py-1 text-[0.8125rem] text-on-brand-muted"
+          >
+            {skill.sources.length} sources, catalog updated {skill.last_changed_at}
+          </span>
+        </div>
+
+        <!-- Wraps rather than scrolling sideways: the `--skill` flag is the
+             whole point of this command and it sat past the panel edge. -->
+        <div
+          class="panel-sm mt-8 flex items-start gap-3 bg-ink px-4 py-3 font-mono text-small text-on-ink"
+        >
+          <span class="shrink-0 text-toy-green" aria-hidden="true">$</span>
+          <span class="min-w-0 flex-1 break-words"
+            >npx skills add nonlooped/roblox-suite --skill {skill.slug}</span
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-paper py-16 text-on-paper sm:py-20">
+      <div class="mx-auto grid max-w-4xl gap-12 px-6 lg:grid-cols-[1fr_15rem]">
+        <!--
+          min-w-0: the truncated source URLs below are nowrap, so without this
+          the grid item's min-content width pushes past the viewport and the
+          paper ground stops short of the text sitting on it.
+        -->
+        <div class="min-w-0">
+          <h2 class="text-heading">What it handles</h2>
+          <ul class="mt-5 flex flex-col gap-3">
+            {
+              skill.covers.map((item, index) => (
+                <li class="flex gap-3 text-on-paper-muted">
+                  <span class="mt-2.5 size-1.5 shrink-0 rounded-full bg-brand" aria-hidden="true" />
+                  <span class="measure">
+                    <span set:html={withCode(item)} />
+                    <span class="ml-1 inline-flex gap-1 whitespace-nowrap font-mono text-[0.8125rem]">
+                      {
+                        sourcesForCover(index).map(({ source, sourceIndex }) => (
+                          <a
+                            href={source.url}
+                            data-claim-citation={`${index + 1}:${sourceIndex}`}
+                            aria-label={`Source ${sourceIndex}: ${source.label}`}
+                            class="text-brand underline underline-offset-2 hover:no-underline"
+                          >
+                            [{sourceIndex}]
+                          </a>
+                        ))
+                      }
+                    </span>
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+
+          <h2 class="text-heading mt-14">Where this comes from</h2>
+          <p class="measure mt-2.5 text-on-paper-muted">
+            Sources for the cited items above. Each citation lists the date it was checked.
           </p>
 
+          <ul class="mt-6 flex flex-col divide-y divide-on-paper/10 border-y border-on-paper/10">
+            {
+              skill.sources.map((source, index) => (
+                <li class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3.5">
+                  <a
+                    href={source.url}
+                    rel="noopener"
+                    class="font-medium text-brand underline underline-offset-4 hover:no-underline"
+                  >
+                    [{index + 1}] {source.label}
+                  </a>
+                  <span class="font-mono text-[0.8125rem] text-on-paper-muted">
+                    checked {source.verified_at}
+                  </span>
+                  <!-- Full muted, not /70: the tinted 70% measured 3.59:1 on
+                       paper, under AA. Hierarchy comes from size and family
+                       against the brand-blue link above it, not from fading.
+                       Wrapped at path separators rather than truncated, which
+                       cut the citation short on any phone-width column. -->
+                  <span
+                    class="w-full break-words font-mono text-[0.8125rem] text-on-paper-muted"
+                    set:html={breakableUrl(source.url)}
+                  />
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <aside class="flex flex-col gap-5">
+          <div class="panel bg-ink p-5 text-on-ink">
+            <h2 class="font-display text-small font-bold text-toy-yellow">Full details</h2>
+            <p class="mt-2.5 text-small text-on-ink-muted">
+              The complete skill file lives in the repo.
+            </p>
+            <a
+              href={skillSourceUrl(skill.slug)}
+              rel="noopener"
+              class="mt-3 inline-block font-mono text-[0.8125rem] text-paper underline underline-offset-4 hover:no-underline"
+            >
+              {skill.slug}/SKILL.md
+            </a>
+          </div>
+
           {
-            pairs.length > 0 && (
-              <section class="mb-10">
-                <h2 class="text-[0.8125rem] font-semibold text-muted mb-4">
-                  Risky / legacy → recommended
-                </h2>
-                <ul class="flex flex-col gap-5">
-                  {pairs.map((p) => (
-                    <li class="grid grid-rows-[auto_auto] gap-2 pb-5 border-b border-border last:border-b-0 last:pb-0">
-                      <div class="grid grid-cols-[1.3em_1fr] gap-3 items-start">
-                        <span class="text-muted text-[0.95rem] leading-[1.5]" aria-hidden="true">✕</span>
-                        <p class="text-ink-soft"><span class="sr-only">Avoid or reconsider: </span>{p.old}</p>
-                      </div>
-                      <div class="grid grid-cols-[1.3em_1fr] gap-3 items-start">
-                        <span class="text-crimson font-bold text-[0.95rem] leading-[1.5]" aria-hidden="true">✓</span>
-                        <div>
-                          <p class="text-ink"><span class="sr-only">Use instead: </span>{p.new}</p>
-                          {p.note && (
-                            <p class="text-muted text-[0.875rem] mt-[0.3em]">
-                              {p.note}
-                            </p>
-                          )}
-                          {p.current && (
-                            <span class="inline-block mt-2 text-[0.6875rem] font-bold text-on-crimson bg-crimson px-[0.55em] py-[0.15em] rounded-full">
-                              current
-                            </span>
-                          )}
-                        </div>
-                      </div>
+            siblings.length > 0 && group && (
+              <div class="panel bg-brand p-5 text-on-brand">
+                <h2 class="font-display text-small font-bold text-toy-yellow">Related</h2>
+                <ul class="mt-3 flex flex-col gap-2">
+                  {siblings.map((entry) => (
+                    <li>
+                      <a
+                        href={`${base}/skills/${entry.slug}/`}
+                        class="text-small text-on-brand-muted transition-colors hover:text-on-brand"
+                      >
+                        {plainLabel(entry.slug).name}
+                      </a>
                     </li>
                   ))}
                 </ul>
-              </section>
+              </div>
             )
           }
-
-          <section class="mb-10 last:mb-0">
-            <h2 class="text-[0.8125rem] font-semibold text-muted mb-4">
-              Covers
-            </h2>
-            <ul class="flex flex-col gap-3">
-              {
-                skill.covers.map((c) => (
-                  <li class="grid grid-cols-[1.5em_1fr] gap-3 text-ink-soft leading-[1.5]">
-                    <span class="mt-[0.62em] h-px w-3.5 bg-crimson-line" aria-hidden="true"></span>
-                    <span><Inline text={c} /></span>
-                  </li>
-                ))
-              }
-            </ul>
-          </section>
-
-          <section class="mb-10 last:mb-0">
-            <h2 class="text-[0.8125rem] font-semibold text-muted mb-4">
-              Sources
-            </h2>
-            <ul class="flex flex-col gap-2.5 mb-3">
-              {
-                skill.sources.map((s) => (
-                  <li>
-                    <a class="link text-[0.9375rem]" href={s.url} target="_blank" rel="noopener noreferrer">
-                      {s.label}
-                    </a>
-                    <span class="text-muted text-xs"> · verified {s.verifiedAt}</span>
-                  </li>
-                ))
-              }
-            </ul>
-            <p class="text-muted text-[0.8125rem]">
-              <a class="link" href={skillRefsGithubUrl(skill.slug)} target="_blank" rel="noopener noreferrer">
-                Full references on GitHub
-              </a>
-            </p>
-          </section>
-        </div>
-
-        <aside class="flex flex-col gap-5 sticky top-[calc(66px+1.5rem)] min-w-0 max-[860px]:static max-[860px]:flex-col max-[860px]:gap-4 max-[860px]:pt-10 max-[860px]:border-t max-[860px]:border-border">
-          <p
-            class="inline-flex items-center gap-2 text-xs font-semibold text-ink-soft bg-surface border border-border px-[0.85em] py-[0.45em] rounded-full tracking-[-0.005em] self-start"
-          >
-            <span class="w-[7px] h-[7px] rounded-full bg-crimson flex-none" aria-hidden="true"></span>
-            Oldest verification {skill.oldestVerifiedAt}
-          </p>
-          <div class="text-xs text-muted leading-relaxed">
-            <p>{skill.verifiedFiles}/{skill.totalFiles} guidance files verified ({Math.round(skill.verificationCoverage * 100)}%)</p>
-            <p>Examples: {skill.exampleStatus}</p>
-            <p>Risk tier: {skill.risk}</p>
-          </div>
-          <div class="flex flex-col gap-3">
-            <a class="btn-primary" href={`${base}#install`}>Add the suite</a>
-            <a class="btn-ghost" href={skillGithubUrl(skill.slug)} target="_blank" rel="noopener noreferrer">
-              SKILL.md on GitHub
-            </a>
-            <a class="btn-ghost" href={reportInaccuracyUrl(skill.slug)} target="_blank" rel="noopener noreferrer">
-              Report an inaccuracy
-            </a>
-          </div>
-          <div class="flex flex-col gap-3 pt-5 border-t border-border">
-            <p class="text-[0.8125rem] font-semibold text-muted">
-              Install just this skill
-            </p>
-            <CodeChip command={installSingleSkill(skill.slug)} />
-          </div>
         </aside>
       </div>
-    </div>
+    </section>
   </article>
 </Base>

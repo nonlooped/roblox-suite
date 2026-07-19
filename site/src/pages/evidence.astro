@@ -1,73 +1,143 @@
 ---
 import Base from "../layouts/Base.astro";
-import { loadSkills } from "../data/skills-meta";
-import { loadFreshness, repoUrl } from "../data/trust";
+import {
+  breakableUrl,
+  latestSourceCheckAt,
+  officialSourceCount,
+  oldestSourceCheckAt,
+  plainLabel,
+  repoUrl,
+  skillCount,
+  skills,
+  sourceCount,
+  supportingSourceCount,
+  uniqueSourceUrls,
+} from "../data/catalog";
 
-const skills = await loadSkills();
-const freshness = await loadFreshness();
-const percent = Math.round(freshness.verificationCoverage * 100);
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const rows = skills
+  .flatMap((skill) => skill.sources.map((source) => ({ skill: skill.slug, ...source })))
+  .sort(
+    (a, b) => b.verified_at.localeCompare(a.verified_at) || a.skill.localeCompare(b.skill),
+  );
 ---
 
 <Base
-  title="Verification evidence and known limitations"
-  description="Per-skill verification coverage, example maturity, CI evidence, and known limitations for Roblox Suite."
+  title="Sources — Roblox Suite"
+  description={`All ${sourceCount} documentation sources behind the suite, with the date each was checked.`}
 >
-  <section class="section">
-    <div class="wrap">
-      <header class="mb-10 max-w-[54rem]">
-        <p class="eyebrow">Trust surface</p>
-        <h1>Verification evidence</h1>
-        <p class="lede mt-4">
-          Currentness is measured per guidance file. The badge uses the oldest verification in a skill, not the newest edit.
-        </p>
-      </header>
+  <section class="py-16 sm:py-20">
+    <div class="mx-auto max-w-5xl px-6">
+      <h1 class="text-title">Show your work</h1>
+      <p class="measure mt-5 text-lead text-on-brand-muted">
+        {sourceCount} documentation citations across {
+          uniqueSourceUrls.size
+        } source pages, backing {skillCount} skills. Open any of them and see for yourself.
+      </p>
+      <!-- Named rather than averaged into one "official" number: Rojo is a
+           third-party tool, so its own docs are the authoritative page for it. -->
+      <p class="measure mt-4 text-on-brand-muted">
+        {officialSourceCount} come from Roblox's own Creator Hub. The other {supportingSourceCount}
+        cite Rojo's documentation and releases, because Rojo is a third-party tool and Roblox does
+        not document it.
+      </p>
+      <p class="measure mt-4 text-on-brand-muted">
+        Citation checks range from {oldestSourceCheckAt} through {latestSourceCheckAt}. Spotted
+        something stale?{" "}
+        <a
+          href={`${repoUrl}/issues/new?template=inaccuracy.yml`}
+          rel="noopener"
+          class="text-toy-yellow underline underline-offset-4 hover:no-underline">Tell us</a
+        > and we will correct it.
+      </p>
+    </div>
+  </section>
 
-      <div class="grid gap-4 mb-12 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="border border-border rounded-lg p-5 bg-surface"><strong>{percent}%</strong><p class="text-muted">repository verification coverage</p></div>
-        <div class="border border-border rounded-lg p-5 bg-surface"><strong>{freshness.oldestVerifiedAt}</strong><p class="text-muted">oldest verification</p></div>
-        <div class="border border-border rounded-lg p-5 bg-surface"><strong>{freshness.verifiedFiles}/{freshness.totalFiles}</strong><p class="text-muted">guidance files with valid dates</p></div>
-        <div class="border border-border rounded-lg p-5 bg-surface"><strong>6/10 → 10/10</strong><p class="text-muted">first paired Codex evaluation</p></div>
-      </div>
+  <!--
+    A real table: this page is a citation list, so it should look like one.
 
-      <div class="overflow-x-auto mb-12">
-        <table class="w-full text-left text-sm">
-          <thead><tr class="border-b border-border"><th class="py-3">Skill</th><th>Risk</th><th>Oldest verified</th><th>Coverage</th><th>Examples</th></tr></thead>
-          <tbody>
-            {skills.map((skill) => (
-              <tr class="border-b border-border">
-                <td class="py-3"><a class="link" href={`${import.meta.env.BASE_URL}skills/${skill.slug}`}>{skill.slug}</a></td>
-                <td>{skill.risk}</td>
-                <td>{skill.oldestVerifiedAt}</td>
-                <td>{skill.verifiedFiles}/{skill.totalFiles}</td>
-                <td>{skill.exampleStatus}</td>
-              </tr>
-            ))}
+    Below 40rem it becomes a stack of records instead. Three columns in 327px
+    meant the differentiating "Checked" date sat ~500px off the right edge,
+    reachable only by horizontal panning — the one column a sceptic is here
+    for. The explicit ARIA roles keep the table semantics that `display: block`
+    otherwise strips, so assistive tech reads the same relationships at both
+    sizes. Fixed layout above 40rem stops the nowrap URLs from setting the
+    table's min-content width and pushing a scrollbar onto tablet widths.
+  -->
+  <section class="bg-paper py-14 text-on-paper sm:py-16">
+    <div class="mx-auto max-w-5xl px-6">
+      <div class="overflow-x-auto">
+        <table role="table" class="w-full border-collapse text-left max-sm:block sm:table-fixed">
+          <caption class="sr-only">
+            Documentation sources behind each skill, with verification dates
+          </caption>
+          <thead role="rowgroup" class="max-sm:sr-only">
+            <tr role="row" class="border-b border-on-paper/20">
+              <th
+                role="columnheader"
+                scope="col"
+                class="py-3 pr-4 font-display text-small font-bold sm:w-[24%]">Skill</th
+              >
+              <th role="columnheader" scope="col" class="py-3 pr-4 font-display text-small font-bold"
+                >Source</th
+              >
+              <th
+                role="columnheader"
+                scope="col"
+                class="py-3 font-display text-small font-bold sm:w-[6.75rem]">Checked</th
+              >
+            </tr>
+          </thead>
+          <tbody role="rowgroup" class="max-sm:block">
+            {
+              rows.map((row) => (
+                <tr
+                  role="row"
+                  class="border-b border-on-paper/10 align-baseline max-sm:block max-sm:py-4"
+                >
+                  <td role="cell" class="py-3 pr-4 max-sm:block max-sm:py-0">
+                    <a
+                      href={`${base}/skills/${row.skill}/`}
+                      class="text-small text-on-paper-muted underline underline-offset-4 hover:no-underline"
+                    >
+                      {plainLabel(row.skill).name}
+                    </a>
+                  </td>
+                  <td role="cell" class="py-3 pr-4 max-sm:block max-sm:py-0 max-sm:pt-1">
+                    <a
+                      href={row.url}
+                      rel="noopener"
+                      class="text-small font-medium text-brand underline underline-offset-4 hover:no-underline"
+                    >
+                      {row.label}
+                    </a>
+                    {/* Wrapped at path separators rather than truncated: on a
+                        citation page the URL is the proof, and an ellipsis hid
+                        exactly the part that identifies the page. */}
+                    <span
+                      class="block break-words font-mono text-[0.8125rem] text-on-paper-muted"
+                      set:html={breakableUrl(row.url)}
+                    />
+                  </td>
+                  <td
+                    role="cell"
+                    class="whitespace-nowrap py-3 font-mono text-[0.8125rem] text-on-paper-muted max-sm:block max-sm:py-0 max-sm:pt-1.5"
+                  >
+                    {/* The column header is off-screen on the stack, so the
+                        date has to name itself. Hidden from AT, which still
+                        gets the header through the row/column association. */}
+                    <span class="sm:hidden" aria-hidden="true">
+                      Checked{" "}
+                    </span>
+                    {row.verified_at}
+                  </td>
+                </tr>
+              ))
+            }
           </tbody>
         </table>
       </div>
-
-      <div class="grid gap-10 md:grid-cols-2">
-        <section>
-          <h2>Enforced now</h2>
-          <ul class="mt-4 flex flex-col gap-2 text-ink-soft">
-            {freshness.ciChecks.map((check) => <li>— {check}</li>)}
-          </ul>
-        </section>
-        <section>
-          <h2>Known limitations</h2>
-          <ul class="mt-4 flex flex-col gap-2 text-ink-soft">
-            <li>— Reviewed examples still require Studio integration in a dedicated test experience.</li>
-            <li>— The published evaluation is one paired run on one model; it does not establish general performance.</li>
-            <li>— Static checks cannot prove Roblox backend behavior or policy compliance.</li>
-            <li>— Public issues and branch protection depend on repository-owner settings.</li>
-          </ul>
-        </section>
-      </div>
-
-      <p class="mt-10 text-sm text-muted">
-        Review the <a class="link" href={`${repoUrl}/blob/main/REVIEW_POLICY.md`}>review policy</a>,
-        <a class="link" href={`${repoUrl}/blob/main/evals/reports/2026-07-16-codex-gpt-5.6-sol.md`}>first evaluation report</a>, and correction history on GitHub.
-      </p>
     </div>
   </section>
 </Base>

@@ -1,6 +1,4 @@
-# Roblox Suite - https://nonlooped.github.io/roblox-suite/
 User-agent: *
 Allow: /
 
-# The site is fully static and crawlable; no internal path is off-limits.
 Sitemap: https://nonlooped.github.io/roblox-suite/sitemap-index.xml

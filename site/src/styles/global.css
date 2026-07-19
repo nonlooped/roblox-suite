@@ -1,248 +1,272 @@
 @import "tailwindcss";
+@import "@fontsource-variable/unbounded";
+@import "@fontsource-variable/hanken-grotesk";
+@import "@fontsource-variable/jetbrains-mono";
 
-/* ─────────────────────────────────────────────────────────────
-   Roblox Suite - Tailwind v4 theme tokens
-   "The Calibrated Signal": near-black + campari crimson.
-   OKLCH throughout. One signal hue carries all the color personality.
-   ───────────────────────────────────────────────────────────── */
-
-@theme {
-  /* Neutral ramp - pure dark, no hue tint */
-  --color-bg: oklch(0.145 0 0);
-  --color-surface: oklch(0.190 0 0);
-  --color-surface-2: oklch(0.240 0 0);
-  --color-ink: oklch(0.945 0.006 22);
-  --color-ink-soft: oklch(0.820 0.006 22);
-  /* muted is the quiet tier for labels, slugs, counts and hairline-adjacent
-     text. Held at 0.70 so even 10px mono slugs on the surface-2 hover ground
-     clear WCAG AA (≈6.6:1). Genuine paragraph copy uses ink-soft, not muted. */
-  --color-muted: oklch(0.700 0.006 22);
-
-  --color-border: oklch(0.945 0.006 22 / 0.12);
-  --color-border-strong: oklch(0.945 0.006 22 / 0.24);
-
-  /* The one signal - campari crimson, hue ~22° */
-  --color-crimson: oklch(0.53 0.19 22);
-  --color-crimson-hover: oklch(0.46 0.17 22);
-  --color-crimson-tint: oklch(0.53 0.19 22 / 0.14);
-  --color-crimson-line: oklch(0.53 0.19 22 / 0.55);
-  --color-on-crimson: oklch(0.97 0 0);
-
-  /* Type */
-  --font-sans: "Switzer", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "Spline Sans Mono", ui-monospace, "SFMono-Regular", monospace;
-
-  /* Radii */
-  --radius: 12px;
-  --radius-sm: 7px;
+/*
+ * Roblox Suite — drenched cobalt.
+ *
+ * Register: brand. The surface IS the colour; sections alternate between the
+ * cobalt drench, near-black ink, and paper so the scroll has real rhythm.
+ *
+ * The form language is injection-moulded plastic: flat saturated fills, solid
+ * edges, and hard offset shadows. Deliberately NOT the generated-UI dark
+ * theme — no glow shadows, no glassmorphism, no gradient text, no violet.
+ */
+:root {
+  /* Cards top out at 12px; only tags and buttons go full pill. */
+  --radius: 0.75rem;
+  --radius-sm: 0.375rem;
+  --radius-lg: 1rem;
   --radius-pill: 999px;
 
-  /* Motion */
-  --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-in-quart: cubic-bezier(0.5, 0, 0.75, 0);
+  /* Deep saturated cobalt. Held at hue 258 so it stays true blue, not violet. */
+  --brand: oklch(0.45 0.235 258);
+  --brand-deep: oklch(0.33 0.19 258);
+  --brand-lift: oklch(0.56 0.22 258);
 
-  /* Layout */
-  --breakpoint-xs: 420px;
+  /* Near-black, tinted toward the brand hue rather than toward warm. */
+  --ink: oklch(0.17 0.035 258);
+  --ink-soft: oklch(0.24 0.04 258);
+
+  /* Off-white tinted to the brand's own hue. Not cream, not beige. */
+  --paper: oklch(0.965 0.012 258);
+  --paper-dim: oklch(0.9 0.016 258);
+
+  /* Moulded-plastic accents. Yellow is the brand's second voice. */
+  --toy-yellow: oklch(0.87 0.185 92);
+  --toy-red: oklch(0.63 0.235 27);
+  --toy-green: oklch(0.75 0.19 148);
+
+  /* On-colours. Muted variants are tints of the surface, never flat gray. */
+  --on-brand: var(--paper);
+  --on-brand-muted: color-mix(in oklab, var(--paper) 76%, var(--brand));
+  --on-ink: var(--paper);
+  --on-ink-muted: color-mix(in oklab, var(--paper) 68%, var(--ink));
+  --on-paper: var(--ink);
+  --on-paper-muted: color-mix(in oklab, var(--ink) 68%, var(--paper));
+
+  /* Hard offset shadow — the moulded-plastic device, not a diffuse glow. */
+  --shadow-hard: 6px 6px 0 var(--ink);
+  --shadow-hard-sm: 3px 3px 0 var(--ink);
+  --shadow-hard-yellow: 6px 6px 0 var(--toy-yellow);
+
+  /* Semantic z-scale. No arbitrary 999s. */
+  --z-scene: 1;
+  --z-content: 2;
+  --z-sticky: 20;
+  --z-modal: 40;
+  --z-toast: 60;
+
+  /* Exponential ease-out. No bounce, no elastic. */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* ── Switzer self-hosted faces ── */
-@font-face {
-  font-family: "Switzer";
-  src: url("../fonts/switzer-400.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Switzer";
-  src: url("../fonts/switzer-500.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Switzer";
-  src: url("../fonts/switzer-600.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Switzer";
-  src: url("../fonts/switzer-700.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
+@theme inline {
+  /*
+   * Content-driven, not device-driven. Measured: the header's wordmark (177px)
+   * plus both nav links and the Star button (225px) plus gutters needs 472px,
+   * so below 31rem Star — the primary conversion — is what falls off the edge.
+   */
+  --breakpoint-xs: 31rem;
+
+  --color-brand: var(--brand);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-lift: var(--brand-lift);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-paper: var(--paper);
+  --color-paper-dim: var(--paper-dim);
+  --color-toy-yellow: var(--toy-yellow);
+  --color-toy-red: var(--toy-red);
+  --color-toy-green: var(--toy-green);
+
+  --color-on-brand: var(--on-brand);
+  --color-on-brand-muted: var(--on-brand-muted);
+  --color-on-ink: var(--on-ink);
+  --color-on-ink-muted: var(--on-ink-muted);
+  --color-on-paper: var(--on-paper);
+  --color-on-paper-muted: var(--on-paper-muted);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-lg);
+
+  /*
+   * Display face: wide geometric, reads extruded. Body: humanist grotesque.
+   * Paired on a contrast axis rather than two near-identical sans faces.
+   * Mono is reserved for literal code, never for decoration.
+   */
+  --font-display: "Unbounded Variable", "Unbounded", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-sans: "Hanken Grotesk Variable", "Hanken Grotesk", ui-sans-serif,
+    system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace,
+    "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /*
+   * Modular scale, >=1.25 between steps. Display max is 6rem (the ceiling)
+   * and tracking bottoms out at -0.04em so characters keep their shapes.
+   */
+  /*
+   * Held at 4rem rather than the 6rem ceiling: Unbounded is a wide face, and
+   * at 96px this headline ran to five lines and pushed the CTAs below the fold.
+   */
+  --text-display: clamp(2.25rem, 4.8vw, 4rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.03em;
+
+  --text-title: clamp(1.875rem, 4.2vw, 3.25rem);
+  --text-title--line-height: 1.02;
+  --text-title--letter-spacing: -0.03em;
+
+  --text-heading: clamp(1.375rem, 2.4vw, 1.875rem);
+  --text-heading--line-height: 1.15;
+  --text-heading--letter-spacing: -0.02em;
+
+  --text-lead: 1.375rem;
+  --text-lead--line-height: 1.5;
+
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.65;
+
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.55;
+
 }
 
-/* ── Base layer ── */
 @layer base {
   html {
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
     scroll-behavior: smooth;
-    scrollbar-gutter: stable;
   }
 
   body {
-    background: var(--color-bg);
-    color: var(--color-ink);
+    background: var(--brand);
+    color: var(--on-brand);
     font-family: var(--font-sans);
-    font-weight: 400;
-    font-size: 1.0625rem;
-    line-height: 1.65;
+    font-size: var(--text-base);
+    /* Light-on-dark needs extra leading to compensate for optical lightening. */
+    line-height: 1.7;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
   }
 
-  h1, h2, h3, h4 {
-    font-weight: 600;
-    line-height: 1.12;
-    text-wrap: balance;
-    letter-spacing: -0.02em;
-    color: var(--color-ink);
-  }
-
-  h1 {
-    font-size: clamp(2.5rem, 1rem + 5vw, 5.5rem);
-    font-weight: 700;
-    line-height: 1.03;
-    letter-spacing: -0.03em;
-  }
-  h2 {
-    font-size: clamp(1.75rem, 0.5rem + 2.5vw, 2.75rem);
-    line-height: 1.14;
-  }
+  h1,
+  h2,
   h3 {
-    font-size: clamp(1.2rem, 0.5rem + 0.9vw, 1.45rem);
-    line-height: 1.25;
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-wrap: balance;
   }
-  h4 { font-size: 1.0625rem; letter-spacing: -0.01em; }
 
-  p { text-wrap: pretty; }
-  strong { font-weight: 600; color: var(--color-ink); }
-  ::selection { background: var(--color-crimson-tint); color: var(--color-ink); }
+  p {
+    text-wrap: pretty;
+  }
 
-  :where(a) { color: inherit; text-decoration: none; }
+  code,
+  pre,
+  kbd {
+    font-family: var(--font-mono);
+  }
 
-  :focus-visible { outline: none; }
-  :where(a, button, [tabindex], input, summary, [role="button"]):focus-visible {
-    box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-crimson);
+  ::selection {
+    background: var(--toy-yellow);
+    color: var(--ink);
+  }
+
+  /* Focus ring must clear both the cobalt drench and the ink panels. */
+  :focus-visible {
+    outline: 3px solid var(--toy-yellow);
+    outline-offset: 3px;
     border-radius: var(--radius-sm);
   }
 
-  code, kbd, samp {
-    font-family: var(--font-mono);
-    font-size: 0.85em;
-    font-weight: 500;
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Constrain measure on running prose. */
+@utility measure {
+  max-width: 68ch;
+}
+
+/*
+ * Moulded panel. A committed edge plus a hard offset shadow — the opposite of
+ * the hairline-border-plus-diffuse-glow signature.
+ */
+@utility panel {
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-hard);
+}
+
+@utility panel-sm {
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+/*
+ * Press interaction: the panel travels into its own shadow, like a real key.
+ * Transform only, so nothing reflows.
+ */
+@utility pressable {
+  transition:
+    transform 0.14s var(--ease-out-quart),
+    box-shadow 0.14s var(--ease-out-quart);
+
+  &:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--ink);
   }
 
-  svg { fill: none; }
-  img, svg, video, canvas { display: block; max-width: 100%; }
+  &:active {
+    transform: translate(6px, 6px);
+    box-shadow: 0 0 0 var(--ink);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
+  .pressable:hover,
+  .pressable:active {
+    transform: none;
+    box-shadow: var(--shadow-hard);
+  }
 }
 
-/* ── Reveal animation JS-gate ──
-   Initial hidden state is applied ONLY when <html class="js"> is present
-   (set by the inline head script in Base.astro). No-JS users and
-   reduced-motion users see content immediately - LCP/CLS-safe.
-   The Motion script in Base.astro animates [data-reveal] into view and
-   adds .is-visible, which restores opacity for any element that never
-   triggered (defensive). */
-.js [data-reveal],
-.js [data-reveal-stagger] > * {
-  opacity: 0;
-  transform: translateY(18px);
-  will-change: opacity, transform;
-}
-.js [data-reveal].is-visible,
-.js [data-reveal-stagger].is-visible > * {
-  opacity: 1;
-  transform: none;
+/*
+ * Scroll reveal. Content is visible by default and the animation layers on
+ * top, so nothing ships blank in a headless render or a background tab.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+  }
 }
 
-/* ── Components: the link signal underline ── */
-@layer components {
-  .link {
-    color: var(--color-ink);
-    text-decoration: underline;
-    text-decoration-color: var(--color-crimson-line);
-    text-decoration-thickness: 1.5px;
-    text-underline-offset: 3px;
-    transition: text-decoration-thickness 180ms var(--ease-out-quart),
-                text-decoration-color 180ms var(--ease-out-quart);
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
   }
-  .link:hover, .link:focus-visible {
-    text-decoration-thickness: 2.5px;
-    text-decoration-color: var(--color-crimson);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-
-  /* Buttons */
-  .btn-primary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.55em;
-    font-weight: 600;
-    font-size: 0.875rem;
-    line-height: 1;
-    padding: 0.85em 1.3em;
-    border-radius: var(--radius-pill);
-    border: 1px solid transparent;
-    background: var(--color-crimson);
-    color: var(--color-on-crimson);
-    cursor: pointer;
-    transition: background 220ms var(--ease-out-quart),
-                transform 220ms var(--ease-out-quart);
-  }
-  .btn-primary:hover { background: var(--color-crimson-hover); }
-  .btn-primary:active { transform: translateY(1px); }
-
-  .btn-ghost {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.55em;
-    font-weight: 600;
-    font-size: 0.875rem;
-    line-height: 1;
-    padding: 0.85em 1.3em;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--color-border-strong);
-    background: transparent;
-    color: var(--color-ink);
-    cursor: pointer;
-    transition: border-color 220ms var(--ease-out-quart),
-                background 220ms var(--ease-out-quart),
-                transform 220ms var(--ease-out-quart);
-  }
-  .btn-ghost:hover {
-    border-color: var(--color-ink);
-    background: var(--color-surface);
-  }
-  .btn-ghost:active { transform: translateY(1px); }
-}
-
-/* ── Utilities ── */
-@utility wrap {
-  width: 100%;
-  max-width: 72rem;
-  margin-inline: auto;
-  padding-inline: clamp(1.25rem, 4vw, 3rem);
-}
-@utility wrap-prose {
-  max-width: 46rem;
-}
-@utility section {
-  padding-block: clamp(3.5rem, 8vw, 6.5rem);
-}
-@utility section-tight {
-  padding-block: clamp(2.5rem, 5vw, 4rem);
 }

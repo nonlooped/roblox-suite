@@ -1,28 +1,35 @@
 ---
 import Base from "../layouts/Base.astro";
+import { skillCount } from "../data/catalog";
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 ---
 
-<Base title="Not found" noindex>
-  <section class="section min-h-[62vh] flex items-center">
-    <div class="wrap flex flex-col gap-6 items-start max-w-[40rem]">
-      <p
-        class="font-mono font-semibold text-ink-soft leading-none tracking-[-0.04em] text-[clamp(3rem,1rem+6vw,5rem)]"
-        aria-hidden="true"
-      >
-        404
+<Base
+  title="Not found — Roblox Suite"
+  description="That page doesn't exist. Browse the full skill catalog instead."
+  noindex
+>
+  <section class="flex min-h-[60vh] items-center py-24">
+    <div class="mx-auto max-w-lg px-6">
+      <p class="font-display text-display text-toy-yellow">404</p>
+      <h1 class="text-heading mt-4">This brick came loose</h1>
+      <p class="measure mt-4 text-on-brand-muted">
+        That link is out of date. All {skillCount} skills are still where you left them.
       </p>
-      <h1 class="text-[clamp(1.75rem,1rem+2.5vw,2.5rem)]">
-        This page isn't in the suite.
-      </h1>
-      <p class="lede text-[clamp(1.125rem,0.5rem+0.9vw,1.375rem)] leading-[1.5] text-ink-soft max-w-[58ch] font-normal">
-        The link may be stale - a little like a deprecated API. Try one of
-        these instead.
-      </p>
-      <div class="flex flex-wrap gap-3 mt-2">
-        <a class="btn-primary" href={base}>Back to home</a>
-        <a class="btn-ghost" href={`${base}skills`}>Browse skills</a>
+      <div class="mt-9 flex flex-wrap gap-4">
+        <a
+          href={`${base}/skills/`}
+          class="panel pressable inline-flex items-center justify-center bg-toy-yellow px-5 py-3 font-display text-small font-bold text-ink"
+        >
+          Browse skills
+        </a>
+        <a
+          href={`${base}/`}
+          class="panel pressable inline-flex items-center justify-center bg-ink px-5 py-3 font-display text-small font-bold text-paper"
+        >
+          Go home
+        </a>
       </div>
     </div>
   </section>

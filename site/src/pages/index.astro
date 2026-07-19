@@ -1,50 +1,87 @@
 ---
 import Base from "../layouts/Base.astro";
-import Hero from "../components/Hero.astro";
-import DomainsTeaser from "../components/DomainsTeaser.astro";
-import InstallCTA from "../components/InstallCTA.astro";
-import { repoUrl, skillsShUrl } from "../data/trust";
-import { skillCount } from "../data/skills-meta";
+import { Hero } from "../components/Hero";
+import { CorrectionPanel } from "../components/CorrectionPanel";
+import { InstallPicker } from "../components/InstallPicker";
+import {
+  installCommand,
+  latestSourceCheckAt,
+  oldestSourceCheckAt,
+  repoUrl,
+  skillCount,
+  sourceCount,
+} from "../data/catalog";
 
-const base = import.meta.env.BASE_URL;
-const siteOrigin = (Astro.site ?? "https://nonlooped.github.io").toString().replace(/\/$/, "");
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-// Home-page JSON-LD: SoftwareApplication describing the suite itself.
-// This is the highest-leverage schema for ranking on the suite's own name.
-const appSchema = {
+/* Describes what this actually is — a free developer tool installed from a
+   command line — rather than leaving search engines to infer it from prose. */
+const schema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: "Roblox Suite",
   applicationCategory: "DeveloperApplication",
-  operatingSystem: "Any (cross-platform via skills.sh CLI)",
-  description: `${skillCount} source-grounded Roblox Luau skills for AI agents, with official sources and measurable verification coverage.`,
-  url: `${siteOrigin}${base}`.replace(/\/+$/, "/"),
-  downloadUrl: repoUrl,
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  operatingSystem: "Any",
+  description: `${skillCount} skills that keep AI coding agents on Roblox APIs that currently work, each correction traceable to official Roblox documentation.`,
+  url: new URL(import.meta.env.BASE_URL, Astro.site).href,
+  codeRepository: repoUrl,
   license: "https://opensource.org/licenses/MIT",
-  author: { "@type": "Person", name: "nonlooped", url: repoUrl },
-  publisher: {
-    "@type": "Organization",
-    name: "Roblox Suite",
-    url: repoUrl,
-    logo: { "@type": "ImageObject", url: `${siteOrigin}${base}favicon.svg` },
-    sameAs: [repoUrl, skillsShUrl],
-  },
-  featureList: [
-    `${skillCount} curated Roblox Luau skills`,
-    "Official source lists and per-source verification dates",
-    "Risky-or-legacy versus recommended guidance per skill",
-    "Installs via the skills.sh CLI as plain Markdown",
-    "CI validates content structure, Luau examples, site routes, links, and spelling",
-  ],
+  offers: { "@type": "Offer", price: 0, priceCurrency: "USD" },
 };
 ---
 
+<!--
+  Three beats on the belief ladder in PRODUCT.md: the claim, the proof, the
+  close. The full correction set and how-it-works live on /skills.
+-->
 <Base
-  tags={["Roblox Studio skills", "Roblox Luau agent", "Roblox Engine API", "AI coding assistant", "skills.sh", "Luau"]}
+  title="Roblox Suite — stop your AI writing broken Roblox code"
+  description={`${skillCount} skills that keep AI coding agents on Roblox APIs that actually work, every correction traceable to dated documentation.`}
+  schema={schema}
 >
-  <script type="application/ld+json" is:inline set:html={JSON.stringify(appSchema)} />
-  <Hero />
-  <DomainsTeaser />
-  <InstallCTA />
+  <Hero client:load installCommand={installCommand} repoUrl={repoUrl} skillCount={skillCount} />
+
+  <section class="pb-20 sm:pb-28">
+    <div class="mx-auto grid max-w-6xl items-center gap-10 px-6 lg:grid-cols-[1fr_0.9fr] lg:gap-16">
+      <CorrectionPanel client:visible skillsBase={`${base}/skills`} />
+
+      <div>
+        <h2 class="text-title">The same six mistakes, over and over</h2>
+        <p class="measure mt-5 text-lead text-on-brand-muted">
+          This is what Roblox Suite changes in an agent's output: specific API guidance with the
+          official page behind each correction.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!--
+    Yellow drench for the close: the brightest surface, saved for the last rung
+    of the ladder — installing costs one command. The evidence and repo links
+    stay, demoted to a single line so the command stays the loudest thing here.
+  -->
+  <section class="bg-toy-yellow py-20 text-ink sm:py-28">
+    <div class="mx-auto max-w-3xl px-6 text-center">
+      <h2 class="text-title">Add it to your agent in one command</h2>
+      <p class="measure mx-auto mt-5 text-lead text-ink/75">
+        Pick the agent you already use. Run the line. Restart it. That is the whole setup — no
+        config file, nothing to maintain per project.
+      </p>
+
+      <InstallPicker client:visible installCommand={installCommand} skillCount={skillCount} />
+
+      <p class="mt-7 text-small text-ink/75">
+        Free and open source. <a
+          href={repoUrl}
+          rel="noopener"
+          class="font-medium underline underline-offset-4 hover:no-underline focus-visible:outline-ink"
+          >Star on GitHub</a
+        > or read the <a
+          href={`${base}/evidence/`}
+          class="font-medium underline underline-offset-4 hover:no-underline focus-visible:outline-ink"
+          >{sourceCount} sources</a
+        > behind the corrections, checked {oldestSourceCheckAt} through {latestSourceCheckAt}.
+      </p>
+    </div>
+  </section>
 </Base>

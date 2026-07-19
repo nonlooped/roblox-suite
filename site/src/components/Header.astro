@@ -1,134 +1,60 @@
 ---
-import { repoUrl } from "../data/trust";
+import { repoUrl } from "../data/catalog";
 
-const base = import.meta.env.BASE_URL;
-const here = Astro.url.pathname.replace(/\/+$/, "");
-const skillsPath = `${base}skills`.replace(/\/+$/, "");
-const evidencePath = `${base}evidence`.replace(/\/+$/, "");
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const here = Astro.url.pathname;
 
-const nav = [
-  { label: "Skills", href: `${base}skills`, active: here === skillsPath },
-  { label: "Evidence", href: `${base}evidence`, active: here === evidencePath },
-  { label: "Install", href: `${base}#install`, active: false },
+const links = [
+  { href: `${base}/skills/`, label: "Skills" },
+  { href: `${base}/evidence/`, label: "Sources" },
 ];
-
-const ghIcon =
-  "M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z";
 ---
 
-<header
-  class="sticky top-0 z-[100] border-b border-border bg-bg/88 backdrop-blur-xl backdrop-saturate-130"
-  data-site-header
->
-  <div class="wrap flex items-center gap-6 min-h-[66px] py-2.5">
+<header class="sticky top-0 z-20 border-b border-ink bg-brand">
+  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-6 xs:gap-4">
+    <!--
+      Negative margin cancels the padding, so the mark still lines up with the
+      6-unit gutter while the link itself carries a full-height touch target.
+    -->
     <a
-      class="mr-auto inline-flex items-center gap-2.5 font-bold text-[1.0625rem] tracking-[-0.02em] text-ink group"
-      href={base}
+      href={`${base}/`}
+      class="-mx-1.5 flex min-h-11 items-center gap-2.5 whitespace-nowrap px-1.5 font-display text-base font-bold"
     >
-      <svg
-        class="text-crimson transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:text-crimson-hover"
-        width="22"
-        height="22"
-        viewBox="0 0 32 32"
-        aria-hidden="true"
-      >
-        <path
-          d="M5 22 L12 15 L17 19 L27 9"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.6"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <circle cx="27" cy="9" r="2.8" fill="currentColor" />
-      </svg>
-      <span class="whitespace-nowrap">Roblox Suite</span>
+      <!--
+        Two stacked bricks: the mark is the same object the hero renders.
+        Below 34rem the wordmark drops and the mark alone carries the identity.
+        The alternative was shrinking every label until Star clipped off the
+        viewport, which costs the primary conversion to save a logotype.
+      -->
+      <span class="relative block size-6 shrink-0" aria-hidden="true">
+        <span class="absolute left-0 top-0 h-3 w-4.5 rounded-[3px] border-2 border-ink bg-paper"
+        ></span>
+        <span
+          class="absolute bottom-0 right-0 h-3 w-4.5 rounded-[3px] border-2 border-ink bg-toy-yellow"
+        ></span>
+      </span>
+      <span class="sr-only xs:not-sr-only">Roblox Suite</span>
     </a>
 
-    <nav class="hidden md:flex items-center gap-[clamp(1.25rem,2vw,2rem)]" aria-label="Primary">
+    <nav class="flex items-center gap-0.5 xs:gap-2" aria-label="Main">
       {
-        nav.map((item) => (
+        links.map((link) => (
           <a
-            class="text-[0.9375rem] font-semibold text-ink-soft py-1 transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-ink aria-[current=page]:text-ink aria-[current=page]:shadow-[inset_0_-2px_0_0_var(--color-crimson)]"
-            href={item.href}
-            aria-current={item.active ? "page" : undefined}
+            href={link.href}
+            aria-current={here.startsWith(link.href) ? "page" : undefined}
+            class="flex min-h-11 items-center px-2.5 text-small text-on-brand-muted transition-colors hover:text-on-brand aria-[current=page]:text-toy-yellow"
           >
-            {item.label}
+            {link.label}
           </a>
         ))
       }
-    </nav>
-
-    <div class="hidden md:flex items-center gap-3">
       <a
-        class="inline-flex items-center gap-1.5 text-[0.9375rem] font-semibold text-ink-soft px-3 py-2 rounded-lg border border-border transition-[color,border-color,background] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-ink hover:border-border-strong hover:bg-surface"
         href={repoUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Star Roblox Suite on GitHub"
+        rel="noopener"
+        class="panel-sm pressable ml-1.5 flex min-h-11 items-center bg-toy-yellow px-3.5 font-display text-small font-bold text-ink"
       >
-        <svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true">
-          <path fill="currentColor" d={ghIcon} />
-        </svg>
-        <span>Star on GitHub</span>
+        Star
       </a>
-      <a class="btn-primary" href={`${base}#install`}>Add the suite</a>
-    </div>
-
-    <details class="md:hidden relative" data-menu>
-      <summary
-        class="list-none cursor-pointer w-11 h-11 inline-flex flex-col justify-center items-center gap-1.5 border border-border rounded-lg bg-surface [&::-webkit-details-marker]:hidden"
-        aria-label="Toggle navigation menu"
-      >
-        <span class="menu-bar block w-[18px] h-0.5 bg-ink rounded-sm transition-[transform,opacity] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"></span>
-        <span class="menu-bar block w-[18px] h-0.5 bg-ink rounded-sm transition-[transform,opacity] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"></span>
-        <span class="menu-bar block w-[18px] h-0.5 bg-ink rounded-sm transition-[transform,opacity] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"></span>
-      </summary>
-      <div
-        class="menu-panel absolute top-full left-0 right-0 flex flex-col gap-1.5 px-[clamp(1.25rem,4vw,3rem)] py-4 bg-bg/92 border-b border-border-strong backdrop-blur-xl backdrop-saturate-125"
-      >
-        {
-          nav.map((item) => (
-            <a
-              class="menu-link py-3 px-2 font-semibold text-ink-soft rounded-sm transition-colors duration-200 hover:text-ink hover:bg-surface"
-              href={item.href}
-            >
-              {item.label}
-            </a>
-          ))
-        }
-        <a class="menu-link py-3 px-2 font-semibold text-ink-soft rounded-sm transition-colors duration-200 hover:text-ink hover:bg-surface" href={repoUrl} target="_blank" rel="noopener noreferrer">
-          GitHub ↗
-        </a>
-        <a class="btn-primary mt-1.5" href={`${base}#install`}>Add the suite</a>
-      </div>
-    </details>
+    </nav>
   </div>
 </header>
-
-<style>
-  /* Burger → X toggle: when the <details> menu is open, the three bars
-     rotate into an X. Pure CSS via details[open] - no extra JS. */
-  details[data-menu][open] .menu-bar:nth-child(1) {
-    transform: translateY(0.5rem) rotate(45deg);
-  }
-  details[data-menu][open] .menu-bar:nth-child(2) {
-    opacity: 0;
-    transform: scaleX(0);
-  }
-  details[data-menu][open] .menu-bar:nth-child(3) {
-    transform: translateY(-0.5rem) rotate(-45deg);
-  }
-</style>
-
-<script>
-  const h = document.querySelector<HTMLElement>("[data-site-header]");
-  if (h) {
-    h.querySelectorAll<HTMLAnchorElement>(".menu-link, .menu-panel .btn-primary").forEach((a) =>
-      a.addEventListener("click", () => {
-        const d = h.querySelector<HTMLDetailsElement>("details[data-menu]");
-        if (d) d.open = false;
-      })
-    );
-  }
-</script>

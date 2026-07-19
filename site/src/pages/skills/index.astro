@@ -1,115 +1,61 @@
 ---
 import Base from "../../layouts/Base.astro";
-import SkillsIndex from "../../components/SkillsIndex.astro";
-import CodeChip from "../../components/CodeChip.astro";
-import Inline from "../../components/Inline.astro";
-import { skillsBySlug, skillCount } from "../../data/skills-meta";
-import { onePairPerDomain } from "../../data/old-vs-new";
+import SkillIndex from "../../components/SkillIndex.astro";
+import HowItWorks from "../../components/HowItWorks.astro";
+import {
+  installCommand,
+  latestSourceCheckAt,
+  officialSourceCount,
+  oldestSourceCheckAt,
+  repoUrl,
+  skillCount,
+  supportingSourceCount,
+} from "../../data/catalog";
 
-const base = import.meta.env.BASE_URL;
-const pairs = onePairPerDomain();
-const hub = skillsBySlug.get("roblox")!;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 ---
 
 <Base
-  title={`All ${skillCount} Roblox Luau skills, by domain`}
-  description={`${skillCount} Luau skills for AI agents, grouped by domain. Each page lists official sources and risky-or-legacy → recommended guidance.`}
-  article
-  section="Skills"
-  tags={["Roblox skills catalog", "Luau", "Roblox Engine API", "AI agent skills", "skills.sh"]}
+  title="All skills — Roblox Suite"
+  description={`Browse all ${skillCount} Roblox Suite skills, from saving player data to physics and monetization.`}
 >
-  <section class="pt-[clamp(2rem,4vw,3.5rem)] pb-[clamp(1.5rem,3vw,2.5rem)]">
-    <div class="wrap">
-      <div class="grid grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] gap-[clamp(1.5rem,4vw,3rem)] items-start max-[920px]:grid-cols-1 max-[920px]:gap-5">
-        <div class="flex flex-col gap-4 items-start min-w-0" data-reveal>
-          <h1 class="max-w-[18ch]">{skillCount} skills</h1>
-          <p class="lede max-w-[40ch] text-[clamp(1.0625rem,0.4rem+0.85vw,1.25rem)] leading-[1.5] text-ink-soft font-normal">
-            Markdown files your agent reads before writing Roblox code. Current APIs, official sources.
-          </p>
-        </div>
+  <!-- The h1 carries the "N skills" string the deploy smoke test greps for. -->
+  <section class="py-16 sm:py-20">
+    <div class="mx-auto max-w-6xl px-6">
+      <h1 class="text-title max-w-2xl">{skillCount} skills, one install</h1>
+      <!-- The split is stated rather than rounded up: {supportingSourceCount} of these cite
+           Rojo's own docs, because Roblox does not document a third-party tool. -->
+      <p class="measure mt-5 text-lead text-on-brand-muted">
+        Browse Roblox guidance backed by {officialSourceCount} citations from Roblox's own
+        documentation, plus {supportingSourceCount} from Rojo's. Every one carries the date it was
+        checked, {oldestSourceCheckAt} through {latestSourceCheckAt}.
+      </p>
 
-        <aside
-          class="skills-hero-hub flex flex-col gap-3 p-5 bg-surface border border-border rounded-xl"
-          data-reveal
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <!-- Wraps rather than truncating: the ellipsis hid the repository the
+             command actually installs, which is the part worth reading. -->
+        <div class="panel-sm flex min-w-0 items-start gap-3 bg-ink px-4 py-3 font-mono text-small text-on-ink">
+          <span class="shrink-0 text-toy-green" aria-hidden="true">$</span>
+          <span class="min-w-0 flex-1 break-words">{installCommand}</span>
+        </div>
+        <a
+          href={repoUrl}
+          rel="noopener"
+          class="panel pressable inline-flex items-center justify-center whitespace-nowrap bg-toy-yellow px-5 py-3 font-display text-small font-bold text-ink"
         >
-          <p class="skills-hero-hub-label text-xs font-bold text-on-crimson bg-crimson self-start px-[0.6em] py-[0.2em] rounded-full">
-            Start here
-          </p>
-          <a
-            class="group skills-hero-hub-link flex flex-col gap-1.5 p-3 border border-border rounded-sm transition-[border-color,background,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-crimson-line hover:bg-surface-2 motion-safe:hover:translate-x-[3px]"
-            href={`${base}skills/roblox`}
-          >
-            <span class="skills-hero-hub-title font-mono text-[1.0625rem] font-semibold text-ink">
-              {hub.title}
-            </span>
-            <span class="skills-hero-hub-desc text-sm text-ink-soft leading-[1.45]">
-              <Inline text={hub.oneLiner} />
-            </span>
-          </a>
-          <CodeChip />
-        </aside>
+          Star on GitHub
+        </a>
       </div>
     </div>
   </section>
 
-  <section class="pt-[clamp(1.5rem,3vw,2.5rem)] pb-[clamp(3rem,6vw,4.5rem)]" id="catalog">
-    <div class="wrap" data-reveal>
-      <SkillsIndex />
+  <section class="pb-20 sm:pb-24">
+    <div class="mx-auto max-w-6xl px-6">
+      <SkillIndex base={base} />
     </div>
   </section>
 
-  <section
-    class="section bg-[color-mix(in_oklch,var(--color-bg)_92%,var(--color-surface))] border-y border-border"
-    id="proof"
-  >
-    <div class="wrap">
-      <h2 class="text-[clamp(1.25rem,0.8rem+1.2vw,1.5rem)] mb-8" data-reveal>
-        Risky / legacy → recommended
-      </h2>
-
-      <ol
-        class="skills-proof-list flex flex-col border-t border-border"
-        data-reveal-stagger
-      >
-        {
-          pairs.map((p) => (
-            <li class="border-b border-border">
-              <a
-                class="group grid grid-cols-[minmax(0,1fr)_auto] gap-4 items-center py-5 px-3 transition-[background,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-surface motion-safe:hover:translate-x-[3px] max-[720px]:grid-cols-1 max-[720px]:gap-3"
-                href={`${base}skills/${p.slug}`}
-              >
-                <div class="skills-proof-pair grid grid-cols-[1fr_auto_1fr] items-center gap-4 min-w-0 max-[720px]:grid-cols-1 max-[720px]:gap-2">
-                  <div class="grid grid-cols-[1.3em_1fr] gap-3 items-start min-w-0">
-                    <span class="text-muted text-[0.95rem] leading-[1.4]" aria-hidden="true">✕</span>
-                    <span class="text-ink-soft leading-[1.4] break-words">
-                      <span class="sr-only">Avoid or reconsider: </span>{p.old}
-                    </span>
-                  </div>
-                  <div class="text-crimson font-semibold text-center max-[720px]:text-left max-[720px]:pl-[1.3em]" aria-hidden="true">
-                    →
-                  </div>
-                  <div class="grid grid-cols-[1.3em_1fr] gap-3 items-start min-w-0">
-                    <span class="text-crimson font-bold text-[0.95rem] leading-[1.4]" aria-hidden="true">✓</span>
-                    <div class="flex flex-col gap-1 min-w-0">
-                      <span class="text-ink leading-[1.4] break-words">
-                        <span class="sr-only">Use instead: </span>{p.new}
-                      </span>
-                      {p.note && (
-                        <span class="text-muted text-xs leading-[1.4]">{p.note}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <span
-                  class="skills-proof-slug self-center font-mono text-xs text-muted whitespace-nowrap transition-colors duration-200 group-hover:text-crimson max-[720px]:justify-self-start"
-                >
-                  {p.slug}
-                </span>
-              </a>
-            </li>
-          ))
-        }
-      </ol>
-    </div>
-  </section>
+  <!-- Moved off the landing page: this explains rather than persuades, and it
+       is more use to someone already browsing the catalog. -->
+  <HowItWorks />
 </Base>
