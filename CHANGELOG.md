@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.7.0 — 2026-07-19
+
+### Site
+
+- Rebuilt the documentation site with React islands, a new visual system, and clearer install and evidence flows.
+- Added interactive hero, install picker, correction panel, and tool logo strip components.
+- Mapped each catalog cover claim to source citations via `cover_sources` and surfaced those links on skill pages.
+- Simplified site validation scripts around the catalog and built-route checks; removed nested accidental font copies.
+
+### Content
+
+- Added per-cover source indexes for every skill in the authoritative catalog.
+- Softened debugging skill copy that named a specific unit-test framework.
+
+### Maintainer
+
+- Expanded gitignore for local AI caches and scratch artifacts.
+- Added a tracked release skill for cutting versions consistently.
+
 ## 1.6.4 — 2026-07-16
 
 ### CI
