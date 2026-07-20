@@ -1,15 +1,17 @@
 ---
-last_reviewed: 2026-07-16
+last_reviewed: 2026-07-20
 ---
 
 # Limits, Quotas, Throttling, and Error Codes
 
 **Primary source:** https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits (contains the exhaustive tables this document summarizes and expands with usage advice).
 
+Open Cloud Data Stores v2 rate limits live on the same page under Access limits (shared with the Engine API). Legacy Open Cloud v1 endpoint limits remain on https://create.roblox.com/docs/cloud/guides/data-stores/throttling and apply only to `/datastores/v1/` and `/ordered-data-stores/v1/` paths after July 29, 2026.
+
 ## Why This Matters
 
 Data stores are a shared cloud resource. Roblox protects the service (and your experience) with multiple layers of limits:
-- Experience-level quotas (scale with total concurrent users across all servers of the universe).
+- Experience-level quotas (scale with total concurrent users across all servers of the universe). **Game servers and Open Cloud share this budget** — external traffic can throttle in-experience usage and vice versa.
 - Per-game-server limits (you can raise these with `DataStoreService:SetRateLimitForRequestType` during server initialization).
 - Per-key throttling in some cases.
 - Hard queue sizes (when queues of 30 fill, requests are dropped with specific throttle errors).
@@ -20,21 +22,26 @@ Exceeding causes dropped requests, errors in the 301+ range (or the more modern 
 
 ## Experience-Level Limits (formulas)
 
-These are shared across the entire experience.
+These are shared across the entire experience (in-engine APIs **and** Open Cloud v2 Data Store endpoints for the matching request type).
 
 ### Standard Data Stores
-- **Read** (GetAsync, GetVersionAsync, GetVersionAtTimeAsync, read portion of UpdateAsync): 250 + concurrentUsers × 40 per minute
-- **Write** (SetAsync, IncrementAsync, write portion of UpdateAsync): 250 + concurrentUsers × 20 per minute
-- **List** (ListDataStoresAsync, ListKeysAsync, ListVersionsAsync): 10 + concurrentUsers × 2 per minute
-- **Remove**: 100 + concurrentUsers × 40 per minute
+- **Read** (GetAsync, GetVersionAsync, GetVersionAtTimeAsync, read portion of UpdateAsync; Open Cloud Get Data Store Entry): 300 + concurrentUsers × 40 per minute
+- **Write** (SetAsync, IncrementAsync, write portion of UpdateAsync; Open Cloud Create/Update/Increment): 300 + concurrentUsers × 20 per minute
+- **List** (ListDataStoresAsync, ListKeysAsync, ListVersionsAsync; Open Cloud List Data Stores / Entries / Revisions): 300 + concurrentUsers × 2 per minute
+- **Remove** (RemoveAsync; Open Cloud Delete Data Store Entry / Delete Data Store / Undelete Data Store): 300 + concurrentUsers × 40 per minute
 
 ### Ordered Data Stores
-- Read (Get + read of Update): 250 + concurrentUsers × 40
-- Write (Set/Increment + write of Update): 250 + concurrentUsers × 20
-- List (GetSortedAsync): 100 + concurrentUsers × 2
-- Remove: 100 + concurrentUsers × 40
+- Read (Get + read of Update; Open Cloud Get Ordered Data Store Entry): 300 + concurrentUsers × 40
+- Write (Set/Increment + write of Update; Open Cloud Create/Update/Increment): 300 + concurrentUsers × 20
+- List (GetSortedAsync; Open Cloud List Ordered Data Store Entries): 300 + concurrentUsers × 2
+- Remove (RemoveAsync; Open Cloud Delete Ordered Data Store Entry): 300 + concurrentUsers × 40
 
 **Important:** UpdateAsync always consumes **both** a read and a write budget for the relevant category.
+
+### Controlling the shared budget
+
+- **Game servers:** use `SetRateLimitForRequestType` + `GetRequestBudgetForRequestType` so individual servers do not exhaust the experience pool.
+- **Open Cloud (external callers):** apply your own limiter (simple fixed spacing of `60 / desired_rpm` seconds, or a leaky-bucket). Official docs include Node.js timeout and leaky-bucket samples on the error-codes page.
 
 ## Server-Level Limits (configurable)
 
@@ -184,15 +191,18 @@ See the full error-codes page for the gigantic tables and the exact messages.
 
 Calculated from lifetime unique users of the experience. Visible in Data Stores Manager as "Total Size" vs "Storage Limit".
 
-**Formula:** `Total latest-version storage limit = 100 MB + (1 MB × lifetime user count)`
+**Formula:** `Total latest-version storage limit = 500 MB + (1 MB × lifetime user count)`
 
-A lifetime user is any user who has joined the experience at least once. Only the latest version of each key counts toward this limit; deleted/replaced keys (even if still accessible through version APIs) do not count. Data stores marked for deletion via Open Cloud continue to count during their 30-day processing period.
+A lifetime user is any user who has joined the experience at least once. Storage usage is measured using the **compressed size** of the latest version of each key — data stores compress before storage. Do **not** pre-compress values yourself; that burns CPU and can reduce the effectiveness of built-in compression (and future schema-based optimizations).
+
+Only the latest version of each key counts toward this limit; deleted keys and superseded versions (still accessible through version APIs during retention) do not count. Data stores marked for deletion via Open Cloud continue to count during their 30-day processing period.
 
 Exceeding → estimated monthly overage costs shown. Can lead to operational pain.
 
 Mitigation (best-practices):
 - Fewer data stores.
 - Larger cohesive objects per key instead of many small keys.
+- Store uncompressed serializable tables; let Roblox compress.
 - Delete test/temporary/seasonal data promptly (Manager "Mark for Deletion" or Batch Processor / Open Cloud).
 - Use MemoryStores for anything that can expire.
 - Monitor the Storage Usage Bytes chart in the observability dashboard.

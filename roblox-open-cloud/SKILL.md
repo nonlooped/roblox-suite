@@ -1,7 +1,7 @@
 ---
 name: roblox-open-cloud
 description: "Roblox Open Cloud REST API for accessing data stores, assets, universes, places, users, groups, subscriptions, and Luau execution from outside the engine or via HttpService. Covers authentication (API keys, OAuth 2.0, avoiding legacy cookie auth), scopes and least-privilege, IP allowlists, key rotation and the 60-day auto-expiry rule, Secrets stores, the HttpService-callable subset and its rate limits, webhooks, and in-engine vs Open Cloud decision tree. Use for external automation, CI/CD, bulk data, scheduled snapshots, and cross-experience tooling."
-last_reviewed: 2026-07-16
+last_reviewed: 2026-07-20
 ---
 
 # roblox-open-cloud
@@ -99,6 +99,8 @@ Base URL: `https://apis.roblox.com/cloud/v2/...` (plus a few `apis.roblox.com/<f
 - `ListDataStoreEntries`, `CreateDataStoreEntry`, `GetDataStoreEntry`, `UpdateDataStoreEntry`, `IncrementDataStoreEntry`, `DeleteDataStoreEntry`.
 - `ListDataStoreEntryRevisions` (version history per entry).
 - Scoped variants under `/data-stores/{data_store_id}/scopes/{scope}/entries/...`.
+- **Rate limits (v2):** share the experience Data Store request budgets with in-engine APIs (read/write/list/remove scale with concurrent users). See [error codes & limits](https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits#access-limits) and rate-limit external callers (fixed spacing or leaky bucket). Do not assume Open Cloud has a separate unlimited pool.
+- **Legacy v1** (`/datastores/v1/`, `/ordered-data-stores/v1/`): after July 29, 2026 the fixed non-scaling tables on the [throttling guide](https://create.roblox.com/docs/cloud/guides/data-stores/throttling) apply only to those legacy paths.
 
 **Memory stores** (`/cloud/v2/universes/{universe_id}/memory-stores/...`):
 - Sorted maps: `ListMemoryStoreSortedMapItems`, `CreateMemoryStoreSortedMapItem`, `GetMemoryStoreSortedMapItem`, `UpdateMemoryStoreSortedMapItem`, `DeleteMemoryStoreSortedMapItem`.
@@ -107,6 +109,7 @@ Base URL: `https://apis.roblox.com/cloud/v2/...` (plus a few `apis.roblox.com/<f
 
 **Ordered data stores** (`/cloud/v2/universes/{universe_id}/ordered-data-stores/...`):
 - `ListOrderedDataStoreEntries`, `CreateOrderedDataStoreEntry`, `GetOrderedDataStoreEntry`, `UpdateOrderedDataStoreEntry`, `IncrementOrderedDataStoreEntry`, `DeleteOrderedDataStoreEntry`.
+- Same shared experience budget model as standard Data Stores v2 (see error-codes page).
 
 ### Universes & places
 
@@ -246,6 +249,7 @@ Open Cloud emits webhooks for certain events, including **subscription** events 
 - Storing API keys in scripts or source control.
 - Using a personal account's key for group automation (compromises all your resources if the key leaks).
 - Hitting the 2500-req/min `HttpService` Open Cloud limit by not batching.
+- Running bulk Open Cloud v2 Data Store jobs without a client-side rate limiter (shared experience budget → live servers throttle).
 - Expecting `..` in data store keys to work from `HttpService` (it doesn't).
 - Forgetting the 60-day auto-expiry and having automation silently break.
 - Using Open Cloud for things the in-engine API already does (unnecessary external dependency and latency).
@@ -267,6 +271,8 @@ Open Cloud emits webhooks for certain events, including **subscription** events 
 - https://create.roblox.com/docs/cloud/auth/oauth2-overview
 - https://create.roblox.com/docs/en-us/cloud-services/http-service
 - https://create.roblox.com/docs/en-us/cloud/reference/rate-limits
+- https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits (Open Cloud v2 Data Store shared budgets)
+- https://create.roblox.com/docs/cloud/guides/data-stores/throttling (legacy v1 Data Store limits)
 - https://create.roblox.com/docs/en-us/cloud/webhooks/webhook-notifications
 - https://create.roblox.com/docs/en-us/cloud-services/secrets
 

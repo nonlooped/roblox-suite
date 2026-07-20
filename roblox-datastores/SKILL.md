@@ -1,7 +1,7 @@
 ---
 name: roblox-datastores
 description: "Safety-oriented Roblox DataStore guidance for reducing data loss, throttling, races, and quota exhaustion. Covers DataStore vs OrderedDataStore, UpdateAsync for atomic writes, versioning and metadata for recovery, budgets and rate limits, player profile and session-locking patterns, leaderboards, RTBF, and integration with Open Cloud. Use for any persistent player data, stats, inventory, settings, or cross-server state."
-last_reviewed: 2026-07-16
+last_reviewed: 2026-07-20
 ---
 
 # roblox-datastores
@@ -136,7 +136,7 @@ See references/versioning-metadata-recovery.md (for listing, caching, serializat
 
 ### Limits, quotas, throttling, and budgets (you *must* respect these)
 
-There are **experience-level** limits (scale with concurrent users across the whole experience) and **per-server** limits (configurable via DataStoreService:SetRateLimitForRequestType).
+There are **experience-level** limits (scale with concurrent users across the whole experience) and **per-server** limits (configurable via DataStoreService:SetRateLimitForRequestType). Experience-level pools are **shared between game servers and Open Cloud v2** Data Store traffic — bulk external jobs can throttle live players (and vice versa).
 
 UpdateAsync counts against *both* read and write budgets.
 
@@ -144,11 +144,11 @@ Use DataStoreService:GetRequestBudgetForRequestType(Enum.DataStoreRequestType.XX
 
 Queues exist (size 30); when full, you get throttle errors (301-306 range or the newer *Throttled errors).
 
-Full tables of every error code (101 KeyNameEmpty ... through all the *ExperienceThrottled and *GameServerThrottled variants) plus server-side errors are in references/limits-quotas-throttling-error-codes.md .
+Full tables of every error code (101 KeyNameEmpty ... through all the *ExperienceThrottled and *GameServerThrottled variants), experience formulas (base 300 + concurrentUsers × N), and server-side errors are in references/limits-quotas-throttling-error-codes.md .
 
 Observability dashboard (Creator Hub → Monitoring → Data Stores) shows real-time request counts by API/status, quota usage percentages, storage bytes vs limit.
 
-Data Stores Manager shows total size vs storage limit (based on lifetime users), per-DS key counts, etc.
+Data Stores Manager shows total size vs storage limit (`500 MB + 1 MB × lifetime users`, measured as compressed latest-version size), per-DS key counts, etc. Do not pre-compress values before writing.
 
 **Pro tip:** Call SetRateLimitForRequestType early in server init (once per type) to raise limits for migration scripts or busy servers. Base + (perPlayer * numPlayers). Constraints per type are documented.
 
