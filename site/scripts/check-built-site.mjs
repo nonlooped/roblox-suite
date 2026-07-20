@@ -105,52 +105,23 @@ for (const asset of ["404.html", "favicon.svg", "robots.txt"]) {
   }
 }
 
-const sitemapIndex = path.join(root, "sitemap-index.xml");
-let sitemapIndexXml = null;
-
+let sitemapContent = null;
 try {
-  sitemapIndexXml = await readFile(sitemapIndex, "utf8");
+  sitemapContent = await readFile(path.join(root, "sitemap.xml"), "utf8");
 } catch {
-  fail("missing sitemap index: sitemap-index.xml");
+  fail("missing sitemap: sitemap.xml");
 }
 
-if (sitemapIndexXml && !/<sitemapindex\b/.test(sitemapIndexXml)) {
-  fail("sitemap-index.xml is not a sitemap index");
+if (sitemapContent && !/<urlset\b/.test(sitemapContent)) {
+  fail("sitemap.xml is not a URL sitemap");
 }
 
-const sitemapUrls = sitemapIndexXml
-  ? [...sitemapIndexXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1])
-  : [];
-
-if (sitemapIndexXml && sitemapUrls.length === 0) {
-  fail("sitemap-index.xml does not reference any sitemap files");
-}
-
-const sitemapXml = [];
-for (const sitemapUrl of sitemapUrls) {
-  let url;
+for (const leftover of ["sitemap-index.xml", "sitemap-0.xml"]) {
   try {
-    url = new URL(sitemapUrl);
+    await access(path.join(root, leftover));
+    fail(`legacy sitemap file still present: ${leftover}`);
   } catch {
-    fail(`sitemap index contains an invalid URL: ${sitemapUrl}`);
-    continue;
-  }
-
-  if (url.origin !== SITE_ORIGIN) {
-    fail(`sitemap index references a non-canonical sitemap: ${sitemapUrl}`);
-    continue;
-  }
-
-  const relativePath = url.pathname.replace(/^\//, "");
-  const sitemapFile = path.join(root, relativePath);
-  try {
-    const contents = await readFile(sitemapFile, "utf8");
-    if (!/<urlset\b/.test(contents)) {
-      fail(`referenced sitemap is not a URL sitemap: ${path.relative(dist, sitemapFile)}`);
-    }
-    sitemapXml.push(contents);
-  } catch {
-    fail(`missing referenced sitemap: ${path.relative(dist, sitemapFile)}`);
+    // expected: flatten-sitemap.mjs removes chunked sitemaps
   }
 }
 
@@ -161,15 +132,23 @@ const expectedSitemapUrls = [
   ...catalog.skills.map((skill) => `${SITEMAP_BASE}skills/${skill.slug}/`),
 ];
 
-const sitemapContent = sitemapXml.join("\n");
 for (const url of expectedSitemapUrls) {
-  if (!sitemapContent.includes(`<loc>${url}</loc>`)) {
+  if (sitemapContent && !sitemapContent.includes(`<loc>${url}</loc>`)) {
     fail(`sitemap is missing canonical URL: ${url}`);
   }
 }
 
-if (/<loc>[^<]*\/404\/?<\/loc>/.test(sitemapContent)) {
+if (sitemapContent && /<loc>[^<]*\/404\/?<\/loc>/.test(sitemapContent)) {
   fail("sitemap includes the generated 404 page");
+}
+
+try {
+  const robots = await readFile(path.join(root, "robots.txt"), "utf8");
+  if (!robots.includes(`Sitemap: ${SITE_ORIGIN}/sitemap.xml`)) {
+    fail("robots.txt does not point at the canonical sitemap.xml");
+  }
+} catch {
+  fail("missing robots.txt");
 }
 
 if (errors.length > 0) {

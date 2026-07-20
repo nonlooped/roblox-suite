@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/flatten-sitemap.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "check:content": "node scripts/validate-content.mjs",

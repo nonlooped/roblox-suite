@@ -94,5 +94,5 @@ jobs:
           while read -r slug; do
             curl -fsSL --retry 3 "$base/skills/$slug/" >/dev/null
           done
-          curl -fsSL --retry 3 "$base/sitemap-index.xml" | grep -q '<sitemapindex'
-          curl -fsSL --retry 3 "$base/robots.txt" | grep -q 'Sitemap: https://roblox-suite.vercel.app/sitemap-index.xml'
+          curl -fsSL --retry 3 "$base/sitemap.xml" | grep -q '<urlset'
+          curl -fsSL --retry 3 "$base/robots.txt" | grep -q 'Sitemap: https://roblox-suite.vercel.app/sitemap.xml'
