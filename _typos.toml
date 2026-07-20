@@ -46,7 +46,7 @@ unparented = "unparented"
 [default]
 # Google Search Console verification token is a random hash; typos flags
 # the "FO" substring inside it as a misspelling of OF/FOR/DO/GO/TO.
-extend-ignore-re = ["grl63lB2HzFOQv_Xq2OfDJqAbwZCpIUmr7tijM15jLU"]
+extend-ignore-re = ["Ri5YRxBLp5tUFERvt908GtJ83VTj97RY3vbpHJQwVxs"]
 
 [files]
 # Only check the files we care about

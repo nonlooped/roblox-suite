@@ -16,9 +16,8 @@ const { title, description, noindex = false, schema } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const asset = (file: string) =>
   new URL(`${import.meta.env.BASE_URL}/${file}`.replace(/\/+/g, "/"), Astro.site).href;
-// Google Search Console HTML-tag verification. Re-verify under the Vercel
-// property if the token is rotated or a new ownership method is added.
-const googleSiteVerification = "grl63lB2HzFOQv_Xq2OfDJqAbwZCpIUmr7tijM15jLU";
+// Google Search Console HTML-tag verification for roblox-suite.vercel.app.
+const googleSiteVerification = "Ri5YRxBLp5tUFERvt908GtJ83VTj97RY3vbpHJQwVxs";
 ---
 
 <html lang="en">
