@@ -1,4 +1,4 @@
-name: Deploy site to GitHub Pages
+name: Deploy site to Vercel
 
 on:
   push:
@@ -11,49 +11,61 @@ on:
       - "roblox-*/**"
       - "scripts/**"
       - "schemas/**"
+      - "vercel.json"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: vercel-deploy
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 24
           cache: npm
           cache-dependency-path: site/package-lock.json
+
       - name: Install dependencies
         working-directory: site
         run: npm ci
+
       - name: Validate and build
         working-directory: site
         run: npm test
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
-        with:
-          path: site/dist
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
+      - name: Pull Vercel project settings
+        run: npx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build production deployment
+        run: npx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Deploy to Vercel
+        id: deploy
+        run: |
+          url=$(npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployed to $url"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
   smoke:
     needs: deploy
@@ -64,7 +76,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          base="https://nonlooped.github.io/roblox-suite"
+          base="https://roblox-suite.vercel.app"
           count=$(node -p "require('./catalog.json').skills.length")
           for attempt in 1 2 3 4 5; do
             home=$(curl -fsSL "$base/")
@@ -82,3 +94,5 @@ jobs:
           while read -r slug; do
             curl -fsSL --retry 3 "$base/skills/$slug/" >/dev/null
           done
+          curl -fsSL --retry 3 "$base/sitemap-index.xml" | grep -q '<sitemapindex'
+          curl -fsSL --retry 3 "$base/robots.txt" | grep -q 'Sitemap: https://roblox-suite.vercel.app/sitemap-index.xml'

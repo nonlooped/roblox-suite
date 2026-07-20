@@ -82,7 +82,7 @@ jobs:
             --accept 200,429,503
             --exclude "rbxassetid://.*"
             --exclude "mailto:.*"
-            --exclude "nonlooped.github.io/roblox-suite"
+            --exclude "roblox-suite.vercel.app"
             "**/*.md"
           fail: true
 

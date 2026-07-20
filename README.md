@@ -9,7 +9,7 @@ An opinionated set of source-grounded skills for AI agents writing Roblox Luau. 
 [![Docs](https://shieldcn.dev/badge/Docs-Engine_Reference-10B981.svg?logo=ri:GoBook&variant=branded)](https://create.roblox.com/docs/reference/engine)
 [![License](https://shieldcn.dev/badge/License-MIT-6366F1.svg?logo=ri:GoLaw&variant=branded)](LICENSE)
 
-🌐 **[nonlooped.github.io/roblox-suite](https://nonlooped.github.io/roblox-suite/)** — the full catalog, what each skill covers, what your agent stops doing, and the official sources used to review each skill. **Start there.**
+🌐 **[roblox-suite.vercel.app](https://roblox-suite.vercel.app/)** — the full catalog, what each skill covers, what your agent stops doing, and the official sources used to review each skill. **Start there.**
 
 ---
 
@@ -29,7 +29,7 @@ npx skills add nonlooped/roblox-suite --skill roblox-datastores
 
 Roblox deprecates APIs and changes policy on a rolling basis. Agents trained on old content confidently emit deprecated APIs such as `Humanoid:LoadAnimation`, `BodyMover`s, and legacy `Teleport` variants, as well as risky patterns such as bare `SetAsync` for contended data. Roblox Suite routes agents toward current documentation and lists the official sources used to review each skill.
 
-For the catalog and visible proof, see the [site](https://nonlooped.github.io/roblox-suite/), its [verification evidence](https://nonlooped.github.io/roblox-suite/evidence/) page, and the [first paired evaluation report](evals/reports/2026-07-16-codex-gpt-5.6-sol.md). Script files are maturity-labeled examples, not a versioned production library.
+For the catalog and visible proof, see the [site](https://roblox-suite.vercel.app/), its [verification evidence](https://roblox-suite.vercel.app/evidence/) page, and the [first paired evaluation report](evals/reports/2026-07-16-codex-gpt-5.6-sol.md). Script files are maturity-labeled examples, not a versioned production library.
 
 ## Manage the installation
 

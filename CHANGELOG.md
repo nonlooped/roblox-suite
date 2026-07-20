@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Site
+
+- Moved the documentation site from GitHub Pages (`nonlooped.github.io/roblox-suite`) to Vercel at [roblox-suite.vercel.app](https://roblox-suite.vercel.app/), with root-base URLs and updated sitemap/robots canonicals.
+
 ## 1.7.0 — 2026-07-19
 
 ### Site

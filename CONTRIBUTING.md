@@ -1,6 +1,6 @@
 # Contributing
 
-This is an agent skill set. Contributions should keep each skill self-contained and follow the existing conventions. The companion [website](https://nonlooped.github.io/roblox-suite/) is the public gateway — the repo is the source of truth the site is built from.
+This is an agent skill set. Contributions should keep each skill self-contained and follow the existing conventions. The companion [website](https://roblox-suite.vercel.app/) is the public gateway — the repo is the source of truth the site is built from.
 
 ## Accuracy is the contract
 
@@ -59,7 +59,7 @@ skill-name/
 
 ## The website (`site/`)
 
-The Astro site imports `catalog.json` and computes strict per-file verification coverage at build time. Malformed or unreadable frontmatter fails the build. Root content changes that affect metadata trigger Pages deployment.
+The Astro site imports `catalog.json` and computes strict per-file verification coverage at build time. Malformed or unreadable frontmatter fails the build. Root content changes that affect metadata trigger Vercel deployment.
 
 ```sh
 cd site

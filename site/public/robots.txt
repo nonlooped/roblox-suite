@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nonlooped.github.io/roblox-suite/sitemap-index.xml
+Sitemap: https://roblox-suite.vercel.app/sitemap-index.xml

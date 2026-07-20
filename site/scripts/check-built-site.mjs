@@ -2,7 +2,7 @@
 /**
  * Post-build smoke test against dist/. Mirrors what the deploy workflow
  * checks against the live site, so failures surface locally and in PRs
- * instead of after a Pages deploy.
+ * instead of after a production deploy.
  */
 import { readFile, access } from "node:fs/promises";
 import path from "node:path";
@@ -12,6 +12,9 @@ const siteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const repoRoot = path.resolve(siteRoot, "..");
 const dist = path.join(siteRoot, "dist");
 
+const SITE_ORIGIN = "https://roblox-suite.vercel.app";
+const SITEMAP_BASE = `${SITE_ORIGIN}/`;
+
 const errors = [];
 const fail = (message) => errors.push(message);
 
@@ -20,8 +23,7 @@ const catalog = JSON.parse(
 );
 const count = catalog.skills.length;
 
-// dist/ is uploaded as the Pages artifact root, which GitHub serves at
-// /roblox-suite/. So dist/index.html *is* the base path — no nested prefix.
+// dist/ is the static host root (Vercel serves it at the site origin).
 const root = dist;
 
 async function page(...segments) {
@@ -91,11 +93,10 @@ for (const [name, html] of [
   }
 }
 
-for (const asset of ["404.html", "favicon.svg", "robots.txt", ".nojekyll"]) {
+for (const asset of ["404.html", "favicon.svg", "robots.txt"]) {
   try {
     await access(path.join(root, asset));
   } catch {
-    // 404.html and .nojekyll are emitted at the dist root by Pages convention.
     try {
       await access(path.join(dist, asset));
     } catch {
@@ -104,7 +105,6 @@ for (const asset of ["404.html", "favicon.svg", "robots.txt", ".nojekyll"]) {
   }
 }
 
-const sitemapBase = "https://nonlooped.github.io/roblox-suite/";
 const sitemapIndex = path.join(root, "sitemap-index.xml");
 let sitemapIndexXml = null;
 
@@ -136,13 +136,13 @@ for (const sitemapUrl of sitemapUrls) {
     continue;
   }
 
-  const basePath = "/roblox-suite/";
-  if (url.origin !== "https://nonlooped.github.io" || !url.pathname.startsWith(basePath)) {
+  if (url.origin !== SITE_ORIGIN) {
     fail(`sitemap index references a non-canonical sitemap: ${sitemapUrl}`);
     continue;
   }
 
-  const sitemapFile = path.join(root, url.pathname.slice(basePath.length));
+  const relativePath = url.pathname.replace(/^\//, "");
+  const sitemapFile = path.join(root, relativePath);
   try {
     const contents = await readFile(sitemapFile, "utf8");
     if (!/<urlset\b/.test(contents)) {
@@ -155,10 +155,10 @@ for (const sitemapUrl of sitemapUrls) {
 }
 
 const expectedSitemapUrls = [
-  sitemapBase,
-  `${sitemapBase}skills/`,
-  `${sitemapBase}evidence/`,
-  ...catalog.skills.map((skill) => `${sitemapBase}skills/${skill.slug}/`),
+  SITEMAP_BASE,
+  `${SITEMAP_BASE}skills/`,
+  `${SITEMAP_BASE}evidence/`,
+  ...catalog.skills.map((skill) => `${SITEMAP_BASE}skills/${skill.slug}/`),
 ];
 
 const sitemapContent = sitemapXml.join("\n");
@@ -170,11 +170,6 @@ for (const url of expectedSitemapUrls) {
 
 if (/<loc>[^<]*\/404\/?<\/loc>/.test(sitemapContent)) {
   fail("sitemap includes the generated 404 page");
-}
-
-// Catch unresolved base paths that would 404 on Pages.
-if (home?.includes('href="/skills/')) {
-  fail("home page contains a root-absolute /skills/ link that ignores the base path");
 }
 
 if (errors.length > 0) {

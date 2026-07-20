@@ -10,4 +10,4 @@ The static site contains an optional GoatCounter integration. It is inactive unl
 
 The integration does not intentionally send command contents beyond the public install command, form inputs, Roblox project data, or a persistent user identifier. GoatCounter processing and retention are governed by the configured GoatCounter instance. The owner must review that configuration and applicable consent requirements before enabling it.
 
-GitHub Pages, GitHub, skills.sh, and linked Roblox documentation have their own privacy practices when visited.
+Vercel (site host), GitHub, skills.sh, and linked Roblox documentation have their own privacy practices when visited.
