@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-07-16
+last_reviewed: 2026-07-20
 ---
 
 # Types of Data Stores
@@ -63,19 +63,19 @@ From https://create.roblox.com/docs/cloud-services/data-stores-vs-memory-stores:
 
 Storage quota is per-universe and based on lifetime users.
 
-**Formula:** `Total latest-version storage limit = 100 MB + (1 MB × lifetime user count)`
+**Formula:** `Total latest-version storage limit = 500 MB + (1 MB × lifetime user count)`
 
-Only the latest version of each key counts; older versions and deleted/replaced keys do not count toward this limit (unless a data store is marked for deletion via Open Cloud, in which case it continues to count during its 30-day processing period). Exceeding the limit triggers estimated monthly costs in the Manager and can affect operations.
+Usage is the **compressed** size of each key's latest version. Older versions and deleted/replaced keys do not count toward this limit (unless a data store is marked for deletion via Open Cloud, in which case it continues to count during its 30-day processing period). Exceeding the limit triggers estimated monthly costs in the Manager and can affect operations.
 
 Monitor via:
 - Creator Hub Data Stores Manager (total size, per-DS size/keys, key browser, version history, per-key Revert, mark-for-deletion with cooldown). The Manager's Restore button is for data stores marked for deletion, not for reverting an individual key's value.
 - Observability dashboard (storage bytes, request counts by API and status, quota usage % for read/write/list/remove categories).
 
-See the dedicated references/limits-quotas-throttling-error-codes.md for the full mathematical formulas (experience-level: 250 + concurrentUsers × N for various categories) and per-server defaults/configurable limits.
+See the dedicated references/limits-quotas-throttling-error-codes.md for the full mathematical formulas (experience-level: 300 + concurrentUsers × N for various categories) and per-server defaults/configurable limits.
 
 ## Open Cloud Contrast (for external tools)
 
-The Engine API (inside experiences) is different from the Open Cloud REST Data Stores APIs. The latter require API keys with specific scopes (universe-datastores.*), support bulk/list operations from outside Roblox, and have their own authentication/rate limits. Use Engine for in-experience logic; Open Cloud + Batch Processor for admin tools, migrations, or RTBF processing.
+The Engine API (inside experiences) is different from the Open Cloud REST Data Stores APIs. The latter require API keys with specific scopes (universe-datastores.*), support bulk/list operations from outside Roblox, and use separate authentication. **Request budgets for Open Cloud v2 Data Stores are shared with the in-engine experience limits** (same read/write/list/remove pools). Legacy Open Cloud v1 Data Store endpoints keep their own fixed per-universe limits (see the throttling guide). Use Engine for in-experience logic; Open Cloud + Batch Processor for admin tools, migrations, or RTBF processing — and rate-limit external callers so they do not starve live servers.
 
 **Key takeaway:** Choose the variant deliberately at creation time. You cannot easily convert an OrderedDataStore into a versioned DataStore later without migration code (see best-practices-and-gotchas.md and versioning-metadata-recovery.md for migration and recovery patterns).
 

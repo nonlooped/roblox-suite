@@ -219,7 +219,7 @@
         {
           "label": "Error codes & limits",
           "url": "https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits",
-          "verified_at": "2026-07-16"
+          "verified_at": "2026-07-20"
         },
         {
           "label": "Best practices",
@@ -247,7 +247,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-07-20"
     },
     {
       "slug": "roblox-user-interfaces",
@@ -514,6 +514,16 @@
           "label": "Rate limits",
           "url": "https://create.roblox.com/docs/en-us/cloud/reference/rate-limits",
           "verified_at": "2026-07-16"
+        },
+        {
+          "label": "Data store error codes & limits (v2 shared budgets)",
+          "url": "https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits",
+          "verified_at": "2026-07-20"
+        },
+        {
+          "label": "Open Cloud Data Stores throttling (legacy v1)",
+          "url": "https://create.roblox.com/docs/cloud/guides/data-stores/throttling",
+          "verified_at": "2026-07-20"
         }
       ],
       "risk": "critical",
@@ -527,7 +537,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-07-20"
     },
     {
       "slug": "roblox-teleport",

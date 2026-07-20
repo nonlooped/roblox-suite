@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Content
+
+- Re-verified DataStore limits against official docs: experience request bases are `300 + concurrentUsers × N` (not 250/10/100), storage is `500 MB + 1 MB × lifetime users` measured on compressed latest-version size, and Open Cloud v2 Data Store traffic shares the experience request budget with game servers. Legacy Open Cloud v1 keeps separate fixed limits after July 29, 2026.
+
 ### Site
 
 - Moved the documentation site from GitHub Pages (`nonlooped.github.io/roblox-suite`) to Vercel at [roblox-suite.vercel.app](https://roblox-suite.vercel.app/), with root-base URLs and updated sitemap/robots canonicals.

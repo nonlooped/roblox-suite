@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-07-20
 ---
 
 # Best Practices and Common Gotchas
@@ -14,8 +14,10 @@ Synthesized from the official "Best practices for data stores" page + all the er
 
 ## Optimization & Quota Hygiene
 
-- Monitor constantly: Data Stores Dashboard (Creator Hub Monitoring) for request volume, status codes, and quota % usage. Data Stores Manager for actual stored size vs lifetime-user-based limit.
+- Monitor constantly: Data Stores Dashboard (Creator Hub Monitoring) for request volume, status codes, and quota % usage. Data Stores Manager for actual stored size vs lifetime-user-based limit (`500 MB + 1 MB × lifetime users`, compressed latest-version size).
 - Set up notifications for approaching or breaching storage limits.
+- Store normal serializable tables; do **not** pre-compress values — Roblox compresses on write and measures quota on compressed size.
+- Rate-limit Open Cloud v2 Data Store clients separately; they share the experience request budget with live servers.
 - Delete aggressively after testing or events: use Manager "Mark for Deletion" (cooldown; keys can be restored via `UpdateAsync` from the Engine API or `UpdateDataStoreEntry` from Open Cloud during the cooldown), Batch Processor CLI, or Open Cloud bulk delete.
 - Prefer versioning + restore over "save a new key for every version".
 - Use MemoryStores for anything that does not truly need to survive server restarts or long player absences.
