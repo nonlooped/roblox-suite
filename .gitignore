@@ -25,9 +25,7 @@ sourcemap.json
 .claude
 .codex
 .impeccable
-.opencode/*
-!.opencode/skills/
-!.opencode/skills/**
+.opencode/
 .playwright-mcp
 skills-lock.json
 
