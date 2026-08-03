@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Install pinned Roblox toolchain
-        uses: paradoxum-games/setup-rokit@de192a6439925d4e06ba9f87334d4f48417e7876 # v2
+        uses: paradoxum-games/setup-rokit@29e6ee09651a3711e3a287a1037671d7b74db6d0 # v3
         with:
           cache: true
 
