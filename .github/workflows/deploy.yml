@@ -82,13 +82,15 @@ jobs:
           base="https://roblox-suite.vercel.app"
           count=$(node -p "require('./catalog.json').skills.length")
           for attempt in 1 2 3 4 5; do
-            home=$(curl -fsSL "$base/")
-            skills=$(curl -fsSL "$base/skills/")
-            if grep -q "$count skills" <<<"$home" && grep -q "$count skills" <<<"$skills"; then
+            home_code=$(curl -sS -o /tmp/smoke-home.html -w "%{http_code}" "$base/" || echo "000")
+            skills_code=$(curl -sS -o /tmp/smoke-skills.html -w "%{http_code}" "$base/skills/" || echo "000")
+            if [ "$home_code" = "200" ] && [ "$skills_code" = "200" ] &&
+              grep -q "$count skills" /tmp/smoke-home.html &&
+              grep -q "$count skills" /tmp/smoke-skills.html; then
               break
             fi
             if [ "$attempt" = 5 ]; then
-              echo "deployed counts do not match catalog ($count)" >&2
+              echo "deployed catalog routes failed (want $count skills; home=$home_code skills=$skills_code)" >&2
               exit 1
             fi
             sleep 10
