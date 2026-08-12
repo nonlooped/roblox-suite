@@ -1,0 +1,49 @@
+name: Smoke live site
+
+on:
+  deployment_status:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+      contains(fromJSON('["Production", "production"]'), github.event.deployment.environment))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.deployment.sha || github.sha }}
+
+      - name: Verify live catalog routes
+        shell: bash
+        env:
+          BASE_URL: https://roblox-suite.vercel.app
+        run: |
+          set -euo pipefail
+          base="$BASE_URL"
+          count=$(node -p "require('./catalog.json').skills.length")
+          for attempt in 1 2 3 4 5; do
+            home_code=$(curl -sS -o /tmp/smoke-home.html -w "%{http_code}" "$base/" || echo "000")
+            skills_code=$(curl -sS -o /tmp/smoke-skills.html -w "%{http_code}" "$base/skills/" || echo "000")
+            if [ "$home_code" = "200" ] && [ "$skills_code" = "200" ] &&
+              grep -q "$count skills" /tmp/smoke-home.html &&
+              grep -q "$count skills" /tmp/smoke-skills.html; then
+              break
+            fi
+            if [ "$attempt" = 5 ]; then
+              echo "deployed catalog routes failed (want $count skills; home=$home_code skills=$skills_code)" >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          node -e "for (const skill of require('./catalog.json').skills) console.log(skill.slug)" |
+          while read -r slug; do
+            curl -fsSL --retry 3 "$base/skills/$slug/" >/dev/null
+          done
+          curl -fsSL --retry 3 "$base/sitemap.xml" | grep -q '<urlset'
+          curl -fsSL --retry 3 "$base/robots.txt" | grep -q 'Sitemap: https://roblox-suite.vercel.app/sitemap.xml'

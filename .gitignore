@@ -36,3 +36,4 @@ scratch_*.mjs
 plans/
 i-have-adhd/
 .vercel
+.env*
