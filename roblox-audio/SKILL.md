@@ -1,7 +1,7 @@
 ---
 name: roblox-audio
 description: "Roblox audio — the modern modular audio graph (AudioPlayer, AudioEmitter, AudioListener, Wire, AudioTextToSpeech) and the legacy Sound/SoundGroup system. Covers 2D vs 3D audio, spatial attenuation, effects (Equalizer, Compressor, Reverb, Echo, Distortion), TTS/STT, acoustic simulation, asset permissions and the 2022 privacy changes, concurrent-voice limits, preloading, and looping. Use for any sound, music, voice, or audio-driven feedback."
-last_reviewed: 2026-06-17
+last_reviewed: 2026-08-10
 ---
 
 # roblox-audio
@@ -193,7 +193,7 @@ Profile audio with the MicroProfiler (audio appears under worker threads) and th
 
 ## Text-to-speech (TTS)
 
-`AudioTextToSpeech` converts text (≤300 chars per request) to audio with an artificial voice (`VoiceId` 1–11, plus locale-specific voices like 101/Spanish, 201/German, etc.). Wire it like an `AudioPlayer`: for 2D, `AudioTextToSpeech` → `Wire` → `AudioDeviceOutput`; for 3D, `AudioTextToSpeech` → `Wire` → `AudioEmitter` (plus the listener→output wire). Set `Text`, `VoiceId`, `Volume` on the `AudioTextToSpeech`. All text must comply with Roblox Community Standards and Terms of Use.
+`AudioTextToSpeech` converts text (≤300 chars per request) to audio with an artificial voice. The available `VoiceId` values are 1–11 (English variants), 101–102 (Spanish), 201–202 (German), 301–302 (Italian), 401–402 (French), 501–502 (Chinese), 601–602 (Hindi), 701–702 (Japanese), 801–802 (Arabic), 901–902 (Korean), and 1001–1002 (Portuguese); odd IDs are male and even IDs are female for the locale-specific pairs. Wire it like an `AudioPlayer`: for 2D, `AudioTextToSpeech` → `Wire` → `AudioDeviceOutput`; for 3D, `AudioTextToSpeech` → `Wire` → `AudioEmitter` (plus the listener→output wire). Set `Text`, `VoiceId`, `Volume` on the `AudioTextToSpeech`. All text must comply with Roblox Community Standards and Terms of Use.
 
 Use cases: accessibility (reading UI text aloud), NPC voiceover without recorded audio, dynamic announcements.
 

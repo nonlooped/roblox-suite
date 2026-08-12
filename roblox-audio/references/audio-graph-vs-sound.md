@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-08-10
 ---
 
 # Audio Graph vs Legacy Sound
@@ -28,6 +28,10 @@ The official docs now state that `Sound`, `SoundGroup`, and `SoundEffect` are **
 | Acoustic occlusion/diffraction | Not available | `AudioEmitter`/`AudioListener` `AcousticSimulationEnabled` |
 | Routing multiple sources through one effect | Hard (per-group effects only) | Native (many wires → one effect → one output) |
 | Tweenable parameter | `Sound.Volume` (number) | `AudioPlayer.TimeVolume` and other number props |
+
+## Text-to-speech voice IDs
+
+`AudioTextToSpeech` accepts the English voices 1–11 and locale-specific pairs: Spanish 101–102, German 201–202, Italian 301–302, French 401–402, Chinese 501–502, Hindi 601–602, Japanese 701–702, Arabic 801–802, Korean 901–902, and Portuguese 1001–1002. The odd ID is male and the even ID is female in every locale-specific pair.
 
 ## When to keep using `Sound`
 

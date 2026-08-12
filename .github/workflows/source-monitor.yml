@@ -26,7 +26,7 @@ jobs:
           : > /tmp/changes.txt
           gh api --paginate "repos/Roblox/creator-docs/commits?since=$since&per_page=30" --jq '.[].sha' |
           while read -r sha; do
-            files=$(gh api "repos/Roblox/creator-docs/commits/$sha" --jq '.files[].filename' | grep -Ei "$pattern" || true)
+            files=$(gh api "repos/Roblox/creator-docs/commits/$sha" --jq '.files[].filename' | grep -Ei '\.(md|mdx|ya?ml|json)$' | grep -Ei "$pattern" || true)
             if [ -n "$files" ]; then
               summary=$(gh api "repos/Roblox/creator-docs/commits/$sha" --jq '.commit.message' | head -1)
               url="https://github.com/Roblox/creator-docs/commit/$sha"

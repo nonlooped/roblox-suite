@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-08-10
 ---
 
 # Collisions and Filtering
@@ -24,7 +24,7 @@ PhysicsService:RegisterCollisionGroup("Projectiles")
 
 PhysicsService:CollisionGroupSetCollidable("Players", "Projectiles", false)
 
-PhysicsService:SetPartCollisionGroup(part, "Projectiles")
+part.CollisionGroup = "Projectiles"
 ```
 
 Useful for team-specific collisions, projectile passthrough, etc.
