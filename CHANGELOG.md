@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.8.0 — 2026-08-18
+
+### Corrected
+
+- Re-verified TeleportService against official Creator Docs (commits 6dcd99db, 2aa3d59b): legacy `Teleport`/`TeleportPartyAsync`/`TeleportToPlaceInstance`/`TeleportToPrivateServer`/`TeleportToSpawnByName` now documented as deprecated with `TeleportAsync` server-only guidance and `RemoteEvent` migration path.
+- Documented `OrderedDataStore:BatchGetAsync` (commit 23280f5c): batch reads return `Dictionary<string, {value}>`, count as N `OrderedRead` requests (experience + server budgets), and share `OrderedReadExperienceThrottled`/`GameServerThrottled` handling.
+- Expanded audio graph verification (commit 23280f5c): `AudioEmitter`/`AudioListener` per-instance `OcclusionEnabled`/`DiffractionEnabled`/`ReverbEnabled` (`SimulationMode`), `DistanceAttenuationMode` + `DistanceAttenuationBounds` (`[4, 10000]`), angle/distance attenuation and `GetAudibility`, plus `AudioPlayer` mixer-time scheduling (`Play`/`Stop` `atTime`, `Cancel`) and `AudioDeviceInput` access lists.
+- Corrected `TeleportInitFailed` and physics `collisions-and-filtering` references and clarified `CoverSources` verification.
+
+### Dependencies
+
+- Bumped `astro` 7.1.6 → 7.2.0, `lucide-react` 1.28.0 → 1.31.0, `motion` 12.43.0 → 13.0.0 (with `framer-motion` 13.1.0) and other site packages; upgraded `crate-ci/typos` and GitHub Actions.
+
+### CI
+
+- Switched site deployment to Vercel GitHub integration with directory-index serving, pinned Vercel CLI with token via env, tightened `source-monitor` file filtering, and consolidated smoke/validate workflows.
+
+### Maintainer
+
+- Marked local `.opencode/` caches as internal (gitignored) and removed the tracked release skill from the product tree.
+
 ## 1.7.1 — 2026-07-20
 
 ### Corrected
