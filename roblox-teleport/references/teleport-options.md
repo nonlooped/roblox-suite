@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-08-18
 ---
 
 # TeleportOptions and TeleportAsyncResult
@@ -25,7 +25,7 @@ last_reviewed: 2026-06-17
 | Method | Purpose |
 | --- | --- |
 | `SetTeleportData(data: Variant)` | Pass data to the destination. Retrieved via `GetLocalPlayerTeleportData()` on the destination client. |
-| `GetTeleportData(): Variant` | Read back what was set. |
+| `GetTeleportData(): Variant` | Read back what was set — returns the data previously stored by `SetTeleportData()`, or `nil` if no data was set. |
 
 ### Conflicting combinations (error)
 

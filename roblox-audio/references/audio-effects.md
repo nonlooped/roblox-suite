@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-17
+last_reviewed: 2026-08-18
 ---
 
 # Audio Effects Reference
@@ -113,7 +113,14 @@ end)
 
 - **Graph:** `AudioReverb` instance in the signal path. Apply per-bus or per-emitter.
 - **Legacy:** `SoundService.AmbientReverb` (an `Enum.ReverbType` preset) applies globally to all `Sound` instances. **It does not affect the audio graph.**
-- **Acoustic simulation:** `SoundService.AcousticSimulationEnabled = true` plus per-instance `AcousticSimulationEnabled` on `AudioEmitter`/`AudioListener` enables automatic occlusion/diffraction/reverberation based on world geometry. This is the most realistic option but the most expensive — profile on low-end devices.
+- **Acoustic simulation:** `SoundService.AcousticSimulationEnabled = true` plus per-instance `AcousticSimulationEnabled` on `AudioEmitter`/`AudioListener` enables automatic occlusion/diffraction/reverberation based on world geometry. Since Aug 2026, each emitter/listener also exposes `OcclusionEnabled`, `DiffractionEnabled`, `ReverbEnabled` (each `SimulationMode`: `Default` inherits from `SoundService`, `Enabled`/`Disabled` override). Both sides must enable a given effect; diffraction requires occlusion. Global defaults also exist on `SoundService`. This is the most realistic option but the most expensive — profile on low-end devices.
+
+## Distance & angle attenuation (updated)
+
+- **Custom curve:** `AudioEmitter.DistanceAttenuation` / `AudioListener.DistanceAttenuation` (`NumberSequence`, keys 0..∞ → 0..1) is used only when `DistanceAttenuationMode == Custom`.
+- **Preset modes:** `AudioEmitter.DistanceAttenuationMode` (`Enum.DistanceAttenuationMode`) + `DistanceAttenuationBounds` (`NumberRange`, default `[4, 10000]`) define a preset rolloff (Inverse, Linear, etc.). When a preset is active, `SetDistanceAttenuation`/`GetDistanceAttenuation` still read/write the custom curve but it is ignored for playback.
+- **Angle attenuation:** `SetAngleAttenuation({[0]=1, [90]=0.5, [180]=0})`, `GetAngleAttenuation()` — maps 0–180° to 0–1 volume. Useful for directional sources.
+- **Audibility:** `emitter:GetAudibility(listener)` / `listener:GetAudibility(emitter)` returns 0..1 after combined distance+angle attenuation.
 
 ## Performance notes
 

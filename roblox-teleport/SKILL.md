@@ -1,7 +1,7 @@
 ---
 name: roblox-teleport
 description: "Roblox TeleportService and multi-place architecture — the modern TeleportAsync API that replaces deprecated Teleport/TeleportPartyAsync/TeleportToPrivateServer variants. Covers TeleportOptions, reserved servers via ReserveServerAsync, the 50-player group limit, cross-experience restrictions, teleport data (and its client-spoofable security caveat), custom loading screens, DataStore handoff, and matchmaking with MessagingService/MemoryStoreService. Use whenever moving players between places, servers, or reserved servers."
-last_reviewed: 2026-07-16
+last_reviewed: 2026-08-18
 ---
 
 # roblox-teleport
@@ -13,7 +13,7 @@ last_reviewed: 2026-07-16
 - https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportAsyncResult
 - https://create.roblox.com/docs/projects/teleport (multi-place architecture)
 
-TeleportService moves players between places and servers. The modern entry point is `TeleportAsync`; the older `Teleport`/`TeleportPartyAsync`/`TeleportToPlaceInstance`/`TeleportToPrivateServer`/`TeleportToSpawnByName` methods are deprecated and should not be used for new work.
+TeleportService moves players between places and servers. The modern entry point is `TeleportAsync` (server-only); the older `Teleport` (client), `TeleportPartyAsync`, `TeleportToPlaceInstance`, `TeleportToPrivateServer`, and `TeleportToSpawnByName` methods are **deprecated** — use `TeleportAsync()` instead. For client-initiated teleports, fire a `RemoteEvent` to the server and let the server call `TeleportAsync()`; do not call `Teleport()` from the client for new work, even if the place is configured as "Fully Open." See the [migrate to secure teleports](https://create.roblox.com/docs/en-us/projects/teleport#migrate-to-secure-teleports) guide.
 
 Cross-reference:
 - [roblox-datastores/SKILL.md](../roblox-datastores/SKILL.md) — handoff pattern for player data across teleports.
@@ -42,7 +42,7 @@ A **universe** (experience) can contain multiple **places**. Each place has its 
 
 ## TeleportAsync (the modern method)
 
-`TeleportService:TeleportAsync(placeId, players, teleportOptions?)` is the single unified method. It can teleport to a different place, a specific server, or a reserved server. **Server-only** — calling from the client errors.
+`TeleportService:TeleportAsync(placeId, players, teleportOptions?)` is the single unified method. It can teleport to a different place, a specific server, or a reserved server. **Server-only** — calling from the client errors. `Teleport()` and the other legacy methods now carry a deprecation message directing you to `TeleportAsync()` (see [Teleport between places](https://create.roblox.com/docs/en-us/projects/teleport#migrate-to-secure-teleports)).
 
 ```lua
 --!strict
@@ -233,7 +233,7 @@ The robust pattern for moving player state between places:
 
 ## Security
 
-- **`TeleportAsync` is server-only.** The client cannot call it directly — if you need client-initiated teleports, the client sends a RemoteEvent and the server validates then calls `TeleportAsync`.
+- **`TeleportAsync` is server-only.** The client cannot call it directly — if you need client-initiated teleports, the client sends a RemoteEvent and the server validates then calls `TeleportAsync`. The legacy client method `Teleport()` is now deprecated (use `TeleportAsync()` on the server); see the migration guide above.
 - **Rate-limit teleport requests** per player. A hostile client spamming "teleport me" Remotes can disrupt your server flow and burn DataStore budget if you save on each trigger.
 - **Validate the destination.** Don't let a client-supplied place ID drive the teleport unsanitized — whitelist allowed destinations server-side.
 - **Teleport data is spoofable.** Treat it as a hint; re-validate any gameplay-affecting claim on the destination server against DataStores.

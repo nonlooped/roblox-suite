@@ -1,7 +1,7 @@
 ---
 name: roblox-audio
 description: "Roblox audio — the modern modular audio graph (AudioPlayer, AudioEmitter, AudioListener, Wire, AudioTextToSpeech) and the legacy Sound/SoundGroup system. Covers 2D vs 3D audio, spatial attenuation, effects (Equalizer, Compressor, Reverb, Echo, Distortion), TTS/STT, acoustic simulation, asset permissions and the 2022 privacy changes, concurrent-voice limits, preloading, and looping. Use for any sound, music, voice, or audio-driven feedback."
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-18
 ---
 
 # roblox-audio
@@ -114,12 +114,16 @@ player.Looping = true
 player.Parent = part
 
 local emitter = Instance.new("AudioEmitter")
--- DistanceAttenuation is a NumberSequence: x = distance (studs), y = volume (0..1)
+-- Custom curve: DistanceAttenuation is a NumberSequence (x = distance studs, y = volume 0..1).
+-- This curve is only used when DistanceAttenuationMode == Custom (the default).
 emitter.DistanceAttenuation = NumberSequence.new({
     NumberSequenceKeypoint.new(0, 1),    -- full volume at 0 studs
     NumberSequenceKeypoint.new(50, 0.5), -- half volume at 50 studs
     NumberSequenceKeypoint.new(70, 0),   -- silent at 70 studs
 })
+-- Preset alternative (no custom curve needed):
+-- emitter.DistanceAttenuationMode = Enum.DistanceAttenuationMode.Inverse
+-- emitter.DistanceAttenuationBounds = NumberRange.new(4, 10000) -- [min,max] for the preset rolloff
 emitter.Parent = part
 
 local wire = Instance.new("Wire")
@@ -131,6 +135,10 @@ player:Play()
 ```
 
 The emitter's **parent position** determines where audio emits from. `AudioEmitter` ignores its own orientation; rotate the parent part/attachment to steer emission.
+
+**Distance model:** `AudioEmitter.DistanceAttenuationMode` selects the rolloff formula (`Custom` by default — uses your `DistanceAttenuation` curve; other presets use `DistanceAttenuationBounds` which defaults to `[4, 10000]` and ignore the custom curve). `GetDistanceAttenuation()` always returns the custom curve even when a preset is active — don't assume it reflects the audible rolloff unless `Mode == Custom`. `SetDistanceAttenuation(curve)` only affects playback when `Mode == Custom`. Angle attenuation is set via `SetAngleAttenuation({[angle]=volume})` (0–180° → 0–1); use for directional sources (e.g. avatar voice projects forward).
+
+**Acoustic simulation (occlusion/diffraction/reverb):** Enable globally via `SoundService` and per-instance via `AudioEmitter.AcousticSimulationEnabled` / `AudioListener.AcousticSimulationEnabled`, then fine-tune with `OcclusionEnabled`/`DiffractionEnabled`/`ReverbEnabled` (each is a `SimulationMode`: `Default` inherits from `SoundService`, `Enabled`/`Disabled` override). Both emitter and listener must have the effect enabled for it to apply; diffraction requires occlusion. `SoundService:GetAudibility(emitter, listener)`-style helpers (`GetAudibility` on the instances) include distance+angle attenuation (0–1).
 
 ## Listener location
 
@@ -151,7 +159,7 @@ someEvent:Connect(function()
 end)
 ```
 
-`AudioPlayer:Play()`, `:Pause()`, `:Stop()`, `:SeekTime(...)`. `AudioPlayer.TimeVolume` is tweenable — see [references/audio-effects.md](references/audio-effects.md) for tweening volume and effect parameters.
+`AudioPlayer:Play(atTime?)`, `:Stop(atTime?)` — when `atTime` is supplied the action is scheduled against `SoundService:GetMixerTime()` for sample-accurate, framerate-independent timing (rhythm games / beat sync). `:Cancel(actionId)` cancels a future-scheduled Play/Stop (returns true if cancelled). `:Pause()`, `:SeekTime(...)`, `:GetWaveform(timeRange)` (samples volume without playing — useful for waveform visualization vs live `AudioAnalyzer`). `AudioPlayer.TimeVolume` is tweenable — see [references/audio-effects.md](references/audio-effects.md) for tweening volume and effect parameters.
 
 ## Preloading audio
 
@@ -181,7 +189,7 @@ Profile audio with the MicroProfiler (audio appears under worker threads) and th
 - **Playback** of `AudioPlayer`, `Sound`, and effects is **client-side** — each client plays its own audio. The server does not mix audio for clients.
 - **Replication:** `AudioPlayer` state (playing/paused/stopped) replicates from server to clients if the instance is in a replicated location, but per-client volume/effects are local. For one-shot SFX, prefer **client-authoritative emission**: server signals "this event happened" via RemoteEvent, each affected client plays the sound locally. This avoids replicating per-burst timing and respects each client's quality settings (same pattern as VFX — see roblox-vfx skill).
 - **Music/ambience** that should be synchronized across all clients can be server-driven (the `AudioPlayer` lives in `ReplicatedStorage` or `SoundService` and the server calls `:Play()`), but be aware each client still renders locally and may drift.
-- **`AudioDeviceInput`** (microphone) is client-only — it captures the local player's mic. Pair with `VoiceChatService` for spatial voice.
+- **`AudioDeviceInput`** (microphone) is client-only — it captures the local player's mic. Pair with `VoiceChatService` for spatial voice. Access control: `SetUserIdAccessList(userIds)` + `AccessType` (`Allow` = only listed users hear the input, `Deny` = all except listed; default `Deny`), `GetUserIdAccessList()` returns the allow/deny list.
 - **Never trust client audio state for gameplay.** A client claiming "I played the reload sound" tells you nothing authoritative; validate gameplay effects on the server (see roblox-networking).
 
 ## Audio asset permissions
@@ -193,7 +201,9 @@ Profile audio with the MicroProfiler (audio appears under worker threads) and th
 
 ## Text-to-speech (TTS)
 
-`AudioTextToSpeech` converts text (≤300 chars per request) to audio with an artificial voice. The available `VoiceId` values are 1–11 (English variants), 101–102 (Spanish), 201–202 (German), 301–302 (Italian), 401–402 (French), 501–502 (Chinese), 601–602 (Hindi), 701–702 (Japanese), 801–802 (Arabic), 901–902 (Korean), and 1001–1002 (Portuguese); odd IDs are male and even IDs are female for the locale-specific pairs. Wire it like an `AudioPlayer`: for 2D, `AudioTextToSpeech` → `Wire` → `AudioDeviceOutput`; for 3D, `AudioTextToSpeech` → `Wire` → `AudioEmitter` (plus the listener→output wire). Set `Text`, `VoiceId`, `Volume` on the `AudioTextToSpeech`. All text must comply with Roblox Community Standards and Terms of Use.
+`AudioTextToSpeech` converts text (≤300 chars per request) to audio with an artificial voice. The available `VoiceId` values are 1–11 (English variants), 101–102 (Spanish), 201–202 (German), 301–302 (Italian), 401–402 (French), 501–502 (Chinese), 601–602 (Hindi), 701–702 (Japanese), 801–802 (Arabic), 901–902 (Korean), and 1001–1002 (Portuguese); odd IDs are male and even IDs are female for the locale-specific pairs. Wire it like an `AudioPlayer`: for 2D, `AudioTextToSpeech` → `Wire` → `AudioDeviceOutput`; for 3D, `AudioTextToSpeech` → `Wire` → `AudioEmitter` (plus the listener→output wire). Set `Text`, `VoiceId`, `Volume` on the `AudioTextToSpeech`. `:WaitForSpeechReady()` yields until `AssetFetchStatus` is `Success` (or `Failure`). All text must comply with Roblox Community Standards and Terms of Use.
+
+**Audio analysis:** `AudioAnalyzer` window is controlled by `AudioWindowSize` — `Small` (lowest latency, low frequency resolution), `Medium` (balanced), `Large` (highest resolution, more latency).
 
 Use cases: accessibility (reading UI text aloud), NPC voiceover without recorded audio, dynamic announcements.
 

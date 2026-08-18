@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-07-20
+last_reviewed: 2026-08-18
 ---
 
 # Limits, Quotas, Throttling, and Error Codes
@@ -31,7 +31,7 @@ These are shared across the entire experience (in-engine APIs **and** Open Cloud
 - **Remove** (RemoveAsync; Open Cloud Delete Data Store Entry / Delete Data Store / Undelete Data Store): 300 + concurrentUsers × 40 per minute
 
 ### Ordered Data Stores
-- Read (Get + read of Update; Open Cloud Get Ordered Data Store Entry): 300 + concurrentUsers × 40
+- Read (Get + `BatchGetAsync` + read of Update; Open Cloud Get Ordered Data Store Entry): 300 + concurrentUsers × 40 — each key in a `BatchGetAsync(keys)` call counts as one read (N keys = N reads)
 - Write (Set/Increment + write of Update; Open Cloud Create/Update/Increment): 300 + concurrentUsers × 20
 - List (GetSortedAsync; Open Cloud List Ordered Data Store Entries): 300 + concurrentUsers × 2
 - Remove (RemoveAsync; Open Cloud Delete Ordered Data Store Entry): 300 + concurrentUsers × 40
@@ -54,7 +54,7 @@ Default (if you never call SetRateLimitForRequestType):
 - StandardRemove: 60 + numPlayers × 40
 
 **Ordered data stores** (defaults differ — write/remove are much tighter):
-- OrderedRead: 60 + numPlayers × 40
+- OrderedRead: 60 + numPlayers × 40 — covers `GetAsync`, `BatchGetAsync` (N keys = N reads), and the read portion of `UpdateAsync`
 - OrderedWrite: **30 + numPlayers × 5**
 - OrderedList (GetSortedAsync): 5 + numPlayers × 2 — **note:** `GetRequestBudgetForRequestType(Enum.DataStoreRequestType.OrderedList)` always returns `0`, so do not rely on budget inspection for this type.
 - OrderedRemove: **30 + numPlayers × 5**

@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-07-20
+last_reviewed: 2026-08-18
 ---
 
 # Types of Data Stores
@@ -39,6 +39,7 @@ last_reviewed: 2026-07-20
   - pageSize: 1–100 (default 50 in many examples).
   - Returns pages of `{key, value}` entries sorted numerically.
   - Iterate with `pages:GetCurrentPage()` and `pages:AdvanceToNextPageAsync()`.
+- Batch reads: `GlobalDataStore:BatchGetAsync(keys: {string})` → `Dictionary<string, {value: any}>` — read multiple ordered entries in one call (N keys = N reads against `OrderedRead` limits; missing keys are omitted from the returned dictionary; see `content/en-us/cloud-services/data-stores/index.md` "Read multiple entries" section).
 - Ideal exclusively for persistent leaderboards / high-score lists.
 - Limits for list operations are different (and often tighter on the list side).
 

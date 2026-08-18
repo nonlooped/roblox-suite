@@ -209,27 +209,27 @@
         {
           "label": "Data stores",
           "url": "https://create.roblox.com/docs/cloud-services/data-stores",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-08-18"
         },
         {
           "label": "Versioning, listing & caching",
           "url": "https://create.roblox.com/docs/cloud-services/data-stores/versioning-listing-and-caching",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-08-18"
         },
         {
           "label": "Error codes & limits",
           "url": "https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits",
-          "verified_at": "2026-07-20"
+          "verified_at": "2026-08-18"
         },
         {
           "label": "Best practices",
           "url": "https://create.roblox.com/docs/cloud-services/data-stores/best-practices",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-08-18"
         },
         {
           "label": "Engine API Reference",
           "url": "https://create.roblox.com/docs/reference/engine",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-08-18"
         }
       ],
       "risk": "critical",
@@ -247,7 +247,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-20"
+      "last_changed_at": "2026-08-18"
     },
     {
       "slug": "roblox-user-interfaces",
@@ -399,22 +399,22 @@
         {
           "label": "Audio objects",
           "url": "https://create.roblox.com/docs/en-us/audio/objects",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-08-18"
         },
         {
           "label": "Audio effects",
           "url": "https://create.roblox.com/docs/en-us/audio/effects",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-08-18"
         },
         {
           "label": "Sound (legacy) class",
           "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/Sound",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-08-18"
         },
         {
           "label": "Engine API Reference",
           "url": "https://create.roblox.com/docs/en-us/reference/engine",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-08-18"
         }
       ],
       "risk": "lower",
@@ -428,7 +428,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-08-18"
     },
     {
       "slug": "roblox-gamepasses",
@@ -518,7 +518,7 @@
         {
           "label": "Data store error codes & limits (v2 shared budgets)",
           "url": "https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits",
-          "verified_at": "2026-07-20"
+          "verified_at": "2026-08-18"
         },
         {
           "label": "Open Cloud Data Stores throttling (legacy v1)",
@@ -537,7 +537,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-20"
+      "last_changed_at": "2026-08-18"
     },
     {
       "slug": "roblox-teleport",
@@ -555,22 +555,22 @@
         {
           "label": "Teleport",
           "url": "https://create.roblox.com/docs/en-us/projects/teleport",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-08-18"
         },
         {
           "label": "TeleportService",
           "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportService",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-08-18"
         },
         {
           "label": "TeleportOptions",
           "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportOptions",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-08-18"
         },
         {
           "label": "TeleportAsyncResult",
           "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportAsyncResult",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-08-18"
         }
       ],
       "risk": "critical",
@@ -584,7 +584,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-08-18"
     },
     {
       "slug": "roblox-rojo",

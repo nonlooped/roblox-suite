@@ -1,7 +1,7 @@
 ---
 name: roblox-datastores
 description: "Safety-oriented Roblox DataStore guidance for reducing data loss, throttling, races, and quota exhaustion. Covers DataStore vs OrderedDataStore, UpdateAsync for atomic writes, versioning and metadata for recovery, budgets and rate limits, player profile and session-locking patterns, leaderboards, RTBF, and integration with Open Cloud. Use for any persistent player data, stats, inventory, settings, or cross-server state."
-last_reviewed: 2026-07-20
+last_reviewed: 2026-08-18
 ---
 
 # roblox-datastores
@@ -98,6 +98,7 @@ Use **UpdateAsync** with a pure (non-yielding) transform function for any value 
 
 Populate on relevant value changes or on save (use SetAsync or Increment).  
 Query with GetSortedAsync(ascending, pageSize, min?, max?) → DataStorePages. Iterate pages with GetCurrentPage() + AdvanceToNextPageAsync().  
+For bulk reads, use `BatchGetAsync(keys)` to fetch multiple ordered entries in one request — each key counts as one `OrderedRead` (see error-codes-and-limits for quotas; missing keys are omitted).  
 Remember: only numbers; keys are strings; page iteration has its own limits; no versioning.
 
 Display in a ScrollingFrame or via UI on demand. Cache top-N in a standard DataStore if you want fast global access without repeated queries.

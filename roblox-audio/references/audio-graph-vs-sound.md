@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-18
 ---
 
 # Audio Graph vs Legacy Sound
@@ -17,7 +17,7 @@ The official docs now state that `Sound`, `SoundGroup`, and `SoundEffect` are **
 | --- | --- | --- |
 | 2D (global) audio | `Sound` not parented to a part | `AudioPlayer` → `Wire` → `AudioDeviceOutput` |
 | 3D positional audio | `Sound` parented to `BasePart`/`Attachment` | `AudioPlayer` → `Wire` → `AudioEmitter` (parented to part) |
-| Distance attenuation | `RollOffMode`, `RollOffMaxDistance`, `RollOffMinDistance`, `EmitterSize` | `AudioEmitter.DistanceAttenuation` (NumberSequence curve) |
+| Distance attenuation | `RollOffMode`, `RollOffMaxDistance`, `RollOffMinDistance`, `EmitterSize` | `AudioEmitter.DistanceAttenuation` (`NumberSequence` when `DistanceAttenuationMode == Custom`) or preset `DistanceAttenuationMode` + `DistanceAttenuationBounds` (`[4,10000]`) |
 | Doppler | Automatic (affected by `SoundService.DopplerScale`, `DistanceFactor`) | Automatic for `AudioEmitter`/`AudioListener` (affected by `SoundService.AcousticSimulationEnabled`) |
 | Group volume / mixing | `SoundGroup` | `AudioFader` (one fader controls many streams) |
 | Per-source effects | `SoundEffect` subclasses on `SoundGroup` | `AudioEqualizer` etc. in the signal path |
@@ -25,7 +25,7 @@ The official docs now state that `Sound`, `SoundGroup`, and `SoundEffect` are **
 | Text-to-speech | Not available | `AudioTextToSpeech` |
 | Speech-to-text | Not available | `AudioSpeechToText` |
 | Microphone capture | Not directly | `AudioDeviceInput` |
-| Acoustic occlusion/diffraction | Not available | `AudioEmitter`/`AudioListener` `AcousticSimulationEnabled` |
+| Acoustic occlusion/diffraction | Not available | `AudioEmitter`/`AudioListener` `AcousticSimulationEnabled` + per-instance `OcclusionEnabled`/`DiffractionEnabled`/`ReverbEnabled` (`SimulationMode`) |
 | Routing multiple sources through one effect | Hard (per-group effects only) | Native (many wires → one effect → one output) |
 | Tweenable parameter | `Sound.Volume` (number) | `AudioPlayer.TimeVolume` and other number props |
 

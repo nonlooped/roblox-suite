@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-07-16
+last_reviewed: 2026-08-18
 ---
 
 # Core Operations and Patterns
@@ -18,6 +18,9 @@ All methods are on DataStore (and OrderedDataStore where supported). `DataStore`
 - To force a fresh backend read (critical after failed writes or for verification): create DataStoreGetOptions with UseCache = false.
 - When AllScopes is active, key must be supplied in "scope/key" form for the desired scope.
 - KeyInfo (when present on v2 path) gives Version, CreatedTime, UpdatedTime, GetUserIds(), GetMetadata().
+
+### BatchGetAsync(keys: {string})
+- OrderedDataStore batch read: `orderedStore:BatchGetAsync({"Player_123", "Player_456"})` → `Dictionary<string, {value: integer}>`. Each requested key counts as one `OrderedRead` against experience and server budgets; missing keys are omitted (check presence before reading `entry.value`). Prefer over N sequential `GetAsync` calls when you need several scores at once. Same `OrderedRead` throttling applies (`OrderedReadExperienceThrottled`, `OrderedReadGameServerThrottled`).
 
 ### SetAsync(key, value, userIds?, options?: DataStoreSetOptions)
 - Fast path for last-write-wins or low-contention data.
