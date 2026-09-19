@@ -1,13 +1,14 @@
 ---
+read_when: "Decide where scripts run or debug loading and replication"
 last_reviewed: 2026-06-17
 ---
 
-# Script Locations, Execution Contexts, and Architecture
+# Script locations, execution contexts, and architecture
 
 **Main source:** https://create.roblox.com/docs/en-us/scripting/locations
 **Related:** https://create.roblox.com/docs/en-us/projects/client-server, https://create.roblox.com/docs/en-us/projects/data-model, https://create.roblox.com/docs/en-us/workspace/streaming, https://create.roblox.com/docs/en-us/scripting/multithreading
 
-## Where Code Actually Runs
+## Where code runs
 
 - **ServerScriptService + Script**: Runs only on the server. Has full access to DataStoreService, TeleportService, etc. Never replicates to clients. Use `RunContext.Server`; the `Legacy` setting exists only for backward compatibility.
 - **ReplicatedStorage**: Holds shared ModuleScripts and assets. A Script placed here only runs if its `RunContext` is explicitly `Client` or `Server`; it does **not** run by default. Put shared logic in ModuleScripts and require them from client/server scripts.
@@ -18,7 +19,7 @@ last_reviewed: 2026-06-17
 
 Modern execution is controlled by `BaseScript.RunContext` (`Legacy`, `Server`, `Client`, `Plugin`). `Legacy` is location-dependent and exists only for backward compatibility; prefer explicit `Server`/`Client` for new code. `RunContext` is set in Studio's Properties window and is read-only at runtime.
 
-## Context Checking
+## Context checking
 
 Always use:
 
@@ -34,7 +35,7 @@ end
 
 `IsStudio()` detects the environment (Studio vs. live), not runtime context. Use it only for test/development guards, never as a substitute for `IsServer`/`IsClient`.
 
-## Recommended Folder Structure
+## Recommended Folder structure
 
 - **ServerScriptService**
   - DataManager
@@ -58,8 +59,6 @@ end
 - **ServerStorage**
   - Server-only assets and temporary data.
 
-This structure makes it obvious at a glance which code can do what.
-
 ## Parallel Luau (Actors)
 
 For CPU-heavy work that doesn't need to yield often:
@@ -68,29 +67,23 @@ For CPU-heavy work that doesn't need to yield often:
 3. Put your Script inside the Actor and set its `RunContext` to `Client` or `Server`.
 4. Use `task.desynchronize()` / `task.synchronize()` around the heavy work.
 
-This can give significant performance wins for pathfinding, complex simulations, etc.
-
 See the multithreading docs for details and limitations.
 
-## Loading Order Realities
+## Load order
 
 Roblox does not guarantee load order. Always use:
 - `WaitForChild`
 - `FindFirstChild` + defensive checks
 - Proper initialization events or module setup functions
 
-This is why the "get services → require modules → add functions → connect events" pattern is so reliable.
-
-## Script Control
+## Script control
 
 - `BaseScript.Enabled` can stop or start a Script/LocalScript without deleting it.
 - A `ModuleScript` runs once per requiring environment and caches its returned value.
 
-## Architecture Summary
+## Architecture summary
 
 - Server = truth
 - Client = presentation + input
 - ReplicatedStorage = shared pure logic and assets
 - Clear boundaries + consistent naming prevent most "why doesn't this replicate" and "why can the client do this" bugs.
-
-Master this foundation and all the higher-level skills (data, UI, animation, etc.) become much easier to apply correctly.

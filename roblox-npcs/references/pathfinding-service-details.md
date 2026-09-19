@@ -1,8 +1,9 @@
 ---
+read_when: "Configure agents, compute paths, or handle blocked waypoints"
 last_reviewed: 2026-06-17
 ---
 
-# Pathfinding Service Details
+# Pathfinding service details
 
 Official guide: https://create.roblox.com/docs/en-us/characters/pathfinding
 
@@ -54,9 +55,9 @@ for i, waypoint in ipairs(waypoints) do
 end
 ```
 
-- `Position` — `Vector3` target.
-- `Action` — `Enum.PathWaypointAction`.
-- `Label` — custom string from modifiers/links.
+- `Position`: `Vector3` target.
+- `Action`: `Enum.PathWaypointAction`.
+- `Label`: custom string from modifiers/links.
 
 ## Blocked paths
 
@@ -133,9 +134,9 @@ Use `math.huge` to forbid traversal entirely.
 
 ## Common statuses
 
-- `Enum.PathStatus.Success` — path found.
-- `Enum.PathStatus.NoPath` — no valid path with given parameters.
-- `Enum.PathStatus.ClosestNoPath` — partial path returned to nearest reachable point.
+- `Enum.PathStatus.Success`: path found.
+- `Enum.PathStatus.NoPath`: no valid path with given parameters.
+- `Enum.PathStatus.ClosestNoPath`: partial path returned to nearest reachable point.
 
 ## Debugging
 

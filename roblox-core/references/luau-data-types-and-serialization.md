@@ -1,12 +1,13 @@
 ---
+read_when: "Choose data types or diagnose serialization failures"
 last_reviewed: 2026-06-17
 ---
 
-# Luau Data Types and Serialization Rules
+# Luau data types and serialization rules
 
 **Main sources:** https://create.roblox.com/docs/en-us/luau, https://create.roblox.com/docs/en-us/luau/tables, https://create.roblox.com/docs/en-us/luau/type-checking, https://create.roblox.com/docs/en-us/scripting/attributes
 
-## Primitive Types
+## Primitive types
 
 - **nil**: The only value that represents "nothing". Different from `false` or `0`. Assigning `nil` to an array index creates a hole; dictionary tables can conceptually hold a nil value for a key, but in practice the key/value pair is removed and `pairs` will not visit it.
 - **boolean**: `true` or `false`.
@@ -16,7 +17,7 @@ last_reviewed: 2026-06-17
 
 ## Tables
 
-The most important type. Can be used as arrays (1-based) or dictionaries.
+Use tables as 1-based arrays or dictionaries.
 
 Important limitations for storage (DataStores, JSON):
 - No functions
@@ -25,27 +26,27 @@ Important limitations for storage (DataStores, JSON):
 - Only the supported primitives inside
 
 Modern table helpers:
-- `table.create(n, value?)` — preallocate/initialize arrays efficiently.
-- `table.find(t, value, init?)` — linear search.
-- `table.clone(t)` — shallow copy.
-- `table.freeze(t)` / `table.isfrozen(t)` — make a table read-only.
+- `table.create(n, value?)`: preallocate/initialize arrays efficiently.
+- `table.find(t, value, init?)`: linear search.
+- `table.clone(t)`: shallow copy.
+- `table.freeze(t)` / `table.isfrozen(t)`: make a table read-only.
 
-## Roblox Datatypes / Instances
+## Roblox datatypes / instances
 
 These are engine objects exposed to Luau:
 - **Instances** (Parts, Models, GUIs, etc.)
 - **Math / value types**: Vector3, CFrame, UDim2, Color3, Ray, Region3, NumberRange, buffer, etc. `typeof()` returns the type name (e.g. `"CFrame"`, `"Vector3"`).
-- **Sequences / physical types**: NumberSequence, ColorSequence, PhysicalProperties — commonly used for particle/beam curves and part physical material settings.
-- **Attributes** — lightweight key/value storage on any Instance via `:SetAttribute`/`:GetAttribute`; prefer over legacy Value objects.
+- **Sequences / physical types**: NumberSequence, ColorSequence, PhysicalProperties: commonly used for particle/beam curves and part physical material settings.
+- **Attributes**: lightweight key/value storage on any Instance via `:SetAttribute`/`:GetAttribute`; prefer over legacy Value objects.
 - **userdata**: Rarely used directly in modern Luau; most engine objects are Instances or datatypes.
 
 These have properties and methods but are opaque for pure Luau operations like `pairs()` in some cases.
 
-## Serialization for DataStores vs Networking
+## Serialization for DataStores vs networking
 
 **DataStores** store data as JSON. Supported: nil, boolean, number, string, buffer, and tables containing only those types recursively.
 
-**RemoteEvent / RemoteFunction** use Roblox's own binary replication, not JSON. They can pass many Roblox datatypes including `Instance`, `Enum`, `CFrame`, `Vector3`, `Color3`, etc. — but DataStores still cannot.
+**RemoteEvent / RemoteFunction** use Roblox's own binary replication, not JSON. They can pass many Roblox datatypes including `Instance`, `Enum`, `CFrame`, `Vector3`, `Color3`, etc. DataStores cannot store those values directly.
 
 Supported after JSON round-trip (DataStores / HttpService):
 - nil, boolean, number, string, buffer
@@ -77,7 +78,7 @@ local roll = rng:NextInteger(1, 6)
 
 Avoid global `math.randomseed` in new code; it mutates shared state and can cause surprising interactions across modules.
 
-## Type Checking
+## Type checking
 
 Luau supports gradual typing:
 - `--!strict` is file-level; add it at the top of a script.

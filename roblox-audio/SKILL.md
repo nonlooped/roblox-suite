@@ -1,12 +1,12 @@
 ---
 name: roblox-audio
-description: "Roblox audio — the modern modular audio graph (AudioPlayer, AudioEmitter, AudioListener, Wire, AudioTextToSpeech) and the legacy Sound/SoundGroup system. Covers 2D vs 3D audio, spatial attenuation, effects (Equalizer, Compressor, Reverb, Echo, Distortion), TTS/STT, acoustic simulation, asset permissions and the 2022 privacy changes, concurrent-voice limits, preloading, and looping. Use for any sound, music, voice, or audio-driven feedback."
+description: "Build or debug Roblox music, spatial audio, effects, text-to-speech, and speech-to-text. Use for audio graphs, asset permissions, playback problems, or migration from Sound."
 last_reviewed: 2026-08-18
 ---
 
 # roblox-audio
 
-**Official sources (always check these for the latest):**
+**Official sources:**
 - https://create.roblox.com/docs/en-us/audio/objects (audio graph overview)
 - https://create.roblox.com/docs/en-us/audio/effects (audio effects)
 - https://create.roblox.com/docs/en-us/reference/engine/classes/Sound (legacy `Sound`)
@@ -14,25 +14,13 @@ last_reviewed: 2026-08-18
 - Engine classes: `AudioPlayer`, `AudioEmitter`, `AudioListener`, `AudioDeviceOutput`, `AudioDeviceInput`, `AudioTextToSpeech`, `AudioSpeechToText`, `Wire`, `AudioEqualizer`, `AudioCompressor`, `AudioReverb`, `AudioChorus`, `AudioDistortion`, `AudioEcho`, `AudioFlanger`, `AudioPitchShifter`, `AudioTremolo`, `AudioFader`, `AudioAnalyzer`
 - Full reference: https://create.roblox.com/docs/en-us/reference/engine
 
-This skill covers both the modern **modular audio graph** (the recommended system) and the legacy `Sound`/`SoundGroup`/`SoundEffect` system. The official docs now state that `Sound`, `SoundGroup`, and `SoundEffect` are **discouraged in favor of the more robust functionality of audio objects**. New work should use the graph; legacy code can keep using `Sound` where the graph offers no advantage.
+Roblox recommends audio objects over `Sound`, `SoundGroup`, and `SoundEffect`. New work should use the graph; legacy code can keep using `Sound` where the graph offers no advantage.
 
 Cross-reference:
 - [roblox-core/SKILL.md](../roblox-core/SKILL.md) for services and script locations.
 - [roblox-animation/SKILL.md](../roblox-animation/SKILL.md) for driving audio from animation markers (footsteps, impact sounds).
 - [roblox-user-interfaces/SKILL.md](../roblox-user-interfaces/SKILL.md) for UI-triggered sound feedback.
 - [roblox-networking/SKILL.md](../roblox-networking/SKILL.md) for client-authoritative cosmetic audio vs server-authoritative gameplay audio.
-
-## When to use this skill
-
-Activate when:
-- Playing music, SFX, ambient audio, UI feedback, or voice in an experience.
-- Setting up 3D positional audio (footsteps, gunshots, environmental ambience).
-- Building an audio bus / routing / mixing architecture (music ducking, group volume).
-- Applying effects (muffling underwater, reverb in a cave, compression for consistent VO volume).
-- Implementing text-to-speech (accessibility, NPC dialogue) or speech-to-text (voice commands).
-- Migrating legacy `Sound` code to the new audio graph.
-- Diagnosing audio that doesn't play, cuts out, or sounds wrong on mobile.
-- Understanding audio asset permissions and the Creator Store audio library.
 
 ## The two systems
 
@@ -61,7 +49,7 @@ Effects (all "modify" category): `AudioEqualizer`, `AudioCompressor`, `AudioReve
 
 ## Decision tree: which system?
 
-- **New experience, greenfield audio** → audio graph. It's the path Roblox is investing in (TTS, STT, acoustic simulation, robust routing).
+- **New experience, greenfield audio** → audio graph. It supports TTS, STT, acoustic simulation, and routing.
 - **Simple 2D SFX or music with no routing/effects** → `Sound` is acceptable and simpler. Don't rewrite working legacy code just to migrate.
 - **3D positional audio with custom attenuation curves** → audio graph (`AudioEmitter.DistanceAttenuation`).
 - **Multiple sources through one effect (e.g. all gunfire through one compressor)** → audio graph (one effect, many players wired in).
@@ -136,17 +124,17 @@ player:Play()
 
 The emitter's **parent position** determines where audio emits from. `AudioEmitter` ignores its own orientation; rotate the parent part/attachment to steer emission.
 
-**Distance model:** `AudioEmitter.DistanceAttenuationMode` selects the rolloff formula (`Custom` by default — uses your `DistanceAttenuation` curve; other presets use `DistanceAttenuationBounds` which defaults to `[4, 10000]` and ignore the custom curve). `GetDistanceAttenuation()` always returns the custom curve even when a preset is active — don't assume it reflects the audible rolloff unless `Mode == Custom`. `SetDistanceAttenuation(curve)` only affects playback when `Mode == Custom`. Angle attenuation is set via `SetAngleAttenuation({[angle]=volume})` (0–180° → 0–1); use for directional sources (e.g. avatar voice projects forward).
+**Distance model:** `AudioEmitter.DistanceAttenuationMode` selects the rolloff formula (`Custom` by default; uses your `DistanceAttenuation` curve; other presets use `DistanceAttenuationBounds` which defaults to `[4, 10000]` and ignore the custom curve). `GetDistanceAttenuation()` always returns the custom curve even when a preset is active. Don't assume it reflects the audible rolloff unless `Mode == Custom`. `SetDistanceAttenuation(curve)` only affects playback when `Mode == Custom`. Angle attenuation is set via `SetAngleAttenuation({[angle]=volume})` (0–180° → 0–1); use for directional sources (e.g. avatar voice projects forward).
 
 **Acoustic simulation (occlusion/diffraction/reverb):** Enable `SoundService.AcousticSimulationEnabled` and `AcousticSimulationEnabled` on both the emitter and listener. The current reference no longer exposes the separate per-instance `OcclusionEnabled`, `DiffractionEnabled`, and `ReverbEnabled` toggles; do not generate calls to them. Use `emitter:GetAudibilityFor(listener)` or `listener:GetAudibilityFor(emitter)` for combined distance and angle attenuation (0–1).
 
 ## Listener location
 
 `SoundService.ListenerLocation` (a `ListenerLocation` enum) controls where the `AudioListener` is auto-created:
-- **Default** — camera in experiences with voice chat.
-- **None** — no auto-listener; create one via script.
-- **Character** — parented to the local player's character (`Humanoid.RootPart`).
-- **Camera** — parented to `workspace.CurrentCamera`.
+- **Default**: camera in experiences with voice chat.
+- **None**: no auto-listener; create one via script.
+- **Character**: parented to the local player's character (`Humanoid.RootPart`).
+- **Camera**: parented to `workspace.CurrentCamera`.
 
 When set to `Character` or `Camera`, the engine auto-creates an `AudioDeviceOutput` under `SoundService` at runtime. The `AudioListener` picks up audio from `AudioEmitter`s based on distance and the emitter's `DistanceAttenuation` curve.
 
@@ -159,7 +147,7 @@ someEvent:Connect(function()
 end)
 ```
 
-`AudioPlayer:Play(atTime?)`, `:Stop(atTime?)` — when `atTime` is supplied the action is scheduled against `SoundService:GetMixerTime()` for sample-accurate, framerate-independent timing (rhythm games / beat sync). `:Cancel(actionId)` cancels a future-scheduled Play/Stop (returns true if cancelled). `:Pause()`, `:SeekTime(...)`, `:GetWaveform(timeRange)` (samples volume without playing — useful for waveform visualization vs live `AudioAnalyzer`). `AudioPlayer.TimeVolume` is tweenable — see [references/audio-effects.md](references/audio-effects.md) for tweening volume and effect parameters.
+`AudioPlayer:Play(atTime?)`, `:Stop(atTime?)`. When `atTime` is supplied the action is scheduled against `SoundService:GetMixerTime()` for sample-accurate, framerate-independent timing (rhythm games / beat sync). `:Cancel(actionId)` cancels a future-scheduled Play/Stop (returns true if cancelled). `:Pause()`, `:SeekTime(...)`, `:GetWaveform(timeRange)` (samples volume without playing; useful for waveform visualization vs live `AudioAnalyzer`). `AudioPlayer.TimeVolume` is tweenable. See [references/audio-effects.md](references/audio-effects.md) for tweening volume and effect parameters.
 
 ## Preloading audio
 
@@ -186,16 +174,16 @@ Profile audio with the MicroProfiler (audio appears under worker threads) and th
 
 ## Script context (client vs server)
 
-- **Playback** of `AudioPlayer`, `Sound`, and effects is **client-side** — each client plays its own audio. The server does not mix audio for clients.
-- **Replication:** `AudioPlayer` state (playing/paused/stopped) replicates from server to clients if the instance is in a replicated location, but per-client volume/effects are local. For one-shot SFX, prefer **client-authoritative emission**: server signals "this event happened" via RemoteEvent, each affected client plays the sound locally. This avoids replicating per-burst timing and respects each client's quality settings (same pattern as VFX — see roblox-vfx skill).
+- **Playback** of `AudioPlayer`, `Sound`, and effects is **client-side**. Each client plays its own audio. The server does not mix audio for clients.
+- **Replication:** `AudioPlayer` state (playing/paused/stopped) replicates from server to clients if the instance is in a replicated location, but per-client volume/effects are local. For one-shot SFX, prefer **client-authoritative emission**: server signals "this event happened" via RemoteEvent, each affected client plays the sound locally. This avoids replicating per-burst timing and respects each client's quality settings (same pattern as VFX; see roblox-vfx skill).
 - **Music/ambience** that should be synchronized across all clients can be server-driven (the `AudioPlayer` lives in `ReplicatedStorage` or `SoundService` and the server calls `:Play()`), but be aware each client still renders locally and may drift.
-- **`AudioDeviceInput`** (microphone) is client-only — it captures the local player's mic. Pair with `VoiceChatService` for spatial voice. Access control: `SetUserIdAccessList(userIds)` + `AccessType` (`Allow` = only listed users hear the input, `Deny` = all except listed; default `Deny`), `GetUserIdAccessList()` returns the allow/deny list.
+- **`AudioDeviceInput`** (microphone) is client-only. It captures the local player's mic. Pair with `VoiceChatService` for spatial voice. Access control: `SetUserIdAccessList(userIds)` + `AccessType` (`Allow` = only listed users hear the input, `Deny` = all except listed; default `Deny`), `GetUserIdAccessList()` returns the allow/deny list.
 - **Never trust client audio state for gameplay.** A client claiming "I played the reload sound" tells you nothing authoritative; validate gameplay effects on the server (see roblox-networking).
 
 ## Audio asset permissions
 
 - Audio assets uploaded before the **2022 audio privacy changes** may be private or have restricted use. Assets you upload to your own experience are usable by that experience.
-- The **Creator Store** has a library of free-to-use audio assets — these are safe to reference by asset ID in any experience.
+- The **Creator Store** has a library of free-to-use audio assets. These are safe to reference by asset ID in any experience.
 - Audio uploaded by other creators may be unusable in your experience unless they've marked it for public use. If you reference a third-party audio asset ID and it doesn't play, permissions are the usual cause.
 - For new audio, upload through the Creator Dashboard's asset manager or the Open Cloud Assets API (see roblox-open-cloud skill for programmatic upload).
 
@@ -203,7 +191,7 @@ Profile audio with the MicroProfiler (audio appears under worker threads) and th
 
 `AudioTextToSpeech` converts text (≤300 chars per request) to audio with an artificial voice. The available `VoiceId` values are 1–11 (English variants), 101–102 (Spanish), 201–202 (German), 301–302 (Italian), 401–402 (French), 501–502 (Mandarin Chinese), 601–602 (Hindi), 701–702 (Japanese), 801–802 (Arabic), 901–902 (Korean), and 1001–1002 (Portuguese); odd IDs are male and even IDs are female for the locale-specific pairs. Wire it like an `AudioPlayer`: for 2D, `AudioTextToSpeech` → `Wire` → `AudioDeviceOutput`; for 3D, `AudioTextToSpeech` → `Wire` → `AudioEmitter` (plus the listener→output wire). Set `Text`, `VoiceId`, `Volume` on the `AudioTextToSpeech`. `:WaitForSpeechReady()` yields until `AssetFetchStatus` is `Success` (or `Failure`). All text must comply with Roblox Community Standards and Terms of Use.
 
-**Audio analysis:** `AudioAnalyzer` window is controlled by `AudioWindowSize` — `Small` (lowest latency, low frequency resolution), `Medium` (balanced), `Large` (highest resolution, more latency).
+**Audio analysis:** `AudioAnalyzer` window is controlled by `AudioWindowSize`. `Small` (lowest latency, low frequency resolution), `Medium` (balanced), `Large` (highest resolution, more latency).
 
 Use cases: accessibility (reading UI text aloud), NPC voiceover without recorded audio, dynamic announcements.
 
@@ -224,7 +212,7 @@ To use STT without broadcasting voice to other players, disable `VoiceChatServic
 - **Mobile:** test at low quality. The engine may drop effects; design so the experience still works without them.
 - **Concurrency:** pool `AudioPlayer`/`Sound` instances for frequent one-shots rather than creating/destroying per shot.
 
-## Common mistakes this skill prevents
+## Common mistakes
 
 - Using `Sound`/`SoundGroup`/`SoundEffect` for new work when the graph is the recommended path.
 - Parenting an `AudioEmitter` to `SoundService` (it must be parented to a 3D part/attachment for 3D audio).
@@ -237,7 +225,7 @@ To use STT without broadcasting voice to other players, disable `VoiceChatServic
 
 ## Scripts
 
-- `scripts/AudioBus.lua` — a small music/SFX bus helper using `AudioFader` to control group volume and duck music when SFX play. Adapt for your mix.
+- `scripts/AudioBus.lua`: a small music/SFX bus helper using `AudioFader` to control group volume and duck music when SFX play. Adapt for your mix.
 
 ## How to proceed
 
@@ -252,8 +240,8 @@ To use STT without broadcasting voice to other players, disable `VoiceChatServic
 <!-- catalog:references:start -->
 ## Reference index
 
-- [audio-effects.md](references/audio-effects.md)
-- [audio-graph-vs-sound.md](references/audio-graph-vs-sound.md)
+- [audio-effects.md](references/audio-effects.md): Route effects, mix audio buses, duck music, or tune attenuation.
+- [audio-graph-vs-sound.md](references/audio-graph-vs-sound.md): Choose an audio system or migrate legacy Sound code.
 <!-- catalog:references:end -->
 
 

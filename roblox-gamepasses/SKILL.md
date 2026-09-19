@@ -1,6 +1,6 @@
 ---
 name: roblox-gamepasses
-description: "Rule-accurate Roblox monetization — game passes, developer products (ProcessReceipt), and subscriptions (GetUserSubscriptionStatusAsync, PromptSubscriptionPurchase). Covers the selling flow, server-authoritative granting on PlayerAdded and purchase completion, PolicyService gating (ArePaidRandomItemsRestricted, IsEligibleToPurchaseSubscription, China policies), personalization, and integration with persistent data. Use for any purchase, perk, or recurring benefit."
+description: "Implement Roblox game passes, developer products, subscriptions, and Robux transfers. Use for purchase prompts, server-side fulfillment, ownership checks, recurring benefits, and monetization policy."
 last_reviewed: 2026-07-16
 ---
 
@@ -8,11 +8,11 @@ last_reviewed: 2026-07-16
 
 **Primary official source:** https://create.roblox.com/docs/en-us/production/monetization/passes (plus developer-products.md for contrast, and the MarketplaceService class reference).
 
-This skill focuses on getting game passes right the first time — correct ownership checking, server-only fulfillment, proper error handling, and modern personalization features that most older tutorials ignore.
+Grant benefits on the server after verifying the purchase or ownership. Keep purchase prompts and shop display on the client.
 
 See roblox-datastores for how to store "player owns this pass" state or associated perks, and roblox-networking for the Remote validation layer around purchase prompts.
 
-## Game Pass vs Developer Product (rules that matter)
+## Game passes and developer products
 
 - **Game Pass**: One-time purchase. Permanent privilege for that specific experience (VIP access, permanent item, extra slot, cosmetic unlock, etc.). Roblox tracks ownership per user per experience.
 - **Developer Product**: Repeatable / consumable (currency packs, potions, revives, temporary boosts). Can be bought many times. Requires ProcessReceipt callback on the server for fulfillment.
@@ -20,7 +20,7 @@ See roblox-datastores for how to store "player owns this pass" state or associat
 - You (the creator) are 100% responsible for actually delivering the benefit. Roblox only handles the transaction and the UserOwnsGamePassAsync query.
 - Passes can be used for randomized virtual items only if you follow the Paid Random Items policy.
 
-## Creation & Asset ID
+## Creation and asset ID
 
 1. Creator Dashboard → your published experience → Monetization → Passes → Create a Pass.
 2. Upload circular-friendly icon (≤512×512, jpg/png/bmp; important content must survive circular crop).
@@ -29,13 +29,13 @@ See roblox-datastores for how to store "player owns this pass" state or associat
 
 For external sales on the game page Store tab: go to the pass → Sales → enable "Item for Sale" and set Robux price (1 to 1B).
 
-## The Authoritative Purchase + Grant Flow (Inside Experience)
+## Prompt purchases and grant benefits
 
-**Client side (LocalScript or UI module — only for prompting and optimistic display):**
+**Client side (LocalScript or UI module; only for prompting and optimistic display):**
 - Call MarketplaceService:UserOwnsGamePassAsync (pcall) to decide "Buy" vs "Owned" button state.
 - If not owned, call MarketplaceService:PromptGamePassPurchase(player, passID).
 
-**Server side (Script in ServerScriptService — the only place that grants benefits):**
+**Server side (Script in ServerScriptService; the only place that grants benefits):**
 ```lua
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
@@ -100,18 +100,18 @@ end)
 **GetProductInfoAsync for dynamic UI (price, name, description, IsForSale):**
 Use `MarketplaceService:GetProductInfoAsync(id, Enum.InfoType.GamePass)`. Do this on the client for display, but never grant based on the result. The non-async counterpart `GetProductInfo` still exists, but `GetProductInfoAsync` is preferred.
 
-## Capability Requirements
+## Capability requirements
 
 Game passes and developer products require a published experience. Enable **Studio Access to API Services** only when a specific API used by a dedicated test experience requires it; do not treat that Studio setting as a blanket prerequisite for every `MarketplaceService` purchase API. Verify each API's current requirements in its Engine Reference entry.
 
-## Personalization & Recommendations (use these)
+## Product recommendations
 
-- `MarketplaceService:RankProductsAsync(arrayOfIdentifiers)` — pass a table of up to 50 `{InfoType = Enum.InfoType.GamePass, Id = ...}`. Returns a personalized ranking for the current user as `{ProductIdentifier, ProductInfo}` items. Use sparingly; call once at join.
-- `MarketplaceService:RecommendTopProductsAsync({Enum.InfoType.GamePass, Enum.InfoType.Product})` — returns up to 50 recommended products the user is likely to engage with. Results usually exclude already-owned items, but verify in your UI. Use sparingly; call once at join.
+- `MarketplaceService:RankProductsAsync(arrayOfIdentifiers)`: pass a table of up to 50 `{InfoType = Enum.InfoType.GamePass, Id = ...}`. Returns a personalized ranking for the current user as `{ProductIdentifier, ProductInfo}` items. Use sparingly; call once at join.
+- `MarketplaceService:RecommendTopProductsAsync({Enum.InfoType.GamePass, Enum.InfoType.Product})`: returns up to 50 recommended products the user is likely to engage with. Results usually exclude already-owned items, but verify in your UI. Use sparingly; call once at join.
 
-Surface these in "Recommended for you" or "Top picks" sections of your in-experience shop. This measurably improves conversion.
+Use these results in a "Recommended for you" section of your shop. Measure whether they improve conversion in your experience.
 
-## Promotions (Buy Robux page bonus pool)
+## Promotions (buy robux page bonus pool)
 
 You can opt passes into the promotion pool so that users buying Robux packages may receive the pass for free (contextually relevant to their history).
 
@@ -124,7 +124,7 @@ Requirements (from the passes doc):
 
 Opt-in via the pass's Promotions tab in the dashboard.
 
-## Analytics & Iteration
+## Analytics and iteration
 
 In Creator Dashboard → experience → Monetization → Passes → Analytics tab you get:
 - Top passes by sales and net Robux.
@@ -133,14 +133,14 @@ In Creator Dashboard → experience → Monetization → Passes → Analytics ta
 
 Use this data to decide pricing, which perks are compelling, and when to run promotions.
 
-## Security, Data, and Policy Gotchas (non-negotiable)
+## Security, data, and policy constraints
 
 - Prompt only from client. Grant and record only on the server in the PromptGamePassPurchaseFinished handler or on PlayerAdded re-check.
 - Always pcall `UserOwnsGamePassAsync` and `Prompt...` calls.
-- Re-check ownership on every relevant join/session start before granting powerful or economy-affecting perks.
+- Re-check ownership on every relevant join/session start before granting gameplay or economy perks.
 - Store your own record of ownership + associated state in DataStores if you need history or custom metadata (Roblox does not expose full per-user pass purchase history via the Engine API).
 - For RTBF / right-to-be-forgotten, include pass-related keys in your deletion patterns (see roblox-datastores skill).
-- Never hardcode Robux prices in UI that the player sees — use `GetProductInfoAsync` so regional pricing and optimizations work.
+- Never hardcode Robux prices in UI that the player sees: use `GetProductInfoAsync` so regional pricing and optimizations work.
 - Test purchases only on dedicated test experiences.
 - For paid random items (loot boxes / gacha passes), use `PolicyService` first: check `PolicyService:GetPolicyInfoForPlayerAsync(player).ArePaidRandomItemsRestricted` and `IsPaidItemTradingAllowed` before offering randomized paid content.
 - For developer products, `MarketplaceService.ProcessReceipt` can only be assigned **once** globally; assign it once in a single server script. The callback must return `Enum.ProductPurchaseDecision.PurchaseGranted` after successful fulfillment, or `Enum.ProductPurchaseDecision.NotProcessedYet` if fulfillment fails, because Roblox may redeliver the receipt until `PurchaseGranted` is returned.
@@ -151,10 +151,10 @@ Use this data to decide pricing, which perks are compelling, and when to run pro
 Subscriptions offer users recurring benefits for a monthly fee, auto-renewing in Robux or local currency. Unlike passes (permanent), subscription benefits persist only while the user keeps paying. Up to 50 per experience; single-tiered (no mutually exclusive Bronze/Silver/Gold); regional pricing enabled by default for Robux-priced subs.
 
 **API surface** (subscription IDs are **strings** like `"EXP-11111111"`):
-- `MarketplaceService:GetUserSubscriptionStatusAsync(player, subscriptionId)` — **server-only**, returns `{IsSubscribed: boolean}`.
-- `MarketplaceService:PromptSubscriptionPurchase(player, subscriptionId)` — client prompt.
-- `MarketplaceService.PromptSubscriptionPurchaseFinished(player, subscriptionId, didTryPurchasing)` — note `didTryPurchasing` is an *attempt* signal, not success; re-check status after a delay.
-- `Players.UserSubscriptionStatusChanged(player, subscriptionId)` — **server-only**, fires on purchase/renewal/cancellation.
+- `MarketplaceService:GetUserSubscriptionStatusAsync(player, subscriptionId)`: **server-only**, returns `{IsSubscribed: boolean}`.
+- `MarketplaceService:PromptSubscriptionPurchase(player, subscriptionId)`: client prompt.
+- `MarketplaceService.PromptSubscriptionPurchaseFinished(player, subscriptionId, didTryPurchasing)`: note `didTryPurchasing` is an *attempt* signal, not success; re-check status after a delay.
+- `Players.UserSubscriptionStatusChanged(player, subscriptionId)`: **server-only**, fires on purchase/renewal/cancellation.
 - `MarketplaceService:GetSubscriptionProductInfoAsync(subscriptionId)` and `GetUserSubscriptionPaymentHistoryAsync(player, subscriptionId)`.
 
 **Security (same posture as passes):** prompt on client, check status and grant/revoke on server only, pcall everything, re-check on every join (subscriptions lapse), respect `PolicyService:IsEligibleToPurchaseSubscription` per player, persist nothing sensitive on the client.
@@ -167,13 +167,13 @@ See [references/subscriptions.md](references/subscriptions.md) for the complete 
 
 As of **July 24, 2025**, Engagement-Based Payouts (formerly "Premium Payouts") and the Creator Affiliate program were **discontinued and replaced by Creator Rewards**. There is no longer a per-Premium-play-minute payout to integrate against.
 
-Creator Rewards pays creators in two ways (no in-experience integration required — it's a platform-side program, but you should know it exists):
-- **Daily Engagement Rewards** — 5 Robux per day per Active Spender who spends 10+ minutes in your experience, provided it's one of the first three experiences they visit that day.
-- **Audience Expansion Rewards** — 35% revenue share on a new/reactivated user's first $100 of qualifying purchases in their first 60 days, attributed via Share Links, direct experience links, or experience-name search.
+Creator Rewards is a platform program with two payment types. It requires no in-experience integration:
+- **Daily Engagement Rewards**: 5 Robux per day per Active Spender who spends 10+ minutes in your experience, provided it's one of the first three experiences they visit that day.
+- **Audience Expansion Rewards**: 35% revenue share on a new/reactivated user's first $100 of qualifying purchases in their first 60 days, attributed via Share Links, direct experience links, or experience-name search.
 
 Official source: https://create.roblox.com/docs/en-us/creator-rewards
 
-## When to Use Game Passes vs Other Monetization
+## When to use game passes vs other monetization
 
 - One-time permanent unlock or access → Game Pass.
 - Repeatable purchase (currency, consumables, temporary power) → Developer Product (with proper ProcessReceipt).
@@ -183,16 +183,15 @@ See the developer-products doc for the repeatable flow.
 
 ## Scripts
 
-- `scripts/PassPurchaseHelper.lua` — a client-side helper for game pass button state, price display, and prompting.
+- `scripts/PassPurchaseHelper.lua`: a client-side helper for game pass button state, price display, and prompting.
 
-This skill + roblox-datastores + roblox-networking gives you a complete, secure, modern game pass implementation that follows current rules and best practices.
 
 <!-- catalog:references:start -->
 ## Reference index
 
-- [creation-and-setup.md](references/creation-and-setup.md)
-- [policyservice.md](references/policyservice.md)
-- [purchase-flow-and-granting.md](references/purchase-flow-and-granting.md)
-- [rules-policies-and-security.md](references/rules-policies-and-security.md)
-- [subscriptions.md](references/subscriptions.md)
+- [creation-and-setup.md](references/creation-and-setup.md): Create a pass, find its asset ID, or configure sales and test access.
+- [policyservice.md](references/policyservice.md): Gate a feature using per-player monetization or content restrictions.
+- [purchase-flow-and-granting.md](references/purchase-flow-and-granting.md): Implement pass purchase prompts, ownership checks, and server grants.
+- [rules-policies-and-security.md](references/rules-policies-and-security.md): Review monetization restrictions, paid random items, or purchase security.
+- [subscriptions.md](references/subscriptions.md): Create recurring benefits or handle subscription status and renewals.
 <!-- catalog:references:end -->

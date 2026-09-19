@@ -10,7 +10,7 @@ assignees: ''
 <!-- A clear description of what is wrong (e.g. "The animation skill still recommends a deprecated pattern" or "Link to X in SKILL.md 404s"). -->
 
 ## Affected skill(s) / file(s)
-<!-- e.g. roblox-animation-and-tweening/SKILL.md or roblox-data-persistence/references/limits-quotas-throttling-error-codes.md -->
+<!-- e.g. roblox-animation/SKILL.md or roblox-datastores/references/limits-quotas-throttling-error-codes.md -->
 
 ## Steps to reproduce the issue
 1. 

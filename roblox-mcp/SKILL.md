@@ -1,31 +1,18 @@
 ---
 name: roblox-mcp
-description: "Roblox Studio MCP server for connecting AI agents directly to Studio — read and write scripts, explore the data model, execute Luau, run playtests, capture the viewport, and control Studio. Covers prerequisites, enabling Studio as an MCP server, quick-connect vs JSON/CLI configuration for Cursor/VS Code/Claude/Codex, every available MCP tool, combining MCP with Script Sync for a file-based workflow, multi-instance handling, and security boundaries. Use when connecting an AI coding tool to Roblox Studio."
+description: "Connect an AI client to Roblox Studio through MCP. Use for connection setup, Studio tools, multiple Studio windows, playtesting, or combining MCP with Script Sync."
 last_reviewed: 2026-06-17
 ---
 
 # roblox-mcp
 
-**Official sources (always check these for the latest):**
+**Official sources:**
 - https://create.roblox.com/docs/en-us/studio/mcp
 - https://create.roblox.com/docs/en-us/ai/build
 - https://create.roblox.com/docs/en-us/scripting/sync
 - https://modelcontextprotocol.io/docs/getting-started/intro
 
-This skill is about the **official Roblox Studio MCP server**, not a third-party wrapper. Once connected, your AI client can drive an open Roblox Studio session: read and edit scripts, search the game tree, run Luau, insert assets, start playtests, simulate input, and capture the viewport.
-
-## When to use this skill
-
-Activate when the user is:
-- Setting up an AI coding tool (Cursor, VS Code + Claude Code, Claude Desktop, Codex CLI, etc.) to talk to Roblox Studio.
-- Asking about the Roblox Studio MCP server, MCP tools, or the coding-harness workflow.
-- Combining Script Sync with agent-driven Studio control.
-- Troubleshooting why MCP tools are not showing up or not executing.
-- Writing prompts or workflows that let an agent safely modify a place.
-
-Cross-reference:
-- [roblox/SKILL.md](../roblox/SKILL.md) for general Roblox architecture and specialized development skills.
-- [roblox-core/SKILL.md](../roblox-core/SKILL.md) for services, script locations, and the data model.
+The official Roblox Studio MCP server lets a connected AI client inspect and edit an open place. It provides tools for scripts, instances, Luau execution, assets, and playtesting.
 
 ## What the Studio MCP server is
 
@@ -33,8 +20,8 @@ Roblox Studio implements a **Model Context Protocol (MCP)** server using `stdio`
 
 ## Prerequisites
 
-1. **Latest Roblox Studio** — update through the launcher or download from the [Creator Hub](https://create.roblox.com/docs/studio/setup).
-2. **An MCP-capable AI client** — Cursor, VS Code with Claude Code, Claude Desktop, Codex CLI, Gemini CLI, Antigravity, or any client that supports `stdio` transport.
+1. **Latest Roblox Studio**. Update through the launcher or download from the [Creator Hub](https://create.roblox.com/docs/studio/setup).
+2. **An MCP-capable AI client**. Cursor, VS Code with Claude Code, Claude Desktop, Codex CLI, Gemini CLI, Antigravity, or any client that supports `stdio` transport.
 3. **A Roblox account** signed into Studio.
 4. **Git** (recommended) for the file-based workflow.
 
@@ -52,14 +39,14 @@ If you do not see MCP options, restart Studio after updating to the latest versi
 
 Choose the method that matches your client:
 
-**Quick connect** — easiest. Supports Antigravity, Codex CLI, Claude Code, Claude Desktop, Cursor, Gemini CLI, and Visual Studio Code.
+**Quick connect** supports Antigravity, Codex CLI, Claude Code, Claude Desktop, Cursor, Gemini CLI, and Visual Studio Code.
 1. In Studio: **Assistant → ⋯ → Manage MCP Servers → Quick connect**.
 2. Turn on your installed client.
 3. Restart the client if the tools do not appear immediately.
 
-**JSON configuration** — for clients that read an `mcp.json` or similar config file. See [references/setup-and-connection.md](references/setup-and-connection.md) for per-OS, copy-paste configurations.
+For clients that read an `mcp.json` or similar config file, see [references/setup-and-connection.md](references/setup-and-connection.md) for per-OS, copy-paste configurations.
 
-**CLI command** — for clients that need a raw command. See [references/setup-and-connection.md](references/setup-and-connection.md) for Windows and macOS commands.
+For clients that need a raw CLI command, see [references/setup-and-connection.md](references/setup-and-connection.md) for Windows and macOS commands.
 
 After connecting, verify with:
 > Use the Roblox MCP to read the current game tree in Roblox Studio. List what's in Workspace.
@@ -79,7 +66,7 @@ The server exposes tools in several categories. The current tool names and usage
 | **Documentation** | `http_get`, `skill` |
 | **Instance discovery** | `list_roblox_studios`; pass `studio_id` on subsequent calls |
 
-## MCP + Script Sync: the complete agent workflow
+## Work with MCP and Script Sync
 
 Script Sync maps folders on disk (`ServerScriptService/`, `ReplicatedStorage/`, `StarterPlayerScripts/`, etc.) to Studio services, so `.luau` files you edit locally appear in Studio automatically. MCP covers everything Script Sync cannot reach: editing `StarterGui`, inserting models, running commands, playtesting, and inspecting instances.
 
@@ -117,8 +104,8 @@ See [references/security-and-troubleshooting.md](references/security-and-trouble
 
 ## Scripts
 
-- `scripts/MCPReadyChecker.lua` — a diagnostic snippet you can run with `execute_luau` to verify Script Sync status and basic model health.
-- `scripts/StudioModelProbe.lua` — a reusable utility for summarizing the game tree, useful as a pattern for agent exploration prompts.
+- `scripts/MCPReadyChecker.lua`: a diagnostic snippet you can run with `execute_luau` to verify Script Sync status and basic model health.
+- `scripts/StudioModelProbe.lua`: a reusable utility for summarizing the game tree, useful as a pattern for agent exploration prompts.
 
 ## How to proceed
 
@@ -131,8 +118,8 @@ See [references/security-and-troubleshooting.md](references/security-and-trouble
 <!-- catalog:references:start -->
 ## Reference index
 
-- [script-sync-integration.md](references/script-sync-integration.md)
-- [security-and-troubleshooting.md](references/security-and-troubleshooting.md)
-- [setup-and-connection.md](references/setup-and-connection.md)
-- [tool-reference.md](references/tool-reference.md)
+- [script-sync-integration.md](references/script-sync-integration.md): Combine files on disk with Studio MCP edits and playtests.
+- [security-and-troubleshooting.md](references/security-and-troubleshooting.md): Investigate MCP connection failures or review Studio access.
+- [setup-and-connection.md](references/setup-and-connection.md): Enable Studio MCP and connect a client on Windows or macOS.
+- [tool-reference.md](references/tool-reference.md): Choose a Studio MCP tool and identify the target Studio instance.
 <!-- catalog:references:end -->

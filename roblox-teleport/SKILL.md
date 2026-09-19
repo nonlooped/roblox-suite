@@ -1,48 +1,38 @@
 ---
 name: roblox-teleport
-description: "Roblox TeleportService and multi-place architecture — the modern TeleportAsync API that replaces deprecated Teleport/TeleportPartyAsync/TeleportToPrivateServer variants. Covers TeleportOptions, reserved servers via ReserveServerAsync, the 50-player group limit, cross-experience restrictions, teleport data (and its client-spoofable security caveat), custom loading screens, DataStore handoff, and matchmaking with MessagingService/MemoryStoreService. Use whenever moving players between places, servers, or reserved servers."
+description: "Move Roblox players between places, public servers, or reserved servers. Use for TeleportAsync, matchmaking, loading screens, teleport failures, and persistent-data handoff."
 last_reviewed: 2026-08-18
 ---
 
 # roblox-teleport
 
-**Official sources (always check these for the latest):**
+**Official sources:**
 - https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportService
 - https://create.roblox.com/docs/en-us/projects/teleport
 - https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportOptions
 - https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportAsyncResult
 - https://create.roblox.com/docs/projects/teleport (multi-place architecture)
 
-TeleportService moves players between places and servers. The modern entry point is `TeleportAsync` (server-only); the older `Teleport` (client), `TeleportPartyAsync`, `TeleportToPlaceInstance`, `TeleportToPrivateServer`, and `TeleportToSpawnByName` methods are **deprecated** — use `TeleportAsync()` instead. For client-initiated teleports, fire a `RemoteEvent` to the server and let the server call `TeleportAsync()`; do not call `Teleport()` from the client for new work, even if the place is configured as "Fully Open." See the [migrate to secure teleports](https://create.roblox.com/docs/en-us/projects/teleport#migrate-to-secure-teleports) guide.
+TeleportService moves players between places and servers. The modern entry point is `TeleportAsync` (server-only); the older `Teleport` (client), `TeleportPartyAsync`, `TeleportToPlaceInstance`, `TeleportToPrivateServer`, and `TeleportToSpawnByName` methods are **deprecated**. Use `TeleportAsync()` instead. For client-initiated teleports, fire a `RemoteEvent` to the server and let the server call `TeleportAsync()`; do not call `Teleport()` from the client for new work, even if the place is configured as "Fully Open." See the [migrate to secure teleports](https://create.roblox.com/docs/en-us/projects/teleport#migrate-to-secure-teleports) guide.
 
 Cross-reference:
-- [roblox-datastores/SKILL.md](../roblox-datastores/SKILL.md) — handoff pattern for player data across teleports.
-- [roblox-networking/SKILL.md](../roblox-networking/SKILL.md) — server authority, rate limiting, and the security model around teleport requests.
-- [roblox-core/SKILL.md](../roblox-core/SKILL.md) — services and script contexts.
-
-## When to use this skill
-
-Activate when:
-- Moving players between places in a universe (lobby → game world → dungeon).
-- Building reserved/private servers (VIP servers, instanced dungeons, matchmaking rooms).
-- Implementing matchmaking (server browser, party join, follow-friend).
-- Passing data across teleports (lobby selection → game server).
-- Building a custom teleport loading screen.
-- Debugging teleport failures (`TeleportInitFailed`).
+- [roblox-datastores/SKILL.md](../roblox-datastores/SKILL.md): handoff pattern for player data across teleports.
+- [roblox-networking/SKILL.md](../roblox-networking/SKILL.md): server authority, rate limiting, and the security model around teleport requests.
+- [roblox-core/SKILL.md](../roblox-core/SKILL.md): services and script contexts.
 
 ## Multi-place architecture
 
-A **universe** (experience) can contain multiple **places**. Each place has its own `PlaceId`; the universe has a `UniverseId` (exposed as `game.GameId`). One place is the **primary place** — the one players join from the Roblox app's main entry point.
+A **universe** (experience) can contain multiple **places**. Each place has its own `PlaceId`; the universe has a `UniverseId` (exposed as `game.GameId`). The **primary place** is the one players join from the Roblox app's main entry point.
 
 - Create additional places in the Creator Dashboard under your experience → Places.
 - Each place must be published and (for it to be joinable) visible/enabled.
 - `game.PlaceId` is the current place; `game.GameId` is the universe ID (sometimes called UniverseId).
 - Places in the same universe share DataStores, MemoryStores, and Asset permissions.
-- Cross-universe (cross-experience) teleports are restricted by default — see "Cross-experience teleports" below.
+- Cross-universe (cross-experience) teleports are restricted by default. See "Cross-experience teleports" below.
 
 ## TeleportAsync (the modern method)
 
-`TeleportService:TeleportAsync(placeId, players, teleportOptions?)` is the single unified method. It can teleport to a different place, a specific server, or a reserved server. **Server-only** — calling from the client errors. `Teleport()` and the other legacy methods now carry a deprecation message directing you to `TeleportAsync()` (see [Teleport between places](https://create.roblox.com/docs/en-us/projects/teleport#migrate-to-secure-teleports)).
+`TeleportService:TeleportAsync(placeId, players, teleportOptions?)` is the single unified method. It can teleport to a different place, a specific server, or a reserved server. **Server-only**. Calling from the client errors. `Teleport()` and the other legacy methods now carry a deprecation message directing you to `TeleportAsync()` (see [Teleport between places](https://create.roblox.com/docs/en-us/projects/teleport#migrate-to-secure-teleports)).
 
 ```lua
 --!strict
@@ -114,13 +104,13 @@ end)
 
 ## Reserved servers
 
-`TeleportService:ReserveServerAsync(placeId)` (server-only, yields) returns an access code plus a `PrivateServerId`. Players can only join a reserved server via that access code — they can't join through normal matchmaking.
+`TeleportService:ReserveServerAsync(placeId)` (server-only, yields) returns an access code plus a `PrivateServerId`. Players can only join a reserved server via that access code. They can't join through normal matchmaking.
 
 - A server starts when the access code is first used.
 - Access codes remain valid indefinitely; a reserved server can be rejoined even if no server is currently running (a new one starts).
 - Detect reserved-server context: `local isReserved = game.PrivateServerId ~= "" and game.PrivateServerOwnerId == 0`.
 - `PrivateServerId` is constant across server instances for the same access code; `JobId` is not.
-- **Cross-platform caveat:** Xbox/PlayStation players with cross-play disabled land in a different server than cross-play-enabled players — multiple servers can share a `PrivateServerId`. Use `game.MatchmakingType` to differentiate.
+- **Cross-platform caveat:** Xbox/PlayStation players with cross-play disabled land in a different server than cross-play-enabled players. Multiple servers can share a `PrivateServerId`. Use `game.MatchmakingType` to differentiate.
 
 ```lua
 --!strict
@@ -173,11 +163,11 @@ Set on the source server (via `TeleportOptions`), retrieved on the destination c
 
 ### `SetTeleportSetting` / `GetTeleportSetting`
 
-Client-only, stored locally, preserved across teleports within the same game. Good for client-side preferences (crouch state, UI tab) that don't need server trust. Also spoofable — use server-side validation for anything that affects gameplay.
+Client-only, stored locally, preserved across teleports within the same game. Good for client-side preferences (crouch state, UI tab) that don't need server trust. Also spoofable. Use server-side validation for anything that affects gameplay.
 
 ## Custom loading screen
 
-`TeleportService:SetTeleportGui(gui)` (client) sets a `ScreenGui` shown during teleport. `TeleportService:GetArrivingTeleportGui()` (client, at the destination) retrieves it so you can parent it to `PlayerGui` and run your own transition. The teleport GUI does **not** cross into a different game (universe), and does not persist across multiple teleports — set it before each one.
+`TeleportService:SetTeleportGui(gui)` (client) sets a `ScreenGui` shown during teleport. `TeleportService:GetArrivingTeleportGui()` (client, at the destination) retrieves it so you can parent it to `PlayerGui` and run your own transition. The teleport GUI does **not** cross into a different game (universe), and does not persist across multiple teleports. Set it before each one.
 
 ```lua
 --!strict
@@ -204,19 +194,19 @@ Teleporting from your experience to **another experience owned by others fails b
 
 ## Matchmaking patterns
 
-### Pattern 1: Lobby → match (simple round-robin)
+### Pattern 1: lobby → match (simple round-robin)
 
 A lobby place collects players; when enough are ready, `TeleportAsync` sends them to a game place. Use `MessagingService` to coordinate across lobby servers if you have multiple lobbies.
 
-### Pattern 2: Reserved server per match
+### Pattern 2: reserved server per match
 
 For instanced dungeons or private matches: `ReserveServerAsync` → persist the access code in a DataStore keyed by match ID → teleport the party with `ReservedServerAccessCode` → players arrive in an isolated server.
 
-### Pattern 3: Server browser via MemoryStoreService
+### Pattern 3: server browser via MemoryStoreService
 
 Maintain a `MemoryStoreService` sorted map of active servers (keyed by `JobId`, value = player count / mode / ping). The lobby lists entries; when a player picks one, `TeleportOptions.ServerInstanceId = jobId` and `TeleportAsync`. Update the sorted map from each game server on join/leave. This scales better than `MessagingService` for many servers.
 
-### Pattern 4: External matchmaking service
+### Pattern 4: external matchmaking service
 
 For complex matchmaking (skill-based, party queues), use an external HTTP service as the matchmaker. It returns a `placeId` + `JobId` or a fresh reserved-server access code; the lobby then `TeleportAsync`s the party. See roblox-networking for the `HttpService` security model and roblox-open-cloud for in-experience Open Cloud calls.
 
@@ -224,7 +214,7 @@ All matchmaking must respect the **50-player-per-`TeleportAsync`** limit; split 
 
 ## DataStore handoff across teleports
 
-The robust pattern for moving player state between places:
+To move player state between places:
 
 1. **Source server:** on the triggering event, save the player's profile via `UpdateAsync` (see roblox-datastores). Then teleport.
 2. **Destination server:** on `PlayerAdded`, load the profile via `GetAsync` (consider `UseCache=false` for a fresh read if the save was recent).
@@ -233,29 +223,29 @@ The robust pattern for moving player state between places:
 
 ## Security
 
-- **`TeleportAsync` is server-only.** The client cannot call it directly — if you need client-initiated teleports, the client sends a RemoteEvent and the server validates then calls `TeleportAsync`. The legacy client method `Teleport()` is now deprecated (use `TeleportAsync()` on the server); see the migration guide above.
+- **`TeleportAsync` is server-only.** The client cannot call it directly. If you need client-initiated teleports, the client sends a RemoteEvent and the server validates then calls `TeleportAsync`. The legacy client method `Teleport()` is now deprecated (use `TeleportAsync()` on the server); see the migration guide above.
 - **Rate-limit teleport requests** per player. A hostile client spamming "teleport me" Remotes can disrupt your server flow and burn DataStore budget if you save on each trigger.
-- **Validate the destination.** Don't let a client-supplied place ID drive the teleport unsanitized — whitelist allowed destinations server-side.
+- **Validate the destination.** Don't let a client-supplied place ID drive the teleport unsanitized. Whitelist allowed destinations server-side.
 - **Teleport data is spoofable.** Treat it as a hint; re-validate any gameplay-affecting claim on the destination server against DataStores.
 - **`GetLocalPlayerTeleportData` is client-only** and returns client-controlled data. Don't use it for authoritative decisions on the server.
 
 ## Studio limitation
 
-**TeleportService does not work during Studio playtesting.** You must publish the experience and test teleports in the Roblox application. Plan for this in your testing workflow — teleport logic can only be verified live.
+**TeleportService does not work during Studio playtesting.** You must publish the experience and test teleports in the Roblox application. Plan for this in your testing workflow. Teleport logic can only be verified live.
 
 ## Gotchas
 
 - Players lose character state across teleports (new place = new character). Save/load via DataStores; don't try to carry live character state.
-- `BindToClose` on the source server can race with the teleport — finish saves before triggering teleports when data is critical.
+- `BindToClose` on the source server can race with the teleport. Finish saves before triggering teleports when data is critical.
 - The default teleport loading message was removed; `CustomizedTeleportUI` is deprecated and does nothing.
 - Cross-platform (Xbox/PS with cross-play off) can split a reserved server into multiple servers with the same `PrivateServerId`.
 - Group teleports are universe-only; you cannot `TeleportAsync` a group across experiences.
-- The 50-player limit is per call — larger groups need multiple calls, and ordering matters for "arrive together" semantics.
+- The 50-player limit is per call. Larger groups need multiple calls, and ordering matters for "arrive together" semantics.
 - Follow-friend: `Players.PlayerAdded` → check `player.FollowUserId` → `GetPlayerPlaceInstanceAsync(followId)` → `TeleportToPlaceInstance`. Note `GetPlayerPlaceInstanceAsync` returns `JobId`, not the reserved-server access code, so it won't work to follow a friend into a reserved server.
 
 ## Scripts
 
-- `scripts/TeleportHelper.lua` — a reviewed server-side example with atomic reserved-code publication, expiry, ambiguous-allocation reconciliation, and separate `teleporting`/`arrived` states.
+- `scripts/TeleportHelper.lua`: a reviewed server-side example with atomic reserved-code publication, expiry, ambiguous-allocation reconciliation, and separate `teleporting`/`arrived` states.
 
 ## How to proceed
 
@@ -270,6 +260,6 @@ The robust pattern for moving player state between places:
 <!-- catalog:references:start -->
 ## Reference index
 
-- [matchmaking.md](references/matchmaking.md)
-- [teleport-options.md](references/teleport-options.md)
+- [matchmaking.md](references/matchmaking.md): Coordinate lobbies, reserved servers, allocation races, or player-data handoff.
+- [teleport-options.md](references/teleport-options.md): Select a destination server or inspect a teleport result.
 <!-- catalog:references:end -->

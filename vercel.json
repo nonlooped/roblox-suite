@@ -5,6 +5,10 @@
   "buildCommand": "npm run build --prefix site",
   "outputDirectory": "site/dist",
   "trailingSlash": true,
+  "redirects": [
+    { "source": "/evidence", "destination": "/skills/", "permanent": true },
+    { "source": "/evidence/", "destination": "/skills/", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/:path*/", "destination": "/:path*/index.html" }

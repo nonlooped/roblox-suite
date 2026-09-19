@@ -1,13 +1,10 @@
 import { useEffect, useRef } from "react";
 
 /*
- * Hand-written 3D brick renderer. True perspective projection, painter's
- * algorithm for depth, flat-shaded faces with solid ink edges and projected
- * studs — the moulded-plastic language of the rest of the page, in three
- * dimensions. No 3D library; the whole thing is ~200 lines of math.
- *
- * Bricks drop in to build a tower, hold, then rebuild. Under reduced motion
- * the scene renders one settled frame and never animates.
+ * Canvas brick renderer with perspective projection and depth-sorted faces.
+ * The tower leans toward the pointer, which is the one bit of play on the
+ * page that costs the reader nothing. Under reduced motion it renders one
+ * settled frame and ignores the pointer entirely.
  */
 
 interface Brick {
@@ -90,6 +87,12 @@ export function BrickScene({ className }: { className?: string }) {
     let start = performance.now();
     let visible = true;
 
+    /* Latest pointer position over the canvas, -1..1 on each axis, and the
+       eased value actually used for the lean. Easing in draw() rather than in
+       the event means the tower settles back on its own when the pointer goes. */
+    const aim = { x: 0, y: 0 };
+    const lean = { x: 0, y: 0 };
+
     function resize() {
       const rect = canvas!.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -141,8 +144,15 @@ export function BrickScene({ className }: { className?: string }) {
       const cx = width / 2;
       const cy = height / 2 + scale * 0.85;
 
-      const spin = reduced ? -0.72 : -0.72 + Math.sin((elapsed / LOOP) * Math.PI * 2) * 0.22;
-      const tilt = 0.42;
+      lean.x += (aim.x - lean.x) * 0.07;
+      lean.y += (aim.y - lean.y) * 0.07;
+
+      // Small angles on purpose: past about 0.5rad the backface cull starts
+      // showing the underside of the base and the stack reads as toppling.
+      const spin = reduced
+        ? -0.72
+        : -0.72 + Math.sin((elapsed / LOOP) * Math.PI * 2) * 0.22 + lean.x * 0.45;
+      const tilt = reduced ? 0.42 : 0.42 + lean.y * 0.16;
 
       // Collect every face from every brick, then sort once, globally.
       const polys: {
@@ -280,6 +290,18 @@ export function BrickScene({ className }: { className?: string }) {
       raf = requestAnimationFrame(frame);
     }
 
+    function onPointerMove(event: PointerEvent) {
+      const rect = canvas!.getBoundingClientRect();
+      const clamp = (value: number) => Math.max(-1, Math.min(1, value));
+      aim.x = clamp(((event.clientX - rect.left) / rect.width) * 2 - 1);
+      aim.y = clamp(((event.clientY - rect.top) / rect.height) * 2 - 1);
+    }
+
+    function releasePointer() {
+      aim.x = 0;
+      aim.y = 0;
+    }
+
     resize();
 
     if (reduced) {
@@ -308,10 +330,19 @@ export function BrickScene({ className }: { className?: string }) {
       };
       window.addEventListener("resize", onResize);
 
+      // On touch the browser cancels the pointer stream as soon as the gesture
+      // becomes a scroll, so the lean releases itself rather than sticking.
+      canvas!.addEventListener("pointermove", onPointerMove);
+      canvas!.addEventListener("pointerleave", releasePointer);
+      canvas!.addEventListener("pointercancel", releasePointer);
+
       return () => {
         cancelAnimationFrame(raf);
         io.disconnect();
         window.removeEventListener("resize", onResize);
+        canvas!.removeEventListener("pointermove", onPointerMove);
+        canvas!.removeEventListener("pointerleave", releasePointer);
+        canvas!.removeEventListener("pointercancel", releasePointer);
       };
     }
 

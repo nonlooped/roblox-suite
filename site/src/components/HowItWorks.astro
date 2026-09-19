@@ -8,19 +8,16 @@ import { installCommand, skillCount } from "../data/catalog";
  */
 ---
 
-<section class="bg-paper py-20 text-on-paper sm:py-28">
+<section class="bg-toy-yellow py-16 text-ink sm:py-20">
   <div class="mx-auto max-w-6xl px-6">
-    <h2 class="text-title max-w-2xl">Three steps, then forget it exists</h2>
-    <p class="measure mt-5 text-lead text-on-paper-muted">
-      There is no config file, no prompt to maintain, and nothing to set up per project.
-    </p>
+    <h2 class="text-title max-w-2xl">How it works</h2>
 
-    <div class="mt-14 grid gap-5 lg:grid-cols-3">
+    <div class="mt-10 grid gap-5 lg:grid-cols-3">
       <!-- Step one is wide and short: it is one line of typing. -->
       <div class="min-w-0 lg:col-span-2">
-        <h3 class="text-heading">You run one command</h3>
-        <p class="mt-2.5 text-on-paper-muted">
-          Drops all {skillCount} skills into your agent. Takes a few seconds.
+        <h3 class="text-heading">1. Run this in your project</h3>
+        <p class="mt-2.5 text-ink/75">
+          Take all {skillCount} skills, or pick the ones you want.
         </p>
         <div class="panel mt-5 bg-ink px-5 py-4 font-mono text-small text-on-ink">
           <span class="text-toy-green" aria-hidden="true">$</span>
@@ -30,13 +27,13 @@ import { installCommand, skillCount } from "../data/catalog";
 
       <!-- Step two is tall: a list of candidates with one chosen. -->
       <div class="min-w-0 lg:row-span-2">
-        <h3 class="text-heading">It picks what it needs</h3>
-        <p class="mt-2.5 text-on-paper-muted">
-          Ask for a save system and it loads the datastore skill, not all {skillCount}.
+        <h3 class="text-heading">2. Your agent picks a skill</h3>
+        <p class="mt-2.5 text-ink/75">
+          Or ask for one by name.
         </p>
         <div class="panel mt-5 overflow-hidden bg-ink font-mono text-[0.8125rem]">
           <div class="border-b border-ink-soft px-4 py-2.5 text-on-ink-muted">
-            "make saving not lose progress"
+            "save my player's coins"
           </div>
           <ul class="divide-y divide-ink-soft">
             {
@@ -64,9 +61,9 @@ import { installCommand, skillCount } from "../data/catalog";
 
       <!-- Step three is medium: the payoff, as actual code. -->
       <div class="min-w-0 lg:col-span-2">
-        <h3 class="text-heading">You get current API guidance</h3>
-        <p class="mt-2.5 text-on-paper-muted">
-          A current animation pattern, with the Roblox documentation that supports the migration. <a
+        <h3 class="text-heading">3. It writes the current API</h3>
+        <p class="mt-2.5 text-ink/75">
+          With the Roblox page it came from. <a
             href="https://create.roblox.com/docs/reference/engine/classes/Humanoid#LoadAnimation"
             rel="noopener"
             class="text-brand underline underline-offset-4 hover:no-underline">Read the source</a

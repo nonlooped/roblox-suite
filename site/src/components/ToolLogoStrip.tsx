@@ -73,19 +73,7 @@ interface Tool {
   Mark: Mark;
 }
 
-/*
- * A sample, not a compatibility matrix.
- *
- * The Skills CLI installs to far more clients than this, and the repository
- * README deliberately refuses to publish a hardcoded list — it points at the
- * CLI's own options page instead, because the list moves. Fifteen marks in the
- * hero read as an exhaustive roster, which is both a claim this page cannot
- * back and a wall of logos competing with the headline. Eight recognisable
- * names carry the "it works with what you already use" point, and the line
- * underneath does the honest work the logos cannot: says there are more.
- *
- * The first four are the ones InstallPicker offers by verified `--agent` id.
- */
+/* Show a sample of agent targets supported by the Skills CLI. The first four correspond to InstallPicker options. */
 const TOOLS: Tool[] = [
   { name: "Claude Code", Mark: ClaudeMark },
   { name: "Codex", Mark: OpenAIMark },
@@ -100,12 +88,7 @@ const TOOLS: Tool[] = [
 export function ToolLogoStrip() {
   return (
     <div className="mt-5">
-      {/*
-        No hover state on the chips: they are labels, not controls, and a
-        colour change on something unclickable promises an interaction that
-        never arrives. The visible name is also the accessible name, so the
-        mark beside it stays aria-hidden rather than announcing twice.
-      */}
+      {/* Agent chips are labels. Keep their icons hidden from assistive technology to avoid repeating the names. */}
       <ul
         aria-label="Coding agents Roblox Suite works with"
         className="flex max-w-xl flex-wrap gap-2"
@@ -117,9 +100,7 @@ export function ToolLogoStrip() {
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-small text-on-brand-muted">
-        …and any other agent the Skills CLI installs to.
-      </p>
+      <p className="mt-3 text-small text-on-brand-muted">…and anywhere else the Skills CLI installs.</p>
     </div>
   );
 }

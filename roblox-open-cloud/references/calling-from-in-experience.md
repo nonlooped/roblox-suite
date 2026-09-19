@@ -1,8 +1,9 @@
 ---
+read_when: "Call supported Open Cloud endpoints through HttpService and handle retries"
 last_reviewed: 2026-07-16
 ---
 
-# Calling Open Cloud from In-Experience
+# Calling Open Cloud from in-experience
 
 **Official source:** https://create.roblox.com/docs/en-us/cloud-services/http-service
 
@@ -12,7 +13,7 @@ A subset of Open Cloud endpoints is callable from inside a live game server via 
 
 1. **Allow HTTP Requests** in Experience Settings (Studio → Game Settings → Security, or the dashboard).
 2. **Create an API key** with the scopes for the endpoints you'll call.
-3. **Save the key to a Secrets Store** and retrieve it with `HttpService:GetSecret("APIKey")`. Never hardcode a key in a script — client-visible scripts are exploitable and the key would leak.
+3. **Save the key to a Secrets Store** and retrieve it with `HttpService:GetSecret("APIKey")`. Never hardcode a key in a script. Client-visible scripts are exploitable and the key would leak.
 
 ## Constraints
 
@@ -20,7 +21,7 @@ A subset of Open Cloud endpoints is callable from inside a live game server via 
 - `x-api-key` must be a `Secret` datatype (from `HttpService:GetSecret`), not a plain string.
 - The `..` string is **not allowed** in URL path parameters. Data stores or entries whose key/name contains `..` are unreachable from `HttpService`.
 - HTTPS only. Ports below 1024 blocked except 80 and 443; port 1194 blocked.
-- HTTP/2 is used automatically when available — send header names in lowercase.
+- HTTP/2 is used automatically when available. Send header names in lowercase.
 
 ## Rate limits
 
@@ -31,20 +32,20 @@ A subset of Open Cloud endpoints is callable from inside a live game server via 
 ## Supported endpoints (subset)
 
 The full list is in the official doc; categories include:
-- **Assets** — `GetAsset`, `ListAssetVersions`, `GetAssetVersion`.
-- **Bans/blocks** — `ListUserRestrictions`, `GetUserRestriction`, `UpdateUserRestriction` (place and universe scoped), `ListUserRestrictionLogs`.
-- **Configs** — CreatorConfigs draft/publish/revision flow.
-- **Creator Store** — product CRUD + search.
-- **Developer products** — create/update/get/list configs.
-- **Game passes** — create/update/get/list configs.
-- **Data & memory stores** — data stores (list/snapshot/entries CRUD/increment/revisions), memory stores (sorted maps, queues, flush), ordered data stores (CRUD/increment).
-- **Groups** — get, memberships, roles, join requests, shout.
-- **Inventories** — `ListInventoryItems`.
-- **Luau execution** — `CreateLuauExecutionSessionTask` (privileged).
-- **Notifications** — `CreateUserNotification`.
-- **Places** — get/update place, get/update instance.
-- **Universes** — get/update, publish message, restart servers.
-- **Users** — get, generate thumbnail.
+- **Assets**: `GetAsset`, `ListAssetVersions`, `GetAssetVersion`.
+- **Bans/blocks**: `ListUserRestrictions`, `GetUserRestriction`, `UpdateUserRestriction` (place and universe scoped), `ListUserRestrictionLogs`.
+- **Configs**: CreatorConfigs draft/publish/revision flow.
+- **Creator Store**: product CRUD + search.
+- **Developer products**: create/update/get/list configs.
+- **Game passes**: create/update/get/list configs.
+- **Data & memory stores**: data stores (list/snapshot/entries CRUD/increment/revisions), memory stores (sorted maps, queues, flush), ordered data stores (CRUD/increment).
+- **Groups**: get, memberships, roles, join requests, shout.
+- **Inventories**: `ListInventoryItems`.
+- **Luau execution**: `CreateLuauExecutionSessionTask` (privileged).
+- **Notifications**: `CreateUserNotification`.
+- **Places**: get/update place, get/update instance.
+- **Universes**: get/update, publish message, restart servers.
+- **Users**: get, generate thumbnail.
 
 New endpoints are added to the supported list over time; check the official doc for the current set.
 
@@ -85,15 +86,15 @@ end
 - Retry safe reads by default, but require endpoint-specific idempotency semantics before retrying mutations. A transport error or 5xx can occur after a mutation was processed.
 - On HTTP 429, honor `retry-after` first and `x-ratelimit-reset` when available; use bounded exponential backoff only when the response supplies no delay.
 - Return the last response/error, and never sleep after the final attempt. Only send an idempotency header when both the endpoint and the in-experience header allowlist support it.
-- **Batch where possible** — aggregate per-player data into one request if a bulk endpoint exists.
+- **Batch where possible**: aggregate per-player data into one request if a bulk endpoint exists.
 - Validate and sanitize all received data.
-- Monitor via the **Observability Dashboard** (Creator Hub → Monitoring) — Request Count and Response Time charts, filterable by request type, status, and endpoint.
+- Monitor via the **Observability Dashboard** (Creator Hub → Monitoring). Request Count and Response Time charts, filterable by request type, status, and endpoint.
 
 ## When *not* to use this
 
-- For data store operations you can do with in-engine `DataStoreService` — that's faster, has budget integration, and doesn't burn the 2500/min `HttpService` Open Cloud budget.
-- For monetization prompts/grants — use in-engine `MarketplaceService`.
-- For anything the client can see the source of — keys in client scripts are exploitable.
+- For data store operations available through `DataStoreService`, use the engine API. It has budget integration and does not consume the 2500/min `HttpService` Open Cloud budget.
+- For monetization prompts/grants: use in-engine `MarketplaceService`.
+- For anything the client can see the source of: keys in client scripts are exploitable.
 
 Use `HttpService` + Open Cloud when the in-engine API genuinely can't do the thing (group management, external-triggered bans, universe-wide message publish from a specific server, etc.).
 

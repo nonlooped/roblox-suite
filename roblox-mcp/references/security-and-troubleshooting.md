@@ -1,8 +1,9 @@
 ---
+read_when: "Investigate MCP connection failures or review Studio access"
 last_reviewed: 2026-06-17
 ---
 
-# Security and Troubleshooting
+# Security and troubleshooting
 
 ## Security checklist
 

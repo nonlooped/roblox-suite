@@ -1,47 +1,46 @@
 ---
 import Base from "../../layouts/Base.astro";
-import SkillIndex from "../../components/SkillIndex.astro";
+import { SkillFinder, type Section } from "../../components/SkillFinder";
+import { CopyCommand } from "../../components/CopyCommand";
 import HowItWorks from "../../components/HowItWorks.astro";
-import {
-  installCommand,
-  latestSourceCheckAt,
-  officialSourceCount,
-  oldestSourceCheckAt,
-  repoUrl,
-  skillCount,
-  supportingSourceCount,
-} from "../../data/catalog";
+import { groupedSkills, installCommand, plainLabel, repoUrl, skillCount } from "../../data/catalog";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+/* Flattened here so the island receives only what it searches and renders. */
+const sections: Section[] = groupedSkills.map((group) => ({
+  id: group.id,
+  title: group.title,
+  description: group.description,
+  tiles: group.entries.map((skill) => {
+    const label = plainLabel(skill.slug);
+    return {
+      slug: skill.slug,
+      name: label.name,
+      blurb: label.blurb,
+      haystack: [label.name, label.does, label.blurb, skill.slug, skill.oneLiner]
+        .join(" ")
+        .toLowerCase(),
+    };
+  }),
+}));
 ---
 
 <Base
-  title="All skills — Roblox Suite"
-  description={`Browse all ${skillCount} Roblox Suite skills, from saving player data to physics and monetization.`}
+  title="All skills | Roblox Suite"
+  description={`Search ${skillCount} Roblox Suite skills for player data, gameplay, presentation, testing, and Studio workflows.`}
 >
   <!-- The h1 carries the "N skills" string the deploy smoke test greps for. -->
-  <section class="py-16 sm:py-20">
+  <section class="py-14 sm:py-16">
     <div class="mx-auto max-w-6xl px-6">
       <h1 class="text-title max-w-2xl">{skillCount} skills, one install</h1>
-      <!-- The split is stated rather than rounded up: {supportingSourceCount} of these cite
-           Rojo's own docs, because Roblox does not document a third-party tool. -->
-      <p class="measure mt-5 text-lead text-on-brand-muted">
-        Browse Roblox guidance backed by {officialSourceCount} citations from Roblox's own
-        documentation, plus {supportingSourceCount} from Rojo's. Every one carries the date it was
-        checked, {oldestSourceCheckAt} through {latestSourceCheckAt}.
-      </p>
 
-      <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <!-- Wraps rather than truncating: the ellipsis hid the repository the
-             command actually installs, which is the part worth reading. -->
-        <div class="panel-sm flex min-w-0 items-start gap-3 bg-ink px-4 py-3 font-mono text-small text-on-ink">
-          <span class="shrink-0 text-toy-green" aria-hidden="true">$</span>
-          <span class="min-w-0 flex-1 break-words">{installCommand}</span>
-        </div>
+      <div class="mt-7 flex flex-col gap-3 sm:flex-row sm:items-start">
+        <CopyCommand client:load command={installCommand} className="sm:max-w-md" />
         <a
           href={repoUrl}
           rel="noopener"
-          class="panel pressable inline-flex items-center justify-center whitespace-nowrap bg-toy-yellow px-5 py-3 font-display text-small font-bold text-ink"
+          class="panel pressable inline-flex shrink-0 items-center justify-center whitespace-nowrap bg-toy-yellow px-5 py-3 font-display text-small font-bold text-ink"
         >
           Star on GitHub
         </a>
@@ -51,11 +50,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
   <section class="pb-20 sm:pb-24">
     <div class="mx-auto max-w-6xl px-6">
-      <SkillIndex base={base} />
+      <SkillFinder client:load base={base} sections={sections} />
     </div>
   </section>
 
-  <!-- Moved off the landing page: this explains rather than persuades, and it
+  <!-- Kept off the landing page: this explains rather than persuades, and it
        is more use to someone already browsing the catalog. -->
   <HowItWorks />
 </Base>

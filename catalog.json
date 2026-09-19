@@ -4,7 +4,7 @@
     {
       "id": "core",
       "title": "Core",
-      "description": "Foundational Roblox development skills every agent should start with.",
+      "description": "Architecture, Luau fundamentals, and client-server communication.",
       "skills": [
         "roblox",
         "roblox-core",
@@ -14,7 +14,7 @@
     {
       "id": "gameplay",
       "title": "Gameplay",
-      "description": "Skills for building characters, physics, AI, world mechanics, and moving players between places.",
+      "description": "Physics, NPC behavior, and player transfers between places.",
       "skills": [
         "roblox-physics",
         "roblox-npcs",
@@ -24,7 +24,7 @@
     {
       "id": "presentation",
       "title": "Presentation",
-      "description": "Skills for user interfaces, animation, visual effects, audio, and polish.",
+      "description": "Interfaces, animation, visual effects, and audio.",
       "skills": [
         "roblox-user-interfaces",
         "roblox-animation",
@@ -35,7 +35,7 @@
     {
       "id": "systems",
       "title": "Systems",
-      "description": "Skills for data persistence, monetization, external automation, and live ops.",
+      "description": "Player data, purchases, and external automation.",
       "skills": [
         "roblox-datastores",
         "roblox-gamepasses",
@@ -45,7 +45,7 @@
     {
       "id": "quality",
       "title": "Quality",
-      "description": "Skills for testing, debugging, and profiling experiences.",
+      "description": "Testing, debugging, and performance profiling.",
       "skills": [
         "roblox-testing"
       ]
@@ -53,7 +53,7 @@
     {
       "id": "agent-workflows",
       "title": "Agent Workflows",
-      "description": "Skills for filesystem workflows (Rojo) and connecting AI agents directly to Roblox Studio.",
+      "description": "Rojo projects and agent connections to Roblox Studio.",
       "skills": [
         "roblox-rojo",
         "roblox-mcp"
@@ -65,12 +65,12 @@
       "slug": "roblox",
       "title": "roblox",
       "hub": true,
-      "oneLiner": "Architecture principles, cross-skill workflows, quick-reference patterns",
+      "oneLiner": "Plan architecture and choose specialist skills",
       "displayTitle": "Roblox development hub: architecture and skill routing",
-      "overview": "Entry-point skill: server authority, client-server model, and a decision tree that routes to the right specialist. Load this first.",
+      "overview": "Start here for architecture decisions and tasks that span several Roblox systems.",
       "covers": [
-        "The single entry point: overarching architecture and server-authority principles.",
-        "Quick-reference patterns and a decision tree that routes you to the right specialized skill.",
+        "Architecture and server authority across Roblox systems.",
+        "Routing to specialist skills by task.",
         "Cross-skill workflows for data, UI, animation, monetization, and networking."
       ],
       "cover_sources": [[1], [2], [2, 3]],
@@ -97,18 +97,18 @@
         "status": "none",
         "files": []
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-core",
       "title": "roblox-core",
-      "oneLiner": "Services, Luau types, serialization, script locations, `RunContext`, the data model",
+      "oneLiner": "Choose services, types, serialization, and script locations",
       "displayTitle": "Roblox core services, Luau types, and RunContext",
-      "overview": "Services via `game:GetService`, Luau types, script locations, `RunContext`, and the client-server data model. The layer every other skill assumes.",
+      "overview": "Choose services, serialize Luau data, and decide where scripts run in the client-server data model.",
       "covers": [
-        "Every important service via `game:GetService`, Luau data types and serialization rules.",
+        "Service access with `game:GetService`, Luau types, and serialization rules.",
         "Script locations and execution contexts, including modern `BaseScript.RunContext`.",
-        "The client-server data model, and the reality that there is no runtime filesystem I/O."
+        "The client-server data model and alternatives to filesystem I/O at runtime."
       ],
       "cover_sources": [[1, 3], [2], [4]],
       "sources": [
@@ -154,9 +154,9 @@
     {
       "slug": "roblox-networking",
       "title": "roblox-networking",
-      "oneLiner": "Remotes, server authority, network ownership, exploit defenses, capabilities",
+      "oneLiner": "Design remotes, validate client requests, and control replication",
       "displayTitle": "Roblox networking: remotes, server authority, security",
-      "overview": "Remotes, network ownership, and server authority. Validation, rate limiting, and capability patterns that stop common exploits.",
+      "overview": "Define remotes, validate client requests, and keep shared gameplay decisions on the server.",
       "covers": [
         "RemoteEvent/RemoteFunction vs Bindable equivalents, and RunService execution contexts.",
         "Server authority as the foundation: validation and rate-limiting on every request.",
@@ -191,14 +191,14 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-datastores",
       "title": "roblox-datastores",
-      "oneLiner": "DataStores, versioning, metadata, quotas, throttling, safe save/load patterns",
+      "oneLiner": "Save player data, handle concurrent writes, and recover versions",
       "displayTitle": "Roblox DataStores: safe saves, versioning, quotas",
-      "overview": "DataStore, OrderedDataStore, and MemoryStore: `UpdateAsync`, versioning, quotas, and save patterns that avoid data loss. Pair with roblox-networking.",
+      "overview": "Save player data with guidance on concurrent writes, uncertain outcomes, version recovery, and request budgets.",
       "covers": [
         "DataStore vs OrderedDataStore vs MemoryStore Service decision tree.",
         "`UpdateAsync` with a pure transform for contended values; hourly versioning for recovery.",
@@ -252,9 +252,9 @@
     {
       "slug": "roblox-user-interfaces",
       "title": "roblox-user-interfaces",
-      "oneLiner": "GUI containers, responsive layouts, interaction, particles-in-UI techniques",
+      "oneLiner": "Build responsive GUIs, handle input, and add UI effects",
       "displayTitle": "Roblox UI: containers, responsive layouts, interaction",
-      "overview": "ScreenGui, SurfaceGui, BillboardGui, and building blocks. Scale+offset layouts, Activated vs mouse events, and particles-in-UI limits.",
+      "overview": "Choose GUI containers, build responsive layouts, handle input, and create particle effects in 2D UI.",
       "covers": [
         "Every GUI container (ScreenGui, SurfaceGui, BillboardGui) and building block.",
         "Scale + offset responsive layouts tested across target screen sizes.",
@@ -299,9 +299,9 @@
     {
       "slug": "roblox-animation",
       "title": "roblox-animation",
-      "oneLiner": "`Animator`, tracks, IK, `TweenService`, UI tweens, animation markers",
+      "oneLiner": "Animate rigs, configure IK, tween properties, and time marker events",
       "displayTitle": "Roblox animation: Animator, IK, TweenService, markers",
-      "overview": "`Animator` / `AnimationTrack` / `IKControl` for characters; `TweenService` for UI and 3D. Replaces deprecated `Humanoid:LoadAnimation`.",
+      "overview": "Play and blend animation tracks, configure IK, and synchronize UI or world effects with animation markers.",
       "covers": [
         "Animator-based loading with proper track lifecycle and marker-driven gameplay.",
         "`IKControl` for procedural posing; CurveAnimation vs KeyframeSequence.",
@@ -354,9 +354,9 @@
     {
       "slug": "roblox-vfx",
       "title": "roblox-vfx",
-      "oneLiner": "`ParticleEmitter`, shapes, flipbooks, beams, trails, highlights, performance",
+      "oneLiner": "Build particles, flipbooks, beams, trails, and highlights",
       "displayTitle": "Roblox VFX: ParticleEmitter, Beam, Trail, performance",
-      "overview": "`ParticleEmitter`, `Beam`, `Trail`, `Highlight` - emission patterns, flipbooks, and LOD so effects don't tank FPS.",
+      "overview": "Tune emitters, animated textures, beams, and trails while managing overdraw and device limits.",
       "covers": [
         "ParticleEmitter properties, sequences, shapes, and flipbooks.",
         "Beam, Trail, Highlight, plus one-shot vs continuous emission.",
@@ -386,14 +386,14 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-audio",
       "title": "roblox-audio",
-      "oneLiner": "Modern audio graph (`AudioPlayer`/`AudioEmitter`/`Wire`/TTS/STT), legacy `Sound`, 3D audio, effects, performance",
+      "oneLiner": "Build audio graphs, mix effects, and migrate legacy Sound code",
       "displayTitle": "Roblox audio: modern graph, legacy Sound, 3D, effects",
-      "overview": "Modern audio graph (`AudioPlayer`, `AudioEmitter`, `Wire`, TTS/STT) vs legacy `Sound`. 2D/3D, effects, and mobile caps.",
+      "overview": "Build audio graphs for music, spatial sound, and voice. Includes effects, asset permissions, and legacy Sound migration.",
       "covers": [
         "The modern modular audio graph: AudioPlayer, AudioEmitter, Wire, TTS, STT.",
         "Legacy Sound/SoundGroup: discouraged for new work, and when to still use it.",
@@ -438,13 +438,13 @@
     {
       "slug": "roblox-gamepasses",
       "title": "roblox-gamepasses",
-      "oneLiner": "Game passes, dev products, subscriptions, purchase flow, policy, Robux transfers, analytics",
+      "oneLiner": "Handle passes, products, subscriptions, transfers, and purchase policy",
       "displayTitle": "Roblox monetization: game passes, products, subscriptions",
-      "overview": "Game passes, developer products (`ProcessReceipt`), and subscriptions - server-side grants, idempotency, and current policy dates.",
+      "overview": "Prompt purchases, verify ownership, and grant benefits on the server. Includes receipt handling, subscriptions, and dated policy guidance.",
       "covers": [
         "Game passes, developer products (`ProcessReceipt`), and subscriptions.",
         "Server-authoritative granting with idempotency guards and `PlayerAdded` re-verification.",
-        "Current policy: cross-experience sales disabled (May 30 2026); Creator Rewards replaced Premium Payouts."
+        "Policy changes, including cross-experience sales restrictions and the move to Creator Rewards."
       ],
       "cover_sources": [[1], [1], [2, 3]],
       "sources": [
@@ -475,14 +475,14 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-open-cloud",
       "title": "roblox-open-cloud",
-      "oneLiner": "Open Cloud REST APIs: API keys/OAuth2, data stores, assets, universes, webhooks, in-experience calling",
+      "oneLiner": "Automate Roblox resources through REST APIs or supported HttpService calls",
       "displayTitle": "Roblox Open Cloud: REST APIs, keys, in-experience calls",
-      "overview": "Open Cloud REST APIs for data stores, assets, universes, and more. Keys, OAuth2, scopes, Secrets Store, and in-experience `HttpService`.",
+      "overview": "Use REST APIs for external automation or supported in-experience calls. Covers authentication, scopes, secrets, and retries.",
       "covers": [
         "REST APIs for data stores, assets, universes, and more, from outside the engine or in-experience via HttpService.",
         "API keys, OAuth2, least-privilege scopes, and the 60-day key auto-expiry rule.",
@@ -547,9 +547,9 @@
     {
       "slug": "roblox-teleport",
       "title": "roblox-teleport",
-      "oneLiner": "`TeleportAsync`, `TeleportOptions`, reserved servers, multi-place, matchmaking, DataStore handoff",
+      "oneLiner": "Move players between places, coordinate matchmaking, and hand off data",
       "displayTitle": "Roblox TeleportService: TeleportAsync, reserved servers",
-      "overview": "`TeleportAsync` (replaces legacy teleport methods), reserved servers, multi-place handoff, and spoofable teleport-data caveats.",
+      "overview": "Use TeleportAsync for player transfers, reserved servers, and matchmaking. Handle failures and keep authoritative data out of teleport payloads.",
       "covers": [
         "The unified `TeleportAsync` API that replaces the deprecated teleport methods.",
         "`TeleportOptions`, reserved servers, and `TeleportAsyncResult` error handling.",
@@ -594,9 +594,9 @@
     {
       "slug": "roblox-rojo",
       "title": "roblox-rojo",
-      "oneLiner": "Rojo 7: CLI/plugin, project format, live sync, build/upload, sourcemap, syncback",
+      "oneLiner": "Set up filesystem projects, sync with Studio, build, and export places",
       "displayTitle": "Rojo: filesystem projects, live sync, build",
-      "overview": "Rojo 7 project workflows: install CLI/plugin, `.project.json`, live sync, build/upload, sourcemaps, and `syncback` for place→files.",
+      "overview": "Set up Rojo 7 projects, map files to instances, sync with Studio, and export places with syncback.",
       "covers": [
         "Install CLI + Studio plugin (Rokit, GitHub, cargo) and connect with `rojo serve`.",
         "Project format, file→instance mapping (`.server.luau` / `.client.luau` / modules), meta files.",
@@ -636,14 +636,14 @@
         "status": "none",
         "files": []
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-mcp",
       "title": "roblox-mcp",
-      "oneLiner": "Connect AI agents to Roblox Studio via MCP: setup, tools, Script Sync, playtesting",
+      "oneLiner": "Connect agents to Studio, inspect instances, edit scripts, and playtest",
       "displayTitle": "Roblox Studio MCP: connect AI agents to Studio",
-      "overview": "Official Studio MCP server: read/write scripts, run Luau, playtest, capture viewport. Setup for Cursor, VS Code, Claude, Codex + Script Sync.",
+      "overview": "Connect an AI client to Studio MCP to inspect instances, edit scripts, run Luau, and playtest. Includes Script Sync integration.",
       "covers": [
         "Connect AI agents to Roblox Studio via the official MCP server.",
         "Read and write scripts, explore the data model, run Luau, and capture the viewport.",
@@ -687,9 +687,9 @@
     {
       "slug": "roblox-physics",
       "title": "roblox-physics",
-      "oneLiner": "Rigid bodies, assemblies, mechanical/mover constraints, network ownership, vehicles",
+      "oneLiner": "Build mechanisms, choose constraints, and assign physics ownership",
       "displayTitle": "Roblox physics: assemblies, constraints, network ownership",
-      "overview": "Assemblies, welds, mechanical/mover constraints (replacing BodyMovers), network ownership for vehicles, and sleep/timestepping.",
+      "overview": "Build assemblies and mechanisms with mechanical or mover constraints. Configure collisions, ownership, and simulation performance.",
       "covers": [
         "Assemblies, root parts, anchoring, and WeldConstraint vs RigidConstraint.",
         "Mechanical and mover constraints, the modern replacements for deprecated BodyMovers.",
@@ -756,9 +756,9 @@
     {
       "slug": "roblox-npcs",
       "title": "roblox-npcs",
-      "oneLiner": "PathfindingService, modifiers/links, waypoint following, patrol/chase AI patterns",
+      "oneLiner": "Navigate NPCs, handle blocked paths, and build patrol or chase behavior",
       "displayTitle": "Roblox NPCs: PathfindingService, AI patterns, patrol",
-      "overview": "`PathfindingService`, modifiers/links, and NPC patterns (state machines, patrol/chase) that scale.",
+      "overview": "Configure PathfindingService, modifiers, and links. Build patrol or chase behavior and manage the cost of many NPCs.",
       "covers": [
         "PathfindingService, agent parameters, and blocked-path handling.",
         "PathfindingModifier and PathfindingLink, with material and region costs.",
@@ -801,18 +801,18 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-testing",
       "title": "roblox-testing",
-      "oneLiner": "Developer Console, MicroProfiler, Scene Analysis, tests, logging, common bug fixes",
+      "oneLiner": "Reproduce bugs, write tests, and profile performance",
       "displayTitle": "Roblox testing: Developer Console, MicroProfiler, TestEZ",
-      "overview": "Developer Console, MicroProfiler, Scene Analysis, TestEZ, and a method for isolating bugs and perf issues.",
+      "overview": "Reproduce failures, inspect runtime state, and profile CPU, GPU, and memory costs with Roblox debugging tools.",
       "covers": [
         "Developer Console, Output discipline, and pcall/assert patterns.",
         "MicroProfiler, Scene Analysis, and the Script Profiler.",
-        "Unit-test patterns, memory diagnostics, and a methodology for isolating issues."
+        "Unit-test patterns, memory diagnostics, and steps for isolating failures."
       ],
       "cover_sources": [[3], [1, 2, 4], [3]],
       "sources": [

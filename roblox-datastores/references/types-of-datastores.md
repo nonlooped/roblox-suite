@@ -1,12 +1,13 @@
 ---
+read_when: "Choose standard, ordered, or temporary storage and organize keys"
 last_reviewed: 2026-08-18
 ---
 
-# Types of Data Stores
+# Types of data stores
 
 **Official starting point:** https://create.roblox.com/docs/cloud-services/data-stores and https://create.roblox.com/docs/cloud-services/data-stores-vs-memory-stores
 
-## The DataStore Variants
+## The DataStore variants
 
 ### 1. DataStore (standard / recommended)
 - Created via `DataStoreService:GetDataStore(name, scope?, options?: DataStoreOptions)`; with `DataStoreOptions` this returns the modern `DataStore` class (which extends `GlobalDataStore`).
@@ -39,13 +40,13 @@ last_reviewed: 2026-08-18
   - pageSize: 1–100 (default 50 in many examples).
   - Returns pages of `{key, value}` entries sorted numerically.
   - Iterate with `pages:GetCurrentPage()` and `pages:AdvanceToNextPageAsync()`.
-- Batch reads: `GlobalDataStore:BatchGetAsync(keys: {string})` → `Dictionary<string, {value: any}>` — read multiple ordered entries in one call (N keys = N reads against `OrderedRead` limits; missing keys are omitted from the returned dictionary; see `content/en-us/cloud-services/data-stores/index.md` "Read multiple entries" section).
+- Batch reads: `GlobalDataStore:BatchGetAsync(keys: {string})` → `Dictionary<string, {value: any}>`. Read multiple ordered entries in one call (N keys = N reads against `OrderedRead` limits; missing keys are omitted from the returned dictionary; see `content/en-us/cloud-services/data-stores/index.md` "Read multiple entries" section).
 - Ideal exclusively for persistent leaderboards / high-score lists.
 - Limits for list operations are different (and often tighter on the list side).
 
 **Rule from official guidance:** If you need sorted queries → Ordered. If you need versioning/metadata/listing → standard DataStore. Simple cases can also use a standard DataStore via `GetDataStore`.
 
-## Scopes vs Modern Prefixes
+## Scopes vs modern prefixes
 
 Legacy scopes (second param to GetDataStore) automatically prepend to every key operation. Useful for isolation (e.g. "vip" scope).
 
@@ -53,14 +54,14 @@ Modern recommendation (best-practices page): Use fewer data stores + organize vi
 
 For cross-scope needs in listing, enable AllScopes on a DataStoreOptions instance.
 
-## Comparison to Memory Stores (critical decision)
+## Comparison to memory stores (critical decision)
 
 From https://create.roblox.com/docs/cloud-services/data-stores-vs-memory-stores:
 - DataStores: persistent across server lifetimes and player absences. Slower, subject to stricter quotas that scale with concurrent users. Best for permanent progress.
 - MemoryStores (MemoryStoreService): fast, high-throughput, in-memory. Data expires after a configurable period, up to 45 days. No persistence across empty servers. Perfect for queues, lobbies, temporary caches, matchmaking state, live counters.
 - Never use DataStores for purely session-scoped or rapidly changing transient data.
 
-## Storage Limits and Quotas Overview
+## Storage limits and quotas overview
 
 Storage quota is per-universe and based on lifetime users.
 
@@ -74,9 +75,9 @@ Monitor via:
 
 See the dedicated references/limits-quotas-throttling-error-codes.md for the full mathematical formulas (experience-level: 300 + concurrentUsers × N for various categories) and per-server defaults/configurable limits.
 
-## Open Cloud Contrast (for external tools)
+## Open Cloud contrast (for external tools)
 
-The Engine API (inside experiences) is different from the Open Cloud REST Data Stores APIs. The latter require API keys with specific scopes (universe-datastores.*), support bulk/list operations from outside Roblox, and use separate authentication. **Request budgets for Open Cloud v2 Data Stores are shared with the in-engine experience limits** (same read/write/list/remove pools). Legacy Open Cloud v1 Data Store endpoints keep their own fixed per-universe limits (see the throttling guide). Use Engine for in-experience logic; Open Cloud + Batch Processor for admin tools, migrations, or RTBF processing — and rate-limit external callers so they do not starve live servers.
+The Engine API (inside experiences) is different from the Open Cloud REST Data Stores APIs. The latter require API keys with specific scopes (universe-datastores.*), support bulk/list operations from outside Roblox, and use separate authentication. **Request budgets for Open Cloud v2 Data Stores are shared with the in-engine experience limits** (same read/write/list/remove pools). Legacy Open Cloud v1 Data Store endpoints keep their own fixed per-universe limits (see the throttling guide). Use Engine for in-experience logic; Open Cloud + Batch Processor for admin tools, migrations, or RTBF processing. Rate-limit external callers so they do not starve live servers.
 
 **Key takeaway:** Choose the variant deliberately at creation time. You cannot easily convert an OrderedDataStore into a versioned DataStore later without migration code (see best-practices-and-gotchas.md and versioning-metadata-recovery.md for migration and recovery patterns).
 

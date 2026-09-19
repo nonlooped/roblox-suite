@@ -1,8 +1,9 @@
 ---
+read_when: "Assign physics simulation to the server or a player and debug ownership"
 last_reviewed: 2026-06-17
 ---
 
-# Network Ownership
+# Network ownership
 
 Official guide: https://create.roblox.com/docs/physics/network-ownership
 
@@ -10,8 +11,8 @@ Official guide: https://create.roblox.com/docs/physics/network-ownership
 
 Roblox uses distributed physics. Each unanchored assembly is simulated by either the server or a client. The owner simulates locally and replicates state.
 
-- **Server-owned** — authoritative, higher latency for clients.
-- **Client-owned** — responsive for that player, but exploitable.
+- **Server-owned**: authoritative, higher latency for clients.
+- **Client-owned**: responsive for that player, but exploitable.
 - **Anchored parts** are always server-owned.
 
 ## Automatic ownership
@@ -66,11 +67,11 @@ Also assign ownership of loose parts on the vehicle (e.g., cargo) to the same dr
 ## Visualization
 
 Enable **Network owners** in Visualization Options. Colors are shown per-assembly:
-- Blue — the local player owns the assembly.
-- Green — another client owns the assembly.
-- Red — buffer zone, pending transfer.
-- White/grey — server owns the assembly.
-- Black — no owner (not simulated).
+- Blue: the local player owns the assembly.
+- Green: another client owns the assembly.
+- Red: buffer zone, pending transfer.
+- White/grey: server owns the assembly.
+- Black: no owner (not simulated).
 
 ## Debugging tips
 

@@ -27,7 +27,7 @@ const specialistLines = catalog.skills
   .filter((skill) => !skill.hub)
   .map(
     (skill) =>
-      `- **${skill.displayTitle}:** [${skill.slug}/SKILL.md](../${skill.slug}/SKILL.md) — ${skill.oneLiner}`,
+      `- [${skill.slug}](../${skill.slug}/SKILL.md): ${skill.oneLiner}`,
   );
 const generatedBlock = `${start}\n${specialistLines.join("\n")}\n${end}`;
 const hub = await readFile(hubPath, "utf8");
@@ -66,11 +66,22 @@ for (const skill of catalog.skills) {
   } catch {
     continue;
   }
+  const referenceLines = await Promise.all(referenceFiles.map(async (file) => {
+    const text = await readFile(path.join(refsDir, file), "utf8");
+    const frontmatter = text.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/)?.[1];
+    const raw = frontmatter?.match(/^read_when: (.+)$/m)?.[1];
+    if (!raw) throw new Error(`${skill.slug}/references/${file} needs read_when frontmatter`);
+    const readWhen = JSON.parse(raw);
+    if (typeof readWhen !== "string" || !readWhen.trim()) {
+      throw new Error(`${skill.slug}/references/${file}: read_when must be a nonempty JSON-quoted string`);
+    }
+    return `- [${file}](references/${file}): ${readWhen}.`;
+  }));
   const referenceBlock = [
     refsStart,
     "## Reference index",
     "",
-    ...referenceFiles.map((file) => `- [${file}](references/${file})`),
+    ...referenceLines,
     refsEnd,
   ].join("\n");
   const current = await readFile(skillPath, "utf8");

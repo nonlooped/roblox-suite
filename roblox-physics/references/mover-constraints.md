@@ -1,8 +1,9 @@
 ---
+read_when: "Apply forces or velocity targets, or migrate BodyMover code"
 last_reviewed: 2026-06-17
 ---
 
-# Mover Constraints
+# Mover constraints
 
 Official guide: https://create.roblox.com/docs/physics/mover-constraints
 
@@ -24,30 +25,30 @@ Mover constraints apply force, velocity, torque, or alignment to assemblies. The
 Moves `Attachment0` toward `Attachment1` or a world `Position`.
 
 Key properties:
-- `Mode` — `TwoAttachment` or `OneAttachment`.
-- `RigidityEnabled` — if `true`, solver does whatever it takes; if `false`, use `MaxForce`, `MaxVelocity`, `Responsiveness`.
-- `ForceLimitMode` — `Magnitude` (scalar `MaxForce`) or `PerAxis` (vector `MaxAxesForce`).
-- `ApplyAtCenterOfMass` — apply at CoM instead of attachment point.
-- `ReactionForceEnabled` — apply equal/opposite force to Attachment1.
+- `Mode`: `TwoAttachment` or `OneAttachment`.
+- `RigidityEnabled`: if `true`, solver does whatever it takes; if `false`, use `MaxForce`, `MaxVelocity`, `Responsiveness`.
+- `ForceLimitMode`: `Magnitude` (scalar `MaxForce`) or `PerAxis` (vector `MaxAxesForce`).
+- `ApplyAtCenterOfMass`: apply at CoM instead of attachment point.
+- `ReactionForceEnabled`: apply equal/opposite force to Attachment1.
 
 ## `AlignOrientation`
 
 Aligns `Attachment0` orientation with `Attachment1` or a goal orientation.
 
 Key properties:
-- `AlignType` — `PrimaryAxisParallel`, `PrimaryAxisPerpendicular`, or `AllAxes`.
+- `AlignType`: `PrimaryAxisParallel`, `PrimaryAxisPerpendicular`, or `AllAxes`.
 - `RigidityEnabled`, `MaxTorque`, `MaxAngularVelocity`, `Responsiveness`.
-- `LookAtPosition` — separate `Vector3` that points Attachment0's primary axis at a world position (use with `OneAttachment` mode and a target orientation).
+- `LookAtPosition`: separate `Vector3` that points Attachment0's primary axis at a world position (use with `OneAttachment` mode and a target orientation).
 
 ## `LinearVelocity`
 
 Maintains constant linear velocity on an assembly.
 
 - `VelocityConstraintMode`:
-  - `Vector` — 3D velocity vector.
-  - `Line` — velocity along attachment axis.
-  - `Plane` — velocity within a plane.
-- `RelativeTo` — world, Attachment0, Attachment1.
+  - `Vector`: 3D velocity vector.
+  - `Line`: velocity along attachment axis.
+  - `Plane`: velocity within a plane.
+- `RelativeTo`: world, Attachment0, Attachment1.
 - `ForceLimitMode` / `MaxForce` / `MaxAxesForce`.
 
 **Warning:** this applies force to *maintain* velocity. For one-time velocity, use `ApplyImpulse` or set `AssemblyLinearVelocity`.
@@ -65,7 +66,7 @@ Maintains constant angular velocity.
 Applies constant force.
 
 - `Force` vector.
-- `RelativeTo` — world or attachment frame.
+- `RelativeTo`: world or attachment frame.
 - Apply at attachment point or CoM depending on setup.
 
 ## `Torque`
@@ -79,7 +80,7 @@ Applies constant torque about the assembly's center of mass.
 
 Applies force along the line connecting two attachments.
 
-- `InverseSquareLaw` — falloff with distance (like gravity/magnetism).
+- `InverseSquareLaw`: falloff with distance (like gravity/magnetism).
 - `Magnitude`.
 - `ApplyAtCenterOfMass`.
 
@@ -87,7 +88,7 @@ Applies force along the line connecting two attachments.
 
 Drives attachments by a target CFrame offset. Useful for animation-driven physics.
 
-- `IsKinematic` — kinematic or force-based.
+- `IsKinematic`: kinematic or force-based.
 - `MaxForce` / `MaxTorque`.
 
 ## Choosing a mover

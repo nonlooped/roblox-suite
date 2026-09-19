@@ -1,8 +1,9 @@
 ---
+read_when: "Write unit tests, mock dependencies, or test client-server flows"
 last_reviewed: 2026-06-17
 ---
 
-# Testing Patterns
+# Testing patterns
 
 Official guide: https://roblox.github.io/testez/
 

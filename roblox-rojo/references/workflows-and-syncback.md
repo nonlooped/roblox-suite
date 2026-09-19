@@ -1,8 +1,9 @@
 ---
+read_when: "Port an existing place, export Studio changes, or build in CI"
 last_reviewed: 2026-07-09
 ---
 
-# Workflows and Syncback
+# Workflows and syncback
 
 Official docs:
 - https://rojo.space/docs/v7/getting-started/existing-game/
@@ -11,10 +12,10 @@ Official docs:
 
 ## Collaboration models (docs status)
 
-The official “Recommended Workflows” page distinguishes:
+The official "Recommended Workflows" page distinguishes:
 
-- **Partially managed Rojo** — Rojo owns scripts (and maybe some instances); world/building may stay in Team Create.
-- **Fully managed Rojo** — entire place comes from the filesystem/build pipeline (CI-friendly, hermetic builds).
+- **Partially managed Rojo**: Rojo owns scripts (and maybe some instances); world/building may stay in Team Create.
+- **Fully managed Rojo**: entire place comes from the filesystem/build pipeline (CI-friendly, hermetic builds).
 
 Those pages are still marked **TODO** in places on rojo.space. Practical guidance from Getting Started + release notes:
 
@@ -84,26 +85,26 @@ Rules:
 | `syncUnscriptable` | Include properties the Studio plugin cannot set; default **true**. |
 | `ignoreReferents` | If true, skip referent properties (e.g. `Model.PrimaryPart`); default **false** (include them). |
 
-Actors and bindable/remote event/function variants may sync back as JSON files (7.7+). Referent properties pointing at instances outside the syncback set were a bug source — fixed in 7.7.0; still design trees so targets are included when you need refs.
+Actors and bindable/remote event/function variants may sync back as JSON files (7.7+). Rojo 7.7.0 fixed a bug involving referent properties that pointed outside the syncback set. Include those targets in the tree when you need their references.
 
 ### Other porting tools (official docs)
 
-- [rbxlx-to-rojo](https://github.com/rojo-rbx/rbxlx-to-rojo) — automated porting helper.
-- [Lune](https://github.com/lune-org/lune) — scriptable pipelines for large/complex conversions.
+- [rbxlx-to-rojo](https://github.com/rojo-rbx/rbxlx-to-rojo): automated porting helper.
+- [Lune](https://github.com/lune-org/lune): scriptable pipelines for large/complex conversions.
 
 ### Leaving Rojo
 
-Edit the built place in Studio and stop using the filesystem tree. Rojo always produces normal places/models — no lock-in.
+Edit the built place in Studio and stop using the filesystem tree. Rojo produces normal place and model files.
 
 ## Plugin settings (behavioral)
 
 From release notes / plugin UX (verify in your plugin version):
 
-- **Open Scripts Externally** — open script edits in the system editor.
-- **Two-Way Sync** — experimental; not reliable for source control.
+- **Open Scripts Externally**: open script edits in the system editor.
+- **Two-Way Sync**: experimental; not reliable for source control.
 - **Patch confirmation** modes (Initial / Always / Large Changes / Unlisted PlaceId).
 - **Sync reminder** when reconnecting to a previously synced place (Forget option in recent plugin).
-- **Auto Connect** / playtest-related options — experimental; may break when Studio changes.
+- **Auto Connect** / playtest-related options: experimental; may break when Studio changes.
 
 ## CI / hermetic builds
 
@@ -119,7 +120,7 @@ Typical pipeline:
 | Tool | Role vs Rojo |
 | --- | --- |
 | **Rojo** | Project file + filesystem middleware → build/serve/syncback. |
-| **Script Sync** | Studio-native folder mapping with its own suffixes (`.server.luau`, `.local.luau`, etc.). Different convention — do not mix naming blindly. |
+| **Script Sync** | Studio-native folder mapping with its own suffixes (`.server.luau`, `.local.luau`, etc.). Different convention; do not mix naming blindly. |
 | **Studio MCP** | Agent control plane (inspect, execute Luau, playtest). Complements Rojo; does not replace project format. |
 
 See [roblox-mcp/SKILL.md](../../roblox-mcp/SKILL.md) for MCP + Script Sync.
@@ -128,9 +129,9 @@ See [roblox-mcp/SKILL.md](../../roblox-mcp/SKILL.md) for MCP + Script Sync.
 
 | Symptom | Check |
 | --- | --- |
-| Plugin won’t connect | CLI major matches plugin; `rojo serve` running; host/port; firewall; Host allowlist if non-local. |
+| Plugin won't connect | CLI major matches plugin; `rojo serve` running; host/port; firewall; Host allowlist if non-local. |
 | Wrong place overwritten | Set `servePlaceIds` / `blockedPlaceIds`. |
 | Scripts wrong class | `emitLegacyScripts` and file suffix (`.server` / `.client` / `.plugin`). |
 | Properties missing after sync | Live-sync type limits; rebuild place. |
 | Syncback wrote nothing | Target services missing from project `tree`; path ignore rules too broad. |
-| Nested project ignored syncRules | Sync rules reset per project file — redeclare. |
+| Nested project ignored syncRules | Sync rules reset per project file; redeclare. |

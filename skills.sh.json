@@ -4,7 +4,7 @@
   "groupings": [
     {
       "title": "Core",
-      "description": "Foundational Roblox development skills every agent should start with.",
+      "description": "Architecture, Luau fundamentals, and client-server communication.",
       "skills": [
         "roblox",
         "roblox-core",
@@ -13,7 +13,7 @@
     },
     {
       "title": "Gameplay",
-      "description": "Skills for building characters, physics, AI, world mechanics, and moving players between places.",
+      "description": "Physics, NPC behavior, and player transfers between places.",
       "skills": [
         "roblox-physics",
         "roblox-npcs",
@@ -22,7 +22,7 @@
     },
     {
       "title": "Presentation",
-      "description": "Skills for user interfaces, animation, visual effects, audio, and polish.",
+      "description": "Interfaces, animation, visual effects, and audio.",
       "skills": [
         "roblox-user-interfaces",
         "roblox-animation",
@@ -32,7 +32,7 @@
     },
     {
       "title": "Systems",
-      "description": "Skills for data persistence, monetization, external automation, and live ops.",
+      "description": "Player data, purchases, and external automation.",
       "skills": [
         "roblox-datastores",
         "roblox-gamepasses",
@@ -41,14 +41,14 @@
     },
     {
       "title": "Quality",
-      "description": "Skills for testing, debugging, and profiling experiences.",
+      "description": "Testing, debugging, and performance profiling.",
       "skills": [
         "roblox-testing"
       ]
     },
     {
       "title": "Agent Workflows",
-      "description": "Skills for filesystem workflows (Rojo) and connecting AI agents directly to Roblox Studio.",
+      "description": "Rojo projects and agent connections to Roblox Studio.",
       "skills": [
         "roblox-rojo",
         "roblox-mcp"

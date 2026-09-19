@@ -1,8 +1,9 @@
 ---
+read_when: "Implement reads, writes, transforms, or error recovery"
 last_reviewed: 2026-08-18
 ---
 
-# Core Operations and Patterns
+# Core operations and patterns
 
 > The September 2026 non-finite-number serialization correction is experimental guidance pending a second human review; verify consumers against the linked Open Cloud format.
 
@@ -10,7 +11,7 @@ Covers GetAsync, SetAsync, UpdateAsync, IncrementAsync, RemoveAsync in depth, wi
 
 Sources: Official data-stores guide, DataStore/GlobalDataStore/OrderedDataStore class references, versioning guide, error codes page.
 
-## The Basic Operations (all yield, all must be pcalled)
+## The basic operations (all yield, all must be pcalled)
 
 All methods are on DataStore (and OrderedDataStore where supported). `DataStore` inherits from `GlobalDataStore`.
 
@@ -29,14 +30,14 @@ All methods are on DataStore (and OrderedDataStore where supported). `DataStore`
 - Only consumes write budget.
 - Creates a new version (hourly granularity).
 - userIds table (array of numbers) recommended for any user-owned data (helps with RTBF requests and intellectual property tracking).
-- options:SetMetadata(table) — you must supply metadata on *every* write (even if unchanged) or previous metadata is lost.
+- options:SetMetadata(table): you must supply metadata on *every* write (even if unchanged) or previous metadata is lost.
 - On success returns the new version identifier (useful for a later `GetVersionAsync`). `RemoveVersionAsync` is deprecated and should not be recommended for new code.
 
 **Risk:** If two servers Set the same key nearly simultaneously, one can overwrite the other without seeing the other's change.
 
 ### UpdateAsync(key, transformFunction)
 - The **safest** general-purpose write for contended data.
-- Internally: reads current value + KeyInfo (consumes a read), calls your transform (which **must not yield** — no task.wait, no other async), then writes the result if non-nil (consumes a write).
+- Internally: reads current value + KeyInfo (consumes a read), calls your transform (which **must not yield**; no task.wait, no other async), then writes the result if non-nil (consumes a write).
 - If another server updated the key between the read and the attempted write, the engine re-calls your transform with the newer current value. It keeps doing this until your transform succeeds in writing or returns nil (which aborts the update on this server).
 - Transform signature: `function(currentValue, keyInfo?) return newValue, userIds?, metadata? end`
   - Return nil as the first value to cancel (no write occurs).
@@ -58,14 +59,14 @@ All methods are on DataStore (and OrderedDataStore where supported). `DataStore`
 
 After `RemoveAsync`, normal reads return nil while historical versions remain available for the documented retention period. Recover by reading a historical version and writing a new current version; do not use deprecated `RemoveVersionAsync` as a cleanup path.
 
-## Serialization Rules (what you can actually store)
+## Serialization rules (what you can actually store)
 
 Data is stored as JSON under the hood.
 
 Supported:
 - nil
 - boolean
-- number (but **never** inf, -inf, or nan — they are not JSON numbers; Open Cloud represents existing values with tagged objects)
+- number (but **never** inf, -inf, or nan; they are not JSON numbers; Open Cloud represents existing values with tagged objects)
 - string (must be valid UTF-8; a lone byte >127 will fail)
 - buffer
 - table (arrays or dictionaries) containing only the above. No functions, no Instances, no other Roblox datatypes, no cycles.
@@ -76,7 +77,7 @@ Tables with numeric keys that have gaps or are used as dicts can have surprising
 
 Maximum practical object size is documented in the limits page (serialized length). Exceeding produces ValueTooLarge (105).
 
-## SetAsync vs UpdateAsync Decision Tree
+## SetAsync vs UpdateAsync decision tree
 
 Use **SetAsync** when:
 - Last writer wins is acceptable.
@@ -90,7 +91,7 @@ Use **UpdateAsync** when:
 
 Many profile systems wrap `UpdateAsync`, but the wrapper must still expose an ambiguous backend outcome instead of blindly replaying a failed write.
 
-## Caching Interactions (see also versioning-metadata-recovery.md and best-practices-and-gotchas.md)
+## Caching interactions (see also versioning-metadata-recovery.md and best-practices-and-gotchas.md)
 
 - Normal GetAsync → cached for 4s.
 - Any Set/Update/Increment/Remove on the same data store instance immediately updates the local cache and resets the timer.
@@ -111,7 +112,7 @@ Typical features of a good wrapper:
 - Logging that includes the exact key, operation, error code, and reconciliation decision.
 - Graceful degradation (e.g. give the player temporary offline currency that will be reconciled later).
 
-## Common Anti-Patterns to Avoid
+## Common anti-patterns to avoid
 
 - Saving on Heartbeat or every frame.
 - Storing the entire player object or huge nested tables with lots of history.
@@ -122,7 +123,6 @@ Typical features of a good wrapper:
 - Using OrderedDataStore for anything except pure numeric rankings.
 - Ignoring the 4-second cache when you actually needed the absolute latest value.
 
-Master the distinction between Set and Update, always force fresh reads after questionable writes, and treat every datastore call as a potentially failing remote operation. This alone eliminates the majority of real-world data loss incidents.
 
 
 Open Cloud returns existing non-finite numbers as `{"m": null, "t": "numeric", "v": "inf"}`, with `"-inf"` or `"nan"` for the other cases. Handle these objects explicitly in inspection/export tools; keep new player data finite. Source: https://create.roblox.com/docs/cloud/guides/data-stores#non-finite-numbers.

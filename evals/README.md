@@ -1,6 +1,6 @@
 # Roblox Suite evaluations
 
-These tasks measure the product claim: whether loading Roblox Suite makes an agent choose current APIs and safer failure semantics.
+These tasks compare API choices and failure handling with and without Roblox Suite.
 
 ## Protocol
 
@@ -32,6 +32,6 @@ Results must include failures. Do not compare runs that changed model, agent, pr
 
 ## Published runs
 
-- [2026-07-16 — Codex / gpt-5.6-sol](reports/2026-07-16-codex-gpt-5.6-sol.md): baseline 6/10, Suite 10/10. Raw paired outputs and machine reports are under `runs/`.
+- [2026-07-16: Codex / gpt-5.6-sol](reports/2026-07-16-codex-gpt-5.6-sol.md): baseline 6/10, Suite 10/10. Raw paired outputs and machine reports are under `runs/`.
 
-This single run is an initial baseline, not a universal performance claim. Repeat it across agents/models and publish failures and variance.
+This run measures one agent/model configuration. Repeat it across configurations and publish failures and variance.

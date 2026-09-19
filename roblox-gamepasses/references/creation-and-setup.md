@@ -1,12 +1,13 @@
 ---
+read_when: "Create a pass, find its asset ID, or configure sales and test access"
 last_reviewed: 2026-06-17
 ---
 
-# Creation and Setup of Game Passes
+# Creation and setup of game passes
 
 **Official guide:** https://create.roblox.com/docs/en-us/production/monetization/passes
 
-## Creating a Pass
+## Creating a pass
 
 1. Go to Creations in Creator Dashboard.
 2. Select your experience (must be published).
@@ -17,7 +18,7 @@ last_reviewed: 2026-06-17
 
 After creation, the pass appears in the list.
 
-## Obtaining the Pass ID (Asset ID)
+## Obtaining the pass ID (asset ID)
 
 - Hover over the pass thumbnail in the list.
 - Click the ⋯ menu.
@@ -28,7 +29,7 @@ This ID (a number like 1234567890) is what you use in all `MarketplaceService` c
 - `PromptGamePassPurchase(player, id)`
 - `UserOwnsGamePassAsync(userId, id)`
 
-## Enabling Sales (External / Game Page Store)
+## Enabling sales (external / game page store)
 
 For the pass to appear on the game's Store tab on Roblox.com:
 
@@ -40,7 +41,7 @@ For the pass to appear on the game's Store tab on Roblox.com:
 
 The price affects your Robux earnings after Roblox fees.
 
-## Icon Best Practices and Validation Errors
+## Icon best practices and validation errors
 
 Icons are validated strictly. Common issues:
 - Content outside the circular boundary gets cropped.
@@ -49,13 +50,13 @@ Icons are validated strictly. Common issues:
 
 Test by viewing the pass in the in-experience purchase prompt and on the web store.
 
-## Group vs Individual Ownership
+## Group vs individual ownership
 
 When publishing the animation or pass:
 - If the experience is group-owned, select the group as the creator during publish/export for the asset.
 - Same applies conceptually for passes (the experience ownership determines who can manage).
 
-## Testing Setup
+## Testing setup
 
 - If a backend API used in Studio requires it, enable **Studio Access to API Services** only for a dedicated test experience. Do not grant Studio sessions access to production data.
 - Create a separate test experience/universe that mirrors your production one.
@@ -63,7 +64,7 @@ When publishing the animation or pass:
 - Verify `UserOwnsGamePassAsync` returns true after purchase on new servers.
 - Test re-join behavior.
 
-## Initial Script Skeleton (before full flow)
+## Initial Script skeleton (before full flow)
 
 Place in ServerScriptService:
 
@@ -134,7 +135,7 @@ end)
 
 See the purchase-flow reference for the complete client prompting code and error handling.
 
-## Common Setup Mistakes
+## Common setup mistakes
 
 - Using the wrong InfoType (must be GamePass, not Product).
 - Forgetting that passes are experience-specific (after the 2026 change).

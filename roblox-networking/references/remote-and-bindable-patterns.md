@@ -1,10 +1,11 @@
 ---
+read_when: "Choose events versus functions or define communication payloads"
 last_reviewed: 2026-06-17
 ---
 
-# Remote and Bindable Patterns
+# Remote and bindable patterns
 
-## RemoteEvent (Fire-and-Forget)
+## RemoteEvent (fire-and-forget)
 
 Best for most gameplay communication.
 
@@ -27,7 +28,7 @@ end)
 - `FireAllClients(...)` for everyone
 - To target a specific subset of players, iterate over the desired players and call `FireClient` on each; there are no built-in variants for specific player lists.
 
-## RemoteFunction (Request-Response)
+## RemoteFunction (request-response)
 
 Use sparingly because it yields the caller.
 
@@ -52,7 +53,7 @@ Never put a Bindable in a place where it could be used to bypass the network bou
 
 Excellent for clean event-driven architecture within one side of the client/server divide.
 
-## Recommended Patterns
+## Recommended patterns
 
 1. **Central Remotes folder** in ReplicatedStorage. All RemoteEvents and RemoteFunctions live here with clear names.
 2. **Wrapper modules** on both sides that expose clean APIs instead of raw Fire/OnEvent calls everywhere.
@@ -60,7 +61,7 @@ Excellent for clean event-driven architecture within one side of the client/serv
 4. **Rate limiting** on sensitive or abusable Remotes.
 5. **Source of truth** lives on the server. Remotes are for synchronization, not authority.
 
-## Argument Sanitization Examples
+## Argument sanitization examples
 
 Validate every argument from the client before using it.
 
@@ -95,7 +96,7 @@ end
 
 > **Warning:** A client-to-server Instance reference can point to any Instance the client can see, including other players' characters or replicated map geometry. The server must re-check the Instance's ClassName, ancestry, and whether the player is allowed to interact with it. Do not trust the client to send the "right" object.
 
-## Payload Sizes
+## Payload sizes
 
 Keep Remote payloads small. Sending large tables, long strings, or many Instances every frame can degrade server performance and increase bandwidth for all clients. Prefer compact identifiers (IDs, positions) and fetch detailed data on demand.
 

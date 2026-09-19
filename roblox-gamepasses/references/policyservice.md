@@ -1,12 +1,13 @@
 ---
+read_when: "Gate a feature using per-player monetization or content restrictions"
 last_reviewed: 2026-06-17
 ---
 
-# PolicyService Reference
+# PolicyService reference
 
 **Official source:** https://create.roblox.com/docs/en-us/reference/engine/classes/PolicyService
 
-`PolicyService` queries per-player policy compliance based on geolocation, age group, and platform. Use it to gate monetization, content sharing, ads, commerce, and region-specific behavior **per player**, not globally — the same experience can have players in different policy regimes at once.
+`PolicyService` queries per-player policy compliance based on geolocation, age group, and platform. Use it to gate monetization, content sharing, ads, commerce, and region-specific behavior **per player**, not globally. The same experience can have players in different policy regimes at once.
 
 `PolicyService` is a service (`game:GetService("PolicyService")`). It is `NotCreatable`, `NotReplicated`, and tagged as a Service. Its async methods **yield** and **must** be wrapped in `pcall`. They are **thread-unsafe** and require the `Basic` capability.
 
@@ -34,16 +35,16 @@ The returned dictionary contains these fields:
 
 ### `CanViewBrandProjectAsync(player: Player, brandProjectId: string): boolean`
 
-Determines whether a player may see a specific brand project's assets. Requires a brand project ID provided by Roblox (request one via the [brand project form](https://docs.google.com/forms/d/e/1FAIpQLSfGTRQwATB2wUg0P4HUSTtyXrhptFahJifo1ew84SyqtfSBfg/viewform)). **Yields**; wrap in `pcall`. **Server-only** — calling from the client errors. Pattern: query on the server, then `RemoteEvent:FireClient(player, assetToShow)` with either the branded asset or a default fallback.
+Determines whether a player may see a specific brand project's assets. Requires a brand project ID provided by Roblox (request one via the [brand project form](https://docs.google.com/forms/d/e/1FAIpQLSfGTRQwATB2wUg0P4HUSTtyXrhptFahJifo1ew84SyqtfSBfg/viewform)). **Yields**; wrap in `pcall`. **Server-only**. Calling from the client errors. Pattern: query on the server, then `RemoteEvent:FireClient(player, assetToShow)` with either the branded asset or a default fallback.
 
-## Error Handling
+## Error handling
 
 Like any async call, wrap in `pcall`. Documented error messages:
 
 | Message | Reason |
 | --- | --- |
 | `Instance was not a player` | `player` parameter is not a `Player`. |
-| `Players not found` | Internal error — the `Players` service is missing. |
+| `Players not found` | Internal error; the `Players` service is missing. |
 | `This method cannot be called on the client for a non-local player` | Client-side call for a non-local `Player`. |
 | `GetPolicyInfoForPlayerAsync is called too many times` | More than ~100 concurrent calls before an HTTP response returns. Throttle. |
 
@@ -127,18 +128,18 @@ RemoteEvent.OnClientEvent:Connect(function(partToLoad)
 end)
 ```
 
-## Rules and Gotchas
+## Rules and gotchas
 
-- **Every call yields and must be pcall'd.** A thrown error here is not a player kick — handle it and degrade gracefully (usually: hide the gated feature).
+- **Every call yields and must be pcall'd.** A thrown error here is not a player kick. Handle it and degrade gracefully (usually: hide the gated feature).
 - **Throttle.** More than ~100 in-flight `GetPolicyInfoForPlayerAsync` calls before HTTP responses return will error. Cache the result per-player for the session; you rarely need to re-query mid-session unless a player's region/platform could change (rare).
 - **Call from the correct side.** `GetPolicyInfoForPlayerAsync` is server-safe and client-safe *for the local player only*; `CanViewBrandProjectAsync` is **server-only** and errors on the client.
 - **Don't gate globally.** Two players in the same server can have different flags. Gate per-player, not with a single experience-wide boolean.
-- **Combine with `LocalizationService:GetCountryRegionForPlayerAsync`** when you need the actual country/region code (a string) for finer-grained logic — `PolicyService` tells you the *restrictions*, `LocalizationService` tells you the *where*.
+- **Combine with `LocalizationService:GetCountryRegionForPlayerAsync`** when you need the actual country/region code (a string) for finer-grained logic. `PolicyService` tells you the *restrictions*, `LocalizationService` tells you the *where*.
 - **Don't trust the client for grant decisions.** If the client reads policy flags and the server grants based on a client Remote saying "ads are allowed for me," that's exploitable. Re-query on the server for any decision that affects economy or access.
 - **`AllowedExternalLinkReferences` is legacy and always empty.** Do not build logic on it.
-- **China (`IsSubjectToChinaPolicies`)** requires experience-specific compliance changes — see the Roblox China program documentation before relying on this flag.
+- **China (`IsSubjectToChinaPolicies`)** requires experience-specific compliance changes: see the Roblox China program documentation before relying on this flag.
 
-## When to Use What
+## When to use what
 
 | Need | Method | Side |
 | --- | --- | --- |

@@ -1,10 +1,5 @@
 ---
-import {
-  latestSourceCheckAt,
-  oldestSourceCheckAt,
-  repoUrl,
-  skillCount,
-} from "../data/catalog";
+import { repoUrl, skillCount } from "../data/catalog";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const year = new Date().getFullYear();
@@ -15,7 +10,6 @@ const columns = [
     links: [
       { label: "Home", href: `${base}/` },
       { label: "Skills", href: `${base}/skills/` },
-      { label: "Sources", href: `${base}/evidence/` },
     ],
   },
   {
@@ -51,9 +45,7 @@ const columns = [
         Roblox Suite
       </div>
       <p class="mt-4 max-w-xs text-small text-on-ink-muted">
-        {skillCount} Roblox API guidance skills for coding agents. Citation checks range from {
-          oldestSourceCheckAt
-        } through {latestSourceCheckAt}.
+        {skillCount} Roblox skills for coding agents, each one linked back to the official docs.
       </p>
     </div>
 
@@ -62,12 +54,7 @@ const columns = [
         columns.map((column) => (
           <div>
             <h2 class="font-display text-small font-bold text-toy-yellow">{column.title}</h2>
-            {/*
-              Padded targets with the gap pulled in: the visual rhythm is the
-              same as gap-2.5 on bare text, but each row is a thumb-sized hit
-              area rather than a 23px line. Negative margin keeps the labels
-              flush with the column heading.
-            */}
+            {/* Pad footer links for touch input; negative margins keep the text aligned with the heading. */}
             <ul class="mt-3 flex flex-col gap-0.5">
               {column.links.map((link) => (
                 <li>

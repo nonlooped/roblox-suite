@@ -1,32 +1,17 @@
 ---
 name: roblox-npcs
-description: "Roblox pathfinding and NPC AI — PathfindingService, agent parameters, waypoint actions, blocked-path handling, PathfindingModifier/Link, material and region costs, and streaming compatibility. Covers NPC design patterns: state machines, behavior trees, follow/patrol/chase, humanoid movement, obstacle avoidance, and performance at scale. Use for NPCs, enemy AI, companions, patrols, or any agent that navigates the 3D world."
+description: "Build or debug Roblox NPC navigation and behavior. Use for PathfindingService, modifiers and links, blocked paths, patrol or chase logic, streaming, and scaling NPC counts."
 last_reviewed: 2026-06-17
 ---
 
 # roblox-npcs
 
-**Official sources (always check these for the latest):**
+**Official sources:**
 - https://create.roblox.com/docs/en-us/characters/pathfinding
 - https://create.roblox.com/docs/en-us/workspace/streaming
 - Engine classes: `PathfindingService`, `Path`, `PathWaypoint`, `PathfindingModifier`, `PathfindingLink`, `Humanoid`
 
-This skill covers navigation mesh pathfinding and the AI patterns that use it. It does not cover custom A* implementations unless absolutely necessary — PathfindingService is the official, optimized solution.
-
-## When to use this skill
-
-Activate when:
-- Building zombies, guards, pets, companions, or any AI that walks/follows/patrols.
-- Tuning agent size, jump/climb ability, or preferred terrain.
-- Handling dynamic obstacles and blocked paths.
-- Using `PathfindingModifier` regions/links for doors, traps, ladders, boats.
-- Scaling pathfinding for many agents.
-
-Cross-reference:
-- [roblox-core/SKILL.md](../roblox-core/SKILL.md) for services and Humanoid basics.
-- [roblox-networking/SKILL.md](../roblox-networking/SKILL.md) for server-authoritative AI.
-- [roblox-physics/SKILL.md](../roblox-physics/SKILL.md) for custom non-humanoid rigs and mover constraints.
-- [roblox-testing/SKILL.md](../roblox-testing/SKILL.md) for profiling AI cost.
+Use PathfindingService for navigation on Roblox's navigation mesh. Build patrol, chase, and other behavior around its computed paths.
 
 ## PathfindingService basics
 
@@ -81,15 +66,15 @@ end
 ## PathWaypoint actions
 
 Each waypoint has a `Position` and an `Action`:
-- `Enum.PathWaypointAction.Walk` — normal movement.
-- `Enum.PathWaypointAction.Jump` — trigger jump.
+- `Enum.PathWaypointAction.Walk`: normal movement.
+- `Enum.PathWaypointAction.Jump`: trigger jump.
 - Custom labels like `"Climb"` or `"UseBoat"` from PathfindingModifiers/Links.
 
 ## Pathfinding modifiers
 
 `PathfindingModifier` instances on anchored, non-colliding parts let you influence path cost:
-- `Label` — key used in `Costs` table.
-- `PassThrough` — if `true`, the volume is ignored by the navmesh and treated as traversable empty space (e.g., zombies "hearing" through doors).
+- `Label`: key used in `Costs` table.
+- `PassThrough`: if `true`, the volume is ignored by the navmesh and treated as traversable empty space (e.g., zombies "hearing" through doors).
 
 Example:
 
@@ -154,7 +139,7 @@ Common NPC states: Idle, Patrol, Chase, Attack, Return. Each state handles its o
 - Consider simplifying agent geometry or using fewer active agents.
 - For very large worlds, split into regions or use local patrol paths.
 
-## Common mistakes this skill prevents
+## Common mistakes
 
 - Computing paths every frame.
 - Ignoring blocked-path events and letting NPCs walk into walls.
@@ -164,9 +149,9 @@ Common NPC states: Idle, Patrol, Chase, Attack, Return. Each state handles its o
 
 ## Scripts
 
-- `scripts/NPCPathFollower.lua` — Humanoid-based path follower with blocked-path recompute, custom-label support, and connection cleanup.
-- `scripts/PatrolBehavior.lua` — state-driven patrol/chase behavior with spatial detection and throttled recomputation.
-- `scripts/PathfindingUtility.lua` — helpers for throttled recomputation and waypoint formatting.
+- `scripts/NPCPathFollower.lua`: Humanoid-based path follower with blocked-path recompute, custom-label support, and connection cleanup.
+- `scripts/PatrolBehavior.lua`: state-driven patrol/chase behavior with spatial detection and throttled recomputation.
+- `scripts/PathfindingUtility.lua`: helpers for throttled recomputation and waypoint formatting.
 
 ## Best practices
 
@@ -191,8 +176,8 @@ Common NPC states: Idle, Patrol, Chase, Attack, Return. Each state handles its o
 <!-- catalog:references:start -->
 ## Reference index
 
-- [modifiers-links-and-streaming.md](references/modifiers-links-and-streaming.md)
-- [npc-behavior-patterns.md](references/npc-behavior-patterns.md)
-- [pathfinding-service-details.md](references/pathfinding-service-details.md)
-- [performance-and-scaling.md](references/performance-and-scaling.md)
+- [modifiers-links-and-streaming.md](references/modifiers-links-and-streaming.md): Route NPCs through special regions or handle streamed geometry.
+- [npc-behavior-patterns.md](references/npc-behavior-patterns.md): Implement patrol, chase, combat, or state transitions.
+- [pathfinding-service-details.md](references/pathfinding-service-details.md): Configure agents, compute paths, or handle blocked waypoints.
+- [performance-and-scaling.md](references/performance-and-scaling.md): Reduce pathfinding and simulation cost as NPC counts grow.
 <!-- catalog:references:end -->

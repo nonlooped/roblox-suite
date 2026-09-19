@@ -1,14 +1,15 @@
 ---
+read_when: "Inspect versions, preserve metadata, or recover data after an incident"
 last_reviewed: 2026-07-16
 ---
 
-# Versioning, Metadata, and Recovery
+# Versioning, metadata, and recovery
 
 Detailed coverage of the versioning system, DataStoreKeyInfo, user-defined metadata, recovery workflows, snapshots, and the Data Stores Manager.
 
 Drawn from https://create.roblox.com/docs/cloud-services/data-stores/versioning-listing-and-caching and class references for DataStore / GlobalDataStore.
 
-## How Versioning Works
+## How versioning works
 
 Writes via SetAsync, UpdateAsync, and IncrementAsync on standard (non-Ordered) data stores automatically create versioned backups.
 
@@ -19,7 +20,7 @@ Writes via SetAsync, UpdateAsync, and IncrementAsync on standard (non-Ordered) d
 
 OrderedDataStores have **no versioning** at all. RemoveAsync on an OrderedDataStore is a true permanent delete.
 
-## KeyInfo Object (returned by many reads)
+## KeyInfo object (returned by many reads)
 
 When using the full DataStore path you often receive a second return value:
 
@@ -32,7 +33,7 @@ On UpdateAsync the transform receives the current KeyInfo as the second argument
 
 **Rule:** When calling SetAsync/UpdateAsync/IncrementAsync with metadata, you must always pass a (possibly unchanged) metadata table. Omitting it or passing nil will clear prior metadata.
 
-## Core Versioning APIs (on the standard DataStore path)
+## Core versioning APIs (on the standard DataStore path)
 
 - `ListVersionsAsync(key, sortDirection?, minDateMillis?, maxDateMillis?, pageSize?)` → DataStoreVersionPages
   - SortDirection.Ascending or Descending (default Ascending in some contexts).
@@ -47,7 +48,7 @@ On UpdateAsync the transform receives the current KeyInfo as the second argument
 
 Normal `RemoveAsync(key)` creates a new tombstone *current* version (GetAsync returns nil) while leaving all previous versions intact for recovery.
 
-## Listing Keys and Data Stores
+## Listing keys and data stores
 
 Both `DataStoreService:ListDataStoresAsync(prefix?, pageSize?, cursor?)` and `DataStore:ListKeysAsync(prefix?, pageSize?, cursor?, excludeDeleted?)` return `DataStoreListingPages`. Iterate with `GetCurrentPage()` and `AdvanceToNextPageAsync()` until `IsFinished` is true.
 
@@ -78,7 +79,7 @@ end
 
 Use the same pattern for `DataStoreService:ListDataStoresAsync`. List operations consume `StandardList` budget.
 
-## Practical Recovery Workflow (example from official docs)
+## Practical recovery workflow (example from official docs)
 
 ```lua
 local maxDate = DateTime.fromUniversalTime(2020, 10, 9, 1, 42)  -- time of the incident
@@ -111,7 +112,7 @@ end
 
 You can also do this interactively through the Data Stores Manager in Creator Hub (select key → select old version → Compare or Revert). Note that the Manager's **Revert** button reverts a key to a previous version by creating a new current version with the old data; this is equivalent to the `SetAsync` restore pattern above. The **Restore** button is for data stores marked for deletion, not for reverting key values.
 
-## Metadata Use Cases
+## Metadata use cases
 
 - Tagging data for analytics or cleanup ("EventSummer2026", "BetaTester").
 - Storing extra context that travels with the key (source of the data, schema version).
@@ -125,7 +126,7 @@ Before any risky publish that changes data storage logic, take a manual snapshot
 
 A snapshot taken at 3:29 UTC protects all data written before that time even if your 3:30 publish immediately corrupts data for keys written in the following minutes.
 
-## Data Stores Manager Capabilities (human + permissioned ops)
+## Data Stores Manager capabilities (human + permissioned ops)
 
 - Browse all data stores (filter by prefix).
 - Drill into a data store → list keys (prefix filter).
@@ -136,7 +137,7 @@ A snapshot taken at 3:29 UTC protects all data written before that time even if 
 
 Permissions (group experiences): View Data Stores, Edit Data Stores, Delete Data Stores, plus the broad "Edit all group experiences".
 
-## Best Practices Around Versioning & Recovery
+## Best practices around versioning and recovery
 
 - Design keys so that a single key = a coherent self-contained object (player profile, not "gold for player X + separately inventory for player X"). This makes version restores consistent.
 - Use versioning instead of creating new keys for every historical save (saves storage quota and key count).

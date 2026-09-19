@@ -1,8 +1,9 @@
 ---
+read_when: "Reduce pathfinding and simulation cost as NPC counts grow"
 last_reviewed: 2026-06-17
 ---
 
-# Performance and Scaling
+# Performance and scaling
 
 ## Throttle pathfinding
 

@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.10.0 — 2026-09-19
+
+### Website
+
+- Rebuilt the site around what a reader is trying to build rather than around the project's own method. The home page now opens the catalog by goal and drops the prose that explained the citation process.
+- Replaced the grouped catalog list with a searchable, filterable index of skill tiles. It still renders on the server, so the full catalog is present without JavaScript.
+- Removed the standalone `/evidence/` source list and folded each skill's sources into a disclosure on its own page, beside the claims they support. `/evidence/` now redirects to the catalog.
+- Removed the home page's API-correction section and the timed carousel that presented it, along with the `CorrectionPanel` component and the `corrections.ts` data that only it used.
+- Restricted section backgrounds to cobalt or yellow. Off-white is now a panel fill only — skill tiles, unpressed keys, the search field, the sources disclosure — so it no longer drenches whole sections.
+- Renamed the risk badges to plain language, added a copy button to every install command, and gave the hero tower a pointer lean.
+- Dropped the Motion dependency with the carousel. Total built client JavaScript is down from 364 KB to 240 KB.
+
+### Skills and documentation
+
+- Shortened all skill descriptions and removed repeated routing and implementation prose.
+- Added task cues to reference indexes, generated from each reference's `read_when` field.
+- Edited documentation, catalog summaries, website copy, and the social preview using writing-for-agents and unslop. Source verification dates and saved evaluation outputs are unchanged.
+
 ## 1.9.0 — 2026-09-19
 
 ### Corrected and added

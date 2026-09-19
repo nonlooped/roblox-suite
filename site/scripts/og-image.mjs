@@ -82,7 +82,7 @@ const html = `<!doctype html>
 
     <div>
       <h1 style="font-family:Unbounded;font-weight:700;font-size:76px;line-height:0.98;letter-spacing:-0.035em;max-width:820px">
-        Your AI writes Roblox code <span style="color:${YELLOW}">from 2019</span>
+        Roblox docs for your <span style="color:${YELLOW}">coding agent</span>
       </h1>
 
       <div style="margin-top:34px;display:inline-flex;flex-direction:column;gap:10px;
@@ -94,7 +94,7 @@ const html = `<!doctype html>
     </div>
 
     <p style="font-size:25px;color:rgba(238,241,248,0.82)">
-      16 skills that keep your coding agent on Roblox APIs that still work.
+      16 skills with API guidance, examples, and official sources.
     </p>
   </div>
 

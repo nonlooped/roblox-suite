@@ -1,12 +1,13 @@
 ---
+read_when: "Tween UI properties, chain transitions, or reveal text"
 last_reviewed: 2026-06-17
 ---
 
-# UI Tweens and Animation Sequences
+# UI tweens and animation sequences
 
 **Primary source:** https://create.roblox.com/docs/ui/animation
 
-## Core TweenService Pattern for GuiObjects
+## TweenService for GuiObjects
 
 ```lua
 local TweenService = game:GetService("TweenService")
@@ -37,11 +38,11 @@ local tween = TweenService:Create(guiObject, tweenInfo, {
 tween:Play()
 ```
 
-## Recommended Properties to Tween on Common UI Objects
+## Recommended properties to Tween on common UI objects
 
 **Frame / CanvasGroup:**
 - Position, Size, Rotation, BackgroundTransparency, BackgroundColor3
-- CanvasGroup.GroupTransparency and GroupColor3 (affects all descendants as a batch — extremely useful)
+- CanvasGroup.GroupTransparency and GroupColor3 (affects all descendants as a batch)
 
 **TextLabel / TextButton:**
 - The above + TextTransparency, TextColor3
@@ -59,19 +60,19 @@ tween:Play()
 
 **Always add UIAspectRatioConstraint** when tweening Size on anything that has a designed aspect ratio. This prevents squashing on different screen sizes.
 
-## Easing Guidance
+## Easing guidance
 
-- **Quad / Cubic** — excellent general purpose, natural feel for most UI.
-- **Sine** — gentler.
-- **Back** — slight overshoot then settle (great for "pop" on appear or button press).
-- **Bounce** — playful, use sparingly.
-- **Elastic** — rubber-band feel, can feel over-the-top.
+- **Quad / Cubic**: general-purpose easing for UI.
+- **Sine**: gentler.
+- **Back**: slight overshoot then settle (great for "pop" on appear or button press).
+- **Bounce**: playful, use sparingly.
+- **Elastic**: rubber-band feel, can feel over-the-top.
 - **Constant** is an interpolation mode in the Animation Editor / curve animations, not a `TweenService` easing style. To snap a value instantly with TweenService, use a 0-duration tween or set the property directly.
 - Linear only when you truly want constant speed (rare for UI polish).
 
 Experiment in Studio. The visual graphs in the docs are accurate.
 
-## Sequences, Chaining, and State Machines
+## Sequences, chaining, and state machines
 
 Simple chain:
 ```lua
@@ -98,9 +99,7 @@ end)
 
 For more complex UI flows (open panel → show content → highlight button), maintain a small table of tweens or use a simple state enum + a "playNext" function. Cancel any in-flight tween before starting a conflicting one, and disconnect Completed connections when the sequence finishes or the GUI is destroyed.
 
-## Typewriter / Animated Text Reveal
-
-One of the highest-ROI UI animations for immersion.
+## Typewriter / animated text reveal
 
 The official guide provides a complete reusable `AnimateUI` module using:
 - `LocalizationService` translator (optional)
@@ -111,9 +110,7 @@ The official guide provides a complete reusable `AnimateUI` module using:
 
 Call it from a LocalScript attached to the target TextLabel.
 
-This technique works beautifully combined with sound cues or subtle particle "text dust" on each character.
-
-## CanvasGroup Power Moves
+## Group transitions with CanvasGroup
 
 Instead of individually tweening 8 elements inside a panel when you want to fade the whole thing:
 1. Wrap them (or the important visual children) in a CanvasGroup.
@@ -122,7 +119,7 @@ Instead of individually tweening 8 elements inside a panel when you want to fade
 
 This is dramatically cheaper than tweening many individual transparencies and colors.
 
-## 3D-in-UI via ViewportFrame + Tweens
+## 3D-in-UI via ViewportFrame + tweens
 
 ViewportFrame lets you embed a miniature 3D scene (with its own ambient lighting, models, and cameras) inside a 2D UI rectangle.
 
@@ -135,18 +132,18 @@ Common pattern:
 
 Performance warning: ViewportFrames have a cost. Limit how many are active and visible, especially on lower-end devices.
 
-## Gotchas Specific to UI Tweens
+## Gotchas specific to UI tweens
 
 - ClipsDescendants does not clip rotated descendants reliably.
 - Tweening very large numbers of transparent UI elements at once is a major source of fill-rate / overdraw problems on mobile.
 - Always work in scale (0–1) + AnchorPoint for resolution independence. Hard pixel offsets are a maintenance nightmare.
-- UDim2.fromScale vs UDim2.new — prefer the former for clarity when doing relative work.
+- UDim2.fromScale vs UDim2.new: prefer the former for clarity when doing relative work.
 - RichText tags will break simple character-by-character reveals unless you strip them first (as shown in the official typewriter example).
 - Tween objects are GC'd when no longer referenced and finished. Keep a reference only while you need to Cancel/Pause/Resume or listen to Completed.
 - Disconnect `Completed` connections and call `:Destroy()` on tweens when the GUI object is removed to avoid leaking memory.
-- Style transitions (beta) via the Style Editor are an alternative declarative approach — good for consistent design-system motion.
+- Style transitions (beta) via the Style Editor are an alternative declarative approach. Good for consistent design-system motion.
 
-## Multi-Property Tweens
+## Multi-property tweens
 
 You can (and should) change several properties in one tween for cohesive motion:
 ```lua
@@ -157,7 +154,7 @@ TweenService:Create(panel, info, {
 }):Play()
 ```
 
-## When to Prefer AnimationTracks over Tweens in UI Contexts
+## When to prefer AnimationTracks over tweens in UI contexts
 
 Rare, but possible: if you have a complex repeating or blended motion that is easier to author once in the Animation Editor and then drive a ViewportFrame rig, or if you want marker events from "UI animation" data.
 

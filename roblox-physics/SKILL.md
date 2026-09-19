@@ -1,12 +1,12 @@
 ---
 name: roblox-physics
-description: "Roblox rigid-body physics for vehicles, mechanisms, doors, platforms, and dynamic objects. Covers assemblies, root parts, anchoring, WeldConstraint vs RigidConstraint, mechanical constraints (hinge, spring, prismatic, rope), mover constraints (AlignPosition, LinearVelocity, VectorForce), network ownership, collision filtering, the sleep system, adaptive timestepping, and units. Use for anything that moves or connects under physics simulation."
+description: "Build or debug Roblox vehicles, mechanisms, and moving objects. Use for assemblies, mechanical or mover constraints, network ownership, collision filtering, and simulation performance."
 last_reviewed: 2026-06-17
 ---
 
 # roblox-physics
 
-**Official sources (always check these for the latest):**
+**Official sources:**
 - https://create.roblox.com/docs/physics
 - https://create.roblox.com/docs/physics/assemblies
 - https://create.roblox.com/docs/physics/mechanical-constraints
@@ -17,21 +17,7 @@ last_reviewed: 2026-06-17
 - https://create.roblox.com/docs/physics/units
 - https://create.roblox.com/docs/workspace/collisions
 
-This skill covers the modern constraint-based physics system, not deprecated `BodyMover` objects. It focuses on building correct, stable, multiplayer-safe mechanisms.
-
-## When to use this skill
-
-Activate when:
-- Building vehicles, doors, elevators, cranes, swings, suspension, or platforms.
-- Moving objects with forces instead of setting `CFrame` every frame.
-- Tuning stability for complex mechanisms or multiplayer physics.
-- Choosing between mechanical and mover constraints.
-- Debugging why assemblies sleep, jitter, or behave unexpectedly.
-
-Cross-reference:
-- [roblox-networking/SKILL.md](../roblox-networking/SKILL.md) for network ownership security and server-authoritative validation.
-- [roblox-core/SKILL.md](../roblox-core/SKILL.md) for services and script locations.
-- [roblox-testing/SKILL.md](../roblox-testing/SKILL.md) for profiling physics with MicroProfiler.
+Use mechanical constraints to connect parts and mover constraints to apply forces or velocity targets. For older code, use the BodyMover migration table below.
 
 ## Core concepts
 
@@ -40,10 +26,10 @@ Cross-reference:
 An **assembly** is one or more parts connected by rigid welds or movable joints, simulated as a single rigid body.
 
 Key `BasePart` properties (same for any part in the assembly):
-- `AssemblyLinearVelocity` / `AssemblyAngularVelocity` — prefer constraints or `ApplyImpulse` over direct assignment for realistic motion.
-- `AssemblyCenterOfMass` — force here produces pure linear acceleration.
-- `AssemblyMass` — sum of all part masses; infinite if any part is anchored.
-- `AssemblyRootPart` — automatically chosen root for replication and network ownership.
+- `AssemblyLinearVelocity` / `AssemblyAngularVelocity`: prefer constraints or `ApplyImpulse` over direct assignment for realistic motion.
+- `AssemblyCenterOfMass`: force here produces pure linear acceleration.
+- `AssemblyMass`: sum of all part masses; infinite if any part is anchored.
+- `AssemblyRootPart`: automatically chosen root for replication and network ownership.
 
 Root-part priority: anchored > non-massless > higher `RootPriority` > size/name heuristics.
 
@@ -91,9 +77,9 @@ Modern replacements for deprecated `BodyMover`s:
 | `BodyAngularVelocity` | `AngularVelocity` | Maintain constant angular velocity |
 | `BodyForce`/`BodyThrust` | `VectorForce` | Apply constant force |
 | `RocketPropulsion` | `LineForce` + `AlignOrientation` | Follow + face target |
-| — | `Torque` | Apply constant torque |
-| — | `LineForce` | Force along line between two attachments |
-| — | `AnimationConstraint` | Constraint driven by animation/transform |
+| - | `Torque` | Apply constant torque |
+| - | `LineForce` | Force along line between two attachments |
+| - | `AnimationConstraint` | Constraint driven by animation/transform |
 
 See [references/mover-constraints.md](references/mover-constraints.md) for force modes (`Magnitude` vs `PerAxis`), relativity frames, rigidity, and reaction forces.
 
@@ -116,8 +102,8 @@ Assemblies stop simulating when still to save performance. They wake on collisio
 ## Physics stepping method
 
 Workspace.PhysicsSteppingMethod:
-- **Fixed** (default, 240 Hz) — best general choice; use for racing, destruction, tanks, or when most parts already solve at 240 Hz.
-- **Adaptive** — assigns assemblies to 60/120/240 Hz islands for up to ~2.5× performance in suitable experiences.
+- **Fixed** (default, 240 Hz): best general choice; use for racing, destruction, tanks, or when most parts already solve at 240 Hz.
+- **Adaptive**: assigns assemblies to 60/120/240 Hz islands for up to ~2.5× performance in suitable experiences.
 
 Use the MicroProfiler to check island distribution.
 
@@ -132,7 +118,7 @@ Use the MicroProfiler to check island distribution.
 
 See [references/units-and-physical-properties.md](references/units-and-physical-properties.md).
 
-## Common mistakes this skill prevents
+## Common mistakes
 
 - Using deprecated `BodyMover`s instead of modern constraints.
 - Setting `CFrame` every frame instead of using forces/constraints.
@@ -143,10 +129,10 @@ See [references/units-and-physical-properties.md](references/units-and-physical-
 
 ## Scripts
 
-- `scripts/VehicleController.lua` — chassis setup with `HingeConstraint` steering and motor drive, with client ownership and server validation.
-- `scripts/DoorHinge.lua` — motorized/servo door with limits and state machine.
-- `scripts/PlatformMover.lua` — `AlignPosition` + `AlignOrientation` platform with configurable waypoints.
-- `scripts/Suspension.lua` — spring-damper suspension using `SpringConstraint`.
+- `scripts/VehicleController.lua`: chassis setup with `HingeConstraint` steering and motor drive, with client ownership and server validation.
+- `scripts/DoorHinge.lua`: motorized/servo door with limits and state machine.
+- `scripts/PlatformMover.lua`: `AlignPosition` + `AlignOrientation` platform with configurable waypoints.
+- `scripts/Suspension.lua`: spring-damper suspension using `SpringConstraint`.
 
 ## How to proceed
 
@@ -159,9 +145,9 @@ See [references/units-and-physical-properties.md](references/units-and-physical-
 <!-- catalog:references:start -->
 ## Reference index
 
-- [collisions-and-filtering.md](references/collisions-and-filtering.md)
-- [mechanical-constraints.md](references/mechanical-constraints.md)
-- [mover-constraints.md](references/mover-constraints.md)
-- [network-ownership.md](references/network-ownership.md)
-- [units-and-physical-properties.md](references/units-and-physical-properties.md)
+- [collisions-and-filtering.md](references/collisions-and-filtering.md): Configure collision groups, touch events, or spatial query filters.
+- [mechanical-constraints.md](references/mechanical-constraints.md): Connect parts with hinges, springs, ropes, or other mechanical constraints.
+- [mover-constraints.md](references/mover-constraints.md): Apply forces or velocity targets, or migrate BodyMover code.
+- [network-ownership.md](references/network-ownership.md): Assign physics simulation to the server or a player and debug ownership.
+- [units-and-physical-properties.md](references/units-and-physical-properties.md): Tune mass, density, friction, force, or simulation stepping.
 <!-- catalog:references:end -->

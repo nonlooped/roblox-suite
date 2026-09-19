@@ -1,8 +1,9 @@
 ---
+read_when: "Route NPCs through special regions or handle streamed geometry"
 last_reviewed: 2026-06-17
 ---
 
-# Modifiers, Links, and Streaming
+# Modifiers, links, and streaming
 
 Official guide: https://create.roblox.com/docs/en-us/characters/pathfinding
 
@@ -11,8 +12,8 @@ Official guide: https://create.roblox.com/docs/en-us/characters/pathfinding
 A `PathfindingModifier` is an instance placed on an anchored, non-colliding part to influence path cost or traversability.
 
 Properties:
-- `Label` — string key referenced in `CreatePath` `Costs`.
-- `PassThrough` — if `true`, the volume is ignored by the navmesh and treated as traversable empty space. The pathfinder can route straight through it; your NPC code is responsible for actually opening the door, climbing, etc.
+- `Label`: string key referenced in `CreatePath` `Costs`.
+- `PassThrough`: if `true`, the volume is ignored by the navmesh and treated as traversable empty space. The pathfinder can route straight through it; your NPC code is responsible for actually opening the door, climbing, etc.
 
 ### Region modifier example
 

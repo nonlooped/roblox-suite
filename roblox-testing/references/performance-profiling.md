@@ -1,8 +1,9 @@
 ---
+read_when: "Find CPU, GPU, memory, or load-time bottlenecks"
 last_reviewed: 2026-06-17
 ---
 
-# Performance Profiling
+# Performance profiling
 
 Official guide: https://create.roblox.com/docs/en-us/performance-optimization/identify
 
@@ -29,9 +30,9 @@ High-end PCs can hide performance problems due to thermal/power headroom.
 
 ## MicroProfiler colors
 
-- **Orange** — worker thread bottleneck (scripts, physics, pathfinding, animations).
-- **Blue** — render thread bottleneck (geometry, effects, UI).
-- **Red** — GPU wait (complex geometry, large textures, overdrawing).
+- **Orange**: worker thread bottleneck (scripts, physics, pathfinding, animations).
+- **Blue**: render thread bottleneck (geometry, effects, UI).
+- **Red**: GPU wait (complex geometry, large textures, overdrawing).
 
 ## Server profiling
 
@@ -70,9 +71,9 @@ High-end PCs can hide performance problems due to thermal/power headroom.
 ## Counters mode and flame graphs
 
 The web MicroProfiler supports:
-- **Flame graphs** — aggregated call stacks.
-- **Diff flame graphs** — compare two dumps.
-- **X-Ray memory** — highlight allocation-heavy frames.
+- **Flame graphs**: aggregated call stacks.
+- **Diff flame graphs**: compare two dumps.
+- **X-Ray memory**: highlight allocation-heavy frames.
 
 Use these for regressions and long-term tracking.
 

@@ -1,8 +1,8 @@
 # Roadmap
 
-Roblox Suite is prioritizing verification depth over catalog growth.
+The priority is to test and verify the existing skills before adding more.
 
-## Now — correctness and enforcement
+## Now: correctness and checks
 
 - [x] Correct transfer economics and deprecated DataStore guidance.
 - [x] Redesign the four high-risk helper examples around explicit failure states and safe coordination.
@@ -11,14 +11,14 @@ Roblox Suite is prioritizing verification depth over catalog growth.
 - [ ] Run the high-risk fixtures in an automated Roblox test environment.
 - [ ] Require a second reviewer for critical changes in branch protection.
 
-## Next — evaluations and change monitoring
+## Next: evaluations and change monitoring
 
 - [x] Add a versioned evaluation task/check schema.
 - [x] Publish the first reproducible baseline-versus-suite run (Codex / gpt-5.6-sol, 2026-07-16).
 - [ ] Add a scheduled official-doc/API change monitor that opens review issues without rewriting content.
 - [ ] Publish per-skill evaluation and integration-test evidence on the website.
 
-## Later — feedback and product learning
+## Later: feedback and usage
 
 - [x] Add a direct inaccuracy-report flow and public trust policies.
 - [ ] Enable public issue creation in repository settings.

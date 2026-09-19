@@ -1,8 +1,9 @@
 ---
+read_when: "Map files to instances or diagnose changes that live sync cannot apply"
 last_reviewed: 2026-07-09
 ---
 
-# Sync Details
+# Sync details
 
 Official docs:
 - https://rojo.space/docs/v7/sync-details/
@@ -75,7 +76,7 @@ Attach Rojo data next to non-project instances:
 
 | Field | Use |
 | --- | --- |
-| `className` | Only in `init.meta.json` — change the folder’s class (e.g. to `Tool`). |
+| `className` | Only in `init.meta.json`; change the folder's class (e.g. to `Tool`). |
 | `properties` | Set properties on the adjacent instance (not for `.rbxm`/`.rbxmx`/`.model.json`, which already define properties). |
 | `ignoreUnknownInstances` | Same meaning as `$ignoreUnknownInstances`. |
 
@@ -112,7 +113,7 @@ Hand-written instance trees (Remotes, simple hierarchies). File name supplies th
 }
 ```
 
-Recent Rojo accepts camelCase keys (`className`, `children`, `properties`, `name`) for JSON models; older PascalCase still appears in docs samples — prefer the format your Rojo version emits/accepts and validate with `rojo build` / serve.
+Recent Rojo accepts camelCase keys (`className`, `children`, `properties`, `name`) for JSON models; older PascalCase still appears in docs samples. Prefer the format your Rojo version emits/accepts and validate with `rojo build` / serve.
 
 ## JSON / TOML / YAML modules
 
@@ -128,7 +129,7 @@ Documented cases that often fail or need a full build:
 
 Type support differs for **build** vs **live sync** (see Properties page tables). When live sync cannot apply a change, generate a place with `rojo build` and open it.
 
-Fallback recreation for difficult instances (e.g. some MeshParts/Unions) may delete/recreate instances and can break unknown references — be careful on large places.
+Fallback recreation for difficult instances (e.g. some MeshParts/Unions) may delete/recreate instances and can break unknown references. Be careful on large places.
 
 ## Line endings
 
@@ -136,5 +137,5 @@ Rojo normalizes Lua sources to LF when syncing (avoids spurious Windows CRLF dif
 
 ## What Rojo is not
 
-- Not Roblox **Script Sync** (Studio’s built-in disk mapping; different naming rules — see roblox-mcp).
+- Not Roblox **Script Sync** (Studio's built-in disk mapping; different naming rules; see roblox-mcp).
 - Not a full round-trip Studio editor: two-way sync is experimental; use **syncback** for place → files.

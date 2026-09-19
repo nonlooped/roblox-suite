@@ -1,65 +1,69 @@
 # Contributing
 
-This is an agent skill set. Contributions should keep each skill self-contained and follow the existing conventions. The companion [website](https://roblox-suite.vercel.app/) is the public gateway — the repo is the source of truth the site is built from.
+Roblox Suite contains agent skills and example code. The [website](https://roblox-suite.vercel.app/) builds its catalog from this repository.
 
-## Accuracy is the contract
+## Verify technical claims
 
-This suite's value proposition is opinionated, source-grounded Roblox guidance whose currentness can be measured. Inaccurate or stale content is worse than no content — it trains models to emit wrong code confidently. Before contributing:
+Check new or changed API and policy claims against current primary sources:
 
-1. **Ground every claim in current official Roblox docs.** Primary sources:
-   - https://create.roblox.com/docs/reference/engine (Engine API Reference — source of truth for classes/properties/methods)
-   - https://create.roblox.com/docs (official guides and tutorials)
-   - https://create.roblox.com/docs/cloud (Open Cloud REST API)
-   - https://create.roblox.com/docs/llms.txt and https://create.roblox.com/docs/reference/engine/llms.txt (agent-facing indexes)
-2. **Triple-check before writing.** If a claim is date-sensitive (policy change, deprecation, new API), verify the current state against the official doc at the time of contribution. Do not rely on memory or older versions of the docs.
-3. **Cite source URLs.** Each SKILL.md and reference should list the official source URLs it was built from, so reviewers and future maintainers can re-verify.
-4. **When the docs are ambiguous, say so.** Prefer "the docs don't specify this" over a confident guess. A noted gap is a fixable TODO; a fabricated claim is a bug.
-5. **Correct, don't soften.** If you find something wrong, fix it. Don't add a "some say X, some say Y" hedge when the official doc is clear.
+- [Engine API Reference](https://create.roblox.com/docs/reference/engine) for classes, properties, and methods.
+- [Creator Hub](https://create.roblox.com/docs) for guides and policies.
+- [Open Cloud](https://create.roblox.com/docs/cloud) for REST APIs.
+- [Documentation index](https://create.roblox.com/docs/llms.txt) and [engine index](https://create.roblox.com/docs/reference/engine/llms.txt) for agent navigation.
+- [Rojo documentation](https://rojo.space/docs/v7/) and [releases](https://github.com/rojo-rbx/rojo/releases) for Rojo behavior.
+
+Include source URLs in the affected skill or reference. State any ambiguity the source leaves unresolved, and distinguish platform requirements from design recommendations.
+
+Every `SKILL.md` and reference records `last_reviewed`. Change this date only after verifying the affected guidance against its sources. An editorial edit does not renew verification. Review requirements and freshness limits are in [REVIEW_POLICY.md](REVIEW_POLICY.md).
+
+## Write for the reader
+
+Use Matt Pocock's [writing-for-agents](https://github.com/mattpocock/skills/blob/main/skills/productivity/writing-for-agents/SKILL.md) for agent instructions and Lauren Tan's [unslop](https://github.com/poteto/noodle/blob/main/.agents/skills/unslop/SKILL.md) for prose.
+
+Keep the skill description focused on the tasks that should trigger it. Put shared decisions and constraints in `SKILL.md`; put branch-specific detail in references. Remove repeated instructions and explain what completes a workflow, such as a successful build or a reproduced failure that the fix resolves.
+
+For public copy, name the behavior or API instead of promising correctness, security, or performance. Use plain language and sentence-case headings. Keep technical caveats, source links, and measured limits. Preserve published evaluation outputs verbatim.
 
 ## Skill structure
 
-Every skill follows the same layout so agents always know where to look:
+- `SKILL.md` contains routing, decisions, constraints, and links to detailed guidance.
+- `references/` contains topic-specific procedures, tables, and examples.
+- `scripts/` contains self-contained examples with comments explaining their use and limitations.
 
+Each reference starts with YAML frontmatter:
+
+```yaml
+---
+read_when: "Diagnose throttling or plan request budgets"
+last_reviewed: YYYY-MM-DD
+---
 ```
-skill-name/
-├── SKILL.md        ← overview, decision trees, quick patterns, pointers to references
-├── references/     ← deep technical docs for specific problems
-└── scripts/        ← maturity-labeled examples to adapt and test
-```
 
-1. **SKILL.md first.** Each skill's `SKILL.md` is the entry point. Keep it focused on decision-making, quick patterns, and pointers to `references/`. Don't dump exhaustive tables in SKILL.md — put them in a reference.
-2. **Deep details go in `references/`.** Use granular files for tables, edge cases, and long-form explanations. Every reference file must start with YAML frontmatter:
-   ```yaml
-   ---
-   last_reviewed: YYYY-MM-DD
-   ---
-   ```
-   `last_reviewed` is the date the content was last verified against official docs. Update it when you re-verify, not when you merely edit.
-3. **Example code goes in `scripts/`.** Scripts must be commented and self-contained. Every script must declare `experimental`, `reviewed`, or `tested` maturity, its verification date, test coverage, and that callers must adapt it before production.
+Write `read_when` as a nonempty, JSON-quoted string without a final period. The catalog generator uses it in the skill's reference index. Describe the task that needs the file; keep the technical detail in the body.
 
-## Luau script requirements
+## Luau examples
 
-- Every script must start with `--!strict` on the first line. No exceptions.
-- Indent with **4 spaces**, never tabs.
-- Use the modern `task` API (`task.wait`, `task.spawn`, `task.delay`, `task.defer`, `task.cancel`) — never the deprecated `wait`/`spawn`/`delay`.
-- Use modern engine APIs. Avoid deprecated `BodyMover`s, `Humanoid:LoadAnimation`, legacy `Sound`/`SoundGroup` for new audio work (the audio graph is preferred — see roblox-audio), deprecated `Teleport`/`TeleportPartyAsync` variants (use `TeleportAsync`), etc.
-- pcall every fallible engine/cloud call (DataStore, Marketplace, Http, Teleport, Policy, etc.).
+- Start every script with `--!strict`. Use four spaces for indentation.
+- Use `task` APIs and current engine APIs. Mention deprecated APIs only when explaining migration.
+- Wrap fallible engine and cloud calls in `pcall`, and handle their failure states.
 - Type-annotate module exports and public functions.
-- Never ship keys, secrets, or credentials in scripts. Use the Secrets Store and `HttpService:GetSecret`.
+- Keep credentials out of scripts. Use Secrets Store and `HttpService:GetSecret`.
+- Declare the script's maturity (`experimental`, `reviewed`, or `tested`), verification date, test coverage, and need for adaptation before production use. Keep the header and catalog consistent.
 
-## Catalog, routing, and generated artifacts
+## Catalog and generated files
 
-`catalog.json` is authoritative for skill identity, risk, groups, site summaries, source verification, and script maturity. The site imports it directly. `skills.sh.json` and the hub's specialist block are generated artifacts.
+`catalog.json` owns skill identity, risk, groups, site summaries, source verification, and script maturity. The site imports it directly. After editing the catalog or reference routing cues, run:
 
-- The hub routes only to specialist `SKILL.md` files; do not add every deep reference to the hub.
-- Each specialist owns links to its own references through its generated reference index.
-- Edit `catalog.json`, then run `node scripts/generate-catalog-artifacts.mjs`.
-- Never hand-edit content between `catalog:*` markers.
-- `node scripts/check-hub-refs.mjs` rejects missing skills, orphan references, broken ownership, and hub-to-deep-reference links.
+```sh
+node scripts/generate-catalog-artifacts.mjs
+node scripts/check-hub-refs.mjs
+```
 
-## The website (`site/`)
+Edit the source fields rather than text inside `catalog:*` markers. The generator writes `skills.sh.json`, the hub's specialist list, and each skill's reference index. The hub links to specialist entry points; each specialist owns its detailed reference links.
 
-The Astro site imports `catalog.json` and computes strict per-file verification coverage at build time. Malformed or unreadable frontmatter fails the build. Root content changes that affect metadata trigger Vercel deployment.
+## Website
+
+To work on the Astro site:
 
 ```sh
 cd site
@@ -67,42 +71,18 @@ npm ci
 npm run dev
 ```
 
-Set `PUBLIC_GOATCOUNTER_CODE` in the deploy environment only after the owner chooses a GoatCounter site. When configured, the site records aggregate page views, install copies, single-skill copies, correction reports, and GitHub/skills.sh outbound clicks.
+Catalog edits affect the site on its next build. For analytics configuration and collected events, read [PRIVACY.md](PRIVACY.md).
 
-## Maintenance and freshness
+## Validate a change
 
-Roblox moves fast. The suite's value depends on staying current.
-
-- **`last_reviewed` discipline.** Every `SKILL.md` and reference carries a verification date. Editing does not reset it. Trust uses the oldest date and coverage across the skill. CI limits critical content to 120 days and other content to 180 days.
-- **Watch for deprecations.** Roblox deprecates APIs over time (e.g. `Sound`/`SoundGroup` → audio graph; `Teleport*` variants → `TeleportAsync`; Engagement-Based Payouts → Creator Rewards, discontinued July 2025). When a deprecation lands, update the affected skill and add a "Common mistakes this skill prevents" entry if useful.
-- **Watch for policy changes.** Monetization policy shifts (e.g. cross-experience sales disabled May 30, 2026; Premium Payouts replaced by Creator Rewards July 24, 2025). These are date-sensitive and must be verified at contribution time.
-- **Each SKILL.md lists its official sources.** Re-check those URLs when updating.
-
-## Pull request checklist
-
-- [ ] Every claim verified against current official Roblox docs at contribution time.
-- [ ] Source URLs listed in the affected SKILL.md / reference.
-- [ ] New/edited `SKILL.md` and references carry valid `last_reviewed: YYYY-MM-DD` frontmatter.
-- [ ] New/edited scripts start with `--!strict`, use 4-space indent, and use modern APIs.
-- [ ] No deprecated APIs introduced (`Humanoid:LoadAnimation`, `BodyMover`, `wait`/`spawn`/`delay`, legacy `Teleport*` variants, etc.) unless explicitly documenting the legacy API for migration context.
-- [ ] No secrets/keys in scripts.
-- [ ] Cross-references use correct skill names and relative paths.
-- [ ] `catalog.json` is updated and `node scripts/generate-catalog-artifacts.mjs` has synchronized generated files.
-- [ ] No broken markdown links (CI checks this).
-- [ ] `skills.sh.json` validates against the official schema (CI checks this).
-- [ ] No new typos (CI runs `typos`).
-
-## Running checks locally
-
-Install the pinned Luau tools with Rokit, then run:
+For documentation, catalog, or site changes:
 
 ```sh
 node scripts/generate-catalog-artifacts.mjs --check
+node scripts/check-hub-refs.mjs
 cd site && npm ci && npm test
-stylua --check roblox-*/scripts/*.lua
-selene roblox-*/scripts/*.lua
-rojo sourcemap default.project.json --output sourcemap.json
-luau-lsp analyze --platform roblox --sourcemap sourcemap.json roblox-*/scripts/*.lua
 ```
 
-CI additionally checks Markdown links and spelling. The skills.sh schema is vendored under `schemas/` so validation does not depend on a mutable network download.
+For Luau changes, install the pinned tools with Rokit and run the Luau checks in [validate.yml](.github/workflows/validate.yml). Run relevant regression fixtures as described in [tests/README.md](tests/README.md). CI also checks Markdown links and spelling and uses the vendored schema under `schemas/`.
+
+Before submitting, confirm that source citations support changed claims, verification dates reflect actual source checks, generated files are synchronized, and checks relevant to the change pass. Report any missing Studio integration tests in the pull request. Critical changes need the review specified in [REVIEW_POLICY.md](REVIEW_POLICY.md).

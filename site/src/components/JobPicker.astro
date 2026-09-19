@@ -1,0 +1,70 @@
+---
+import { plainLabel, skillCount } from "../data/catalog";
+
+interface Props {
+  base: string;
+}
+
+const { base } = Astro.props;
+
+/*
+ * The catalog by the reader's goal, not by subsystem name. Eight jobs rather
+ * than all sixteen skills: this is a door into the catalog, and a full grid
+ * here would just be the catalog page twice.
+ *
+ * Fills alternate so the grid reads as a wall of bricks. Every combination is
+ * ink text on a saturated fill, which clears AA at this size.
+ */
+const JOBS: { slug: string; fill: string }[] = [
+  { slug: "roblox-datastores", fill: "bg-toy-yellow" },
+  { slug: "roblox-networking", fill: "bg-paper" },
+  { slug: "roblox-npcs", fill: "bg-toy-green" },
+  { slug: "roblox-user-interfaces", fill: "bg-paper" },
+  { slug: "roblox-physics", fill: "bg-toy-yellow" },
+  { slug: "roblox-vfx", fill: "bg-toy-green" },
+  { slug: "roblox-animation", fill: "bg-paper" },
+  { slug: "roblox-gamepasses", fill: "bg-toy-yellow" },
+];
+---
+
+<section class="py-16 sm:py-20">
+  <div class="mx-auto max-w-6xl px-6">
+    <h2 class="text-title">What are you building?</h2>
+
+    <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        JOBS.map((job) => {
+          const label = plainLabel(job.slug);
+          return (
+            <li class="flex">
+              <a
+                href={`${base}/skills/${job.slug}/`}
+                class={`panel pressable flex min-w-0 flex-1 flex-col justify-between gap-6 p-5 text-ink ${job.fill}`}
+              >
+                {/* Unbounded is wide: at four columns a lead-size headline
+                    wraps to four lines. Body size still reads as a heading in
+                    the display face. */}
+                <span class="font-display text-base font-bold leading-snug">{label.does}</span>
+                <span class="flex items-center justify-between gap-3">
+                  <span class="text-small font-medium text-ink/75">{label.name}</span>
+                  <span class="font-display text-base font-bold" aria-hidden="true">
+                    →
+                  </span>
+                </span>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+
+    <div class="mt-8">
+      <a
+        href={`${base}/skills/`}
+        class="panel pressable inline-flex items-center bg-ink px-5 py-3 font-display text-small font-bold text-paper"
+      >
+        Browse all {skillCount} skills
+      </a>
+    </div>
+  </div>
+</section>

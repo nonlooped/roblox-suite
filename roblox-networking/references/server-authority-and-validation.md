@@ -1,10 +1,11 @@
 ---
+read_when: "Validate remote arguments, enforce cooldowns, or review client prediction"
 last_reviewed: 2026-07-16
 ---
 
-# Server Authority and Validation
+# Server authority and validation
 
-## Core Principle
+## Core principle
 
 If it can give a player an advantage, the server must be the one that ultimately decides whether it happens.
 
@@ -19,7 +20,7 @@ Server must:
 - Apply the change (or reject it)
 - Replicate the authoritative result
 
-## Practical Validation Checklist (per remote)
+## Practical validation checklist (per remote)
 
 - Is the player alive / in a valid state?
 - Is the action on cooldown?
@@ -30,7 +31,7 @@ Server must:
 
 Only after all checks pass do you apply the effect and save/persist as needed.
 
-## Common Implementation
+## Common implementation
 
 Many teams keep a "Validator" or "ActionHandler" module on the server that all Remotes funnel through.
 
@@ -51,7 +52,7 @@ local function handleAction(player: Player, actionName: string, payload: any)
 end
 ```
 
-## Concrete Argument Sanitization
+## Concrete argument sanitization
 
 Sanitize every value the client sends before trusting it.
 
@@ -84,7 +85,7 @@ end
 
 Instance references from the client can refer to any replicated Instance. Always re-validate the type, ancestry, and whether the player is permitted to interact with that specific object.
 
-## Network Ownership
+## Network ownership
 
 For physics objects (vehicles, projectiles, pushable crates):
 - The network owner simulates the physics.
@@ -94,7 +95,7 @@ For physics objects (vehicles, projectiles, pushable crates):
 - Use `Workspace.SetNetworkOwnerAuto = false` to disable automatic ownership assignment entirely when you need full manual control (e.g., competitive or tightly-controlled physics).
 - Always validate important outcomes on the server regardless of who owns the physics.
 
-## When Client Prediction is Acceptable
+## When client prediction is acceptable
 
 - Cosmetic animations
 - Local camera work

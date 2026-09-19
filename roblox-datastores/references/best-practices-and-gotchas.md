@@ -1,8 +1,9 @@
 ---
+read_when: "Design player profiles, session locking, saves, or deletion workflows"
 last_reviewed: 2026-07-20
 ---
 
-# Best Practices and Common Gotchas
+# Best practices and common gotchas
 
 > The September 2026 request-scheduling, serialization, and session-locking corrections below are experimental guidance pending a second human review. They follow the linked official sources; the suite does not provide a tested session-lock implementation.
 
@@ -14,11 +15,11 @@ Synthesized from the official "Best practices for data stores" page + all the er
 - **Use a single object for related data.** Fetch/save a player's entire relevant state in one key when possible (respects the ~4 MB serialized limit, keeps versions consistent, reduces round-trips).
 - **Use key prefixes to organize.** "profiles/User_1234", "inventory/User_1234", etc. Then ListKeysAsync("profiles/") gives you clean filtered results. Preferred over (or in addition to) legacy scopes for new work.
 
-## Optimization & Quota Hygiene
+## Optimization and quota hygiene
 
 - Monitor constantly: Data Stores Dashboard (Creator Hub Monitoring) for request volume, status codes, and quota % usage. Data Stores Manager for actual stored size vs lifetime-user-based limit (`500 MB + 1 MB × lifetime users`, compressed latest-version size).
 - Set up notifications for approaching or breaching storage limits.
-- Store normal serializable tables; do **not** pre-compress values — Roblox compresses on write and measures quota on compressed size.
+- Store normal serializable tables; do **not** pre-compress values. Roblox compresses on write and measures quota on compressed size.
 - Rate-limit Open Cloud v2 Data Store clients separately; they share the experience request budget with live servers.
 - Delete aggressively after testing or events: use Manager "Mark for Deletion" (cooldown; keys can be restored via `UpdateAsync` from the Engine API or `UpdateDataStoreEntry` from Open Cloud during the cooldown), Batch Processor CLI, or Open Cloud bulk delete.
 - Prefer versioning + restore over "save a new key for every version".
@@ -35,14 +36,14 @@ Synthesized from the official "Best practices for data stores" page + all the er
 
 Source: https://create.roblox.com/docs/cloud-services/data-stores/best-practices.
 
-## Caching Gotchas
+## Caching gotchas
 
 - Cache is per DataStore *instance* (different scope or AllScopes setting = different cache).
 - A write on one instance does not invalidate the cache on another instance pointing at the "same" logical store.
 - After any write error, always verify with GetAsync(..., {UseCache = false}).
 - Normal Gets inside the 4-second window are "free" (don't count against budgets) but can be stale.
 
-## Serialization & Data Shape Gotchas
+## Serialization and data shape gotchas
 
 - Prefer finite numbers. Existing inf/-inf/nan values are represented as tagged JSON objects by Open Cloud, not ordinary JSON numbers; see [serialization rules](core-operations-and-patterns.md).
 - UTF-8 strings only. Lone high bytes are fatal.
@@ -50,30 +51,30 @@ Source: https://create.roblox.com/docs/cloud-services/data-stores/best-practices
 - Large objects or very deep tables increase latency and risk ValueTooLarge.
 - When returning from UpdateAsync transform, be consistent about type and always return the userIds/metadata you want to keep.
 
-## Concurrency & Multi-Server Reality
+## Concurrency and multi-server reality
 
 - Multiple servers can (and will) be reading/writing the same keys for the same player (rejoins, multiple places, etc.).
 - SetAsync is not safe for contended values.
 - UpdateAsync + pure transform is the tool designed exactly for this.
-- OnUpdate is deprecated — use MessagingService for cross-server pub/sub when you need near-real-time notifications.
+- OnUpdate is deprecated: use MessagingService for cross-server pub/sub when you need near-real-time notifications.
 
-## Studio, Testing, and Lifecycle Gotchas
+## Studio, testing, and lifecycle gotchas
 
 - Studio API access must be explicitly enabled per place (Security settings). Never do this on a live/production place.
 - Data in Studio with API access enabled writes to the exact same backend as the live game. Use separate test experiences/universes.
 - Studio Run mode uses its own static limits, which may be lower than `SetRateLimitForRequestType` settings. Test rate-limit-sensitive logic in Team Create or a live test environment.
-- BindToClose gives you up to ~30 seconds to finish final saves — use it, but don't assume unlimited time.
-- CharacterRemoving vs PlayerRemoving timing varies; have a robust final-save strategy.
+- BindToClose gives you up to ~30 seconds to finish final saves. Use it, but don't assume unlimited time.
+- CharacterRemoving and PlayerRemoving occur at different points in the player lifecycle. Test the final-save path for both.
 
-## Error & Throttle Handling Gotchas
+## Error and throttle handling gotchas
 
 - A "failed" write does not prove the backend did not apply the change. Always verify with a fresh read when the outcome matters.
 - Throttle errors (301-306 family and the *Throttled family) mean you are either at experience quota or the per-server queue filled. Back off; do not tight-loop retry.
-- Shutdown errors (4xx during experience close) are normal — your final saves in BindToClose may see them.
+- Shutdown errors (4xx during experience close) are normal. Your final saves in BindToClose may see them.
 - "Key not found" after RemoveAsync is expected (tombstone).
 - OrderedDataStore has its own error surface (page size, min/max integers, etc.).
 
-## Session Locking
+## Session locking
 
 For profiles that must not be edited by two servers simultaneously, coordinate ownership in the profile key's metadata and check it in the same `UpdateAsync` transform as the data write. A lock in a separate key does not make the profile write atomic with the ownership check.
 
@@ -85,18 +86,18 @@ For profiles that must not be edited by two servers simultaneously, coordinate o
 
 Study the official [player data and purchasing sample](https://create.roblox.com/docs/cloud-services/data-stores/player-data-purchasing#session-locking) before implementing this protocol. The suite's `SafeDataStore` helper is not a session-locking system; adapt and integration-test ownership transfer and crash recovery separately.
 
-## Security & Privacy
+## Security and privacy
 
 - Never store secrets, auth tokens, or PII that you don't need.
 - Always associate userIds on writes for data you may later need to delete under RTBF requests.
 - Use the documented key template patterns + manual verification against live data (via Manager or ListKeys) before relying on automated deletion.
 - Server-only access is mandatory. Any client-visible datastore key or value is a potential exploit vector.
 
-## When to Break the "Fewer Stores" Rule
+## When to break the "fewer stores" rule
 
 Only when you have a genuine need for completely different rate-limit or permission characteristics, or when you are deliberately isolating experimental vs production data. In almost all cases one well-organized store (or a small number) per major domain (player data, economy, world state, leaderboards) is superior.
 
-## Summary Checklist (print this in your team docs)
+## Review checklist
 
 - [ ] Using the right variant (Ordered only for numeric sorted queries, standard DataStore when you need versions/metadata).
 - [ ] UpdateAsync for any contended player-owned value.

@@ -1,8 +1,9 @@
 ---
+read_when: "Combine files on disk with Studio MCP edits and playtests"
 last_reviewed: 2026-06-17
 ---
 
-# Script Sync Integration
+# Script Sync integration
 
 Official guides:
 - https://create.roblox.com/docs/en-us/scripting/sync
@@ -45,12 +46,12 @@ Script Sync uses the file extension to decide which Roblox script class to creat
 | --- | --- | --- |
 | `Name.server.luau` | `Script` | `Server` |
 | `Name.client.luau` | `Script` | `Client` |
-| `Name.local.luau` | `LocalScript` | — |
+| `Name.local.luau` | `LocalScript` | - |
 | `Name.legacy.luau` | `Script` | `Legacy` |
 | `Name.plugin.luau` | `Script` | `Plugin` |
-| `Name.luau` | `ModuleScript` | — |
+| `Name.luau` | `ModuleScript` | - |
 | `init.server.luau`, `init.client.luau`, `init.local.luau`, `init.legacy.luau`, `init.plugin.luau`, `init.luau` | Same as above, using the parent folder's name | Same as above |
-| Directory with no `.luau` file | `Folder` | — |
+| Directory with no `.luau` file | `Folder` | - |
 
 Common mistakes:
 - `Test.shared.luau` does **not** create a `ModuleScript` named `Test`. It creates an instance literally named `Test.shared`. Use `Test.luau` for a `ModuleScript`.

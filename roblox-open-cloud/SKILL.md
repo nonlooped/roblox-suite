@@ -1,38 +1,18 @@
 ---
 name: roblox-open-cloud
-description: "Roblox Open Cloud REST API for accessing data stores, assets, universes, places, users, groups, subscriptions, and Luau execution from outside the engine or via HttpService. Covers authentication (API keys, OAuth 2.0, avoiding legacy cookie auth), scopes and least-privilege, IP allowlists, key rotation and the 60-day auto-expiry rule, Secrets stores, the HttpService-callable subset and its rate limits, webhooks, and in-engine vs Open Cloud decision tree. Use for external automation, CI/CD, bulk data, scheduled snapshots, and cross-experience tooling."
+description: "Use Roblox Open Cloud for external automation or supported in-experience HTTP calls. Covers API keys, OAuth, scopes, Secrets Store, webhooks, rate limits, and choosing REST versus engine APIs."
 last_reviewed: 2026-08-18
 ---
 
 # roblox-open-cloud
 
-**Official sources (always check these for the latest):**
-- https://create.roblox.com/docs/en-us/cloud (API reference index)
-- https://create.roblox.com/docs/en-us/cloud/auth/api-keys (API key management)
-- https://create.roblox.com/docs/cloud/auth/oauth2-overview (OAuth 2.0)
-- https://create.roblox.com/docs/en-us/cloud-services/http-service (in-experience calls)
-- https://create.roblox.com/docs/en-us/cloud/reference/rate-limits
-- https://create.roblox.com/docs/en-us/cloud/webhooks/webhook-notifications
-
-Open Cloud is the REST API surface for Roblox resources. It lets you build command-line tools, web apps, CI/CD pipelines, scheduled jobs, and external automation that read and write the same resources your live game servers use — without spinning up a game server.
+Open Cloud is the REST API surface for Roblox resources. It lets you build command-line tools, web apps, CI/CD pipelines, scheduled jobs, and external automation that read and write the same resources your live game servers use, without running a game server.
 
 Cross-reference:
-- [roblox-datastores/SKILL.md](../roblox-datastores/SKILL.md) — in-engine DataStore API; Open Cloud Data Stores is the external counterpart.
-- [roblox-gamepasses/SKILL.md](../roblox-gamepasses/SKILL.md) — game passes, developer products, and subscriptions also have Open Cloud management endpoints.
-- [roblox-networking/SKILL.md](../roblox-networking/SKILL.md) — for in-experience HTTP via `HttpService` and the security model around outbound requests.
-- [roblox-core/SKILL.md](../roblox-core/SKILL.md) — services, `HttpService`, script contexts.
-
-## When to use this skill
-
-Activate when:
-- Building external automation that reads/writes Roblox resources (data stores, places, assets, groups, users).
-- Implementing CI/CD for place publishing or asset upload.
-- Doing bulk data operations (migration, cleanup, RTBF deletion, snapshot/restore) at a scale that's painful from in-engine scripts.
-- Receiving webhook notifications (subscription purchased/refunded/renewed, etc.).
-- Calling Open Cloud endpoints from inside a live game server via `HttpService` (e.g. updating a group membership from in-experience).
-- Managing API keys, OAuth 2.0 clients, or secrets for Roblox automation.
-
-Do **not** use Open Cloud for what the in-engine API already does well inside a running server (normal DataStore reads/writes, Marketplace prompts, etc.). Use it for the things the engine *can't* do: external triggers, bulk ops, cross-experience tooling, scheduled jobs, and webhooks.
+- [roblox-datastores/SKILL.md](../roblox-datastores/SKILL.md): in-engine DataStore API; Open Cloud Data Stores is the external counterpart.
+- [roblox-gamepasses/SKILL.md](../roblox-gamepasses/SKILL.md): game passes, developer products, and subscriptions also have Open Cloud management endpoints.
+- [roblox-networking/SKILL.md](../roblox-networking/SKILL.md): for in-experience HTTP via `HttpService` and the security model around outbound requests.
+- [roblox-core/SKILL.md](../roblox-core/SKILL.md): services, `HttpService`, script contexts.
 
 ## Authentication
 
@@ -42,21 +22,21 @@ Three auth models, in order of preference:
 
 All Open Cloud APIs accept an `x-api-key` header containing an API key string. Create keys on the [Creator Dashboard → API Keys](https://create.roblox.com/dashboard/credentials?activeTab=ApiKeysTab) page.
 
-- A key's access is determined by the **permissions of the user who owns it** — it can reach any resource that user can, including their personal experiences and any group-owned experiences where they have the right role.
+- A key's access is determined by the **permissions of the user who owns it**. It can reach any resource that user can, including their personal experiences and any group-owned experiences where they have the right role.
 - Some scopes can be restricted to specific experiences; not all.
 - **Best practices** (from the official docs):
   - Create **separate keys per application** to isolate blast radius.
   - Select the **minimum permissions** needed; restrict scope to specific experiences where possible.
-  - Use **IP restrictions** (CIDR notation) — but **not** when calling from Roblox game servers (Roblox server IPs aren't known/predictable).
+  - Use **IP restrictions** (CIDR notation). But **not** when calling from Roblox game servers (Roblox server IPs aren't known/predictable).
   - Set **expiration dates** for short-term keys; avoid them for long-term use without a rotation process.
   - **Never** store keys in source control, scripts, or public channels. Use a secrets manager; in Roblox places use a [Secrets Store](https://create.roblox.com/docs/en-us/cloud-services/secrets).
-  - For **group-owned resources**, create a dedicated alternate account with only the target group access and generate the key there — don't use your personal account's key for group automation.
+  - For **group-owned resources**, create a dedicated alternate account with only the target group access and generate the key there. Don't use your personal account's key for group automation.
 
 ### 2. OAuth 2.0 (for apps acting on behalf of other users)
 
 Use OAuth 2.0 when your app needs to act on behalf of a Roblox user who isn't you (e.g. a third-party tool a creator logs into). See https://create.roblox.com/docs/cloud/auth/oauth2-overview. Has stronger stability guarantees and regular updates.
 
-### 3. Legacy cookie auth (avoid)
+### 3. legacy cookie auth (avoid)
 
 Legacy APIs use cookie-based auth, can break without notice, and have minimal stability guarantees. **Not recommended for production.** Only use for one-off internal tooling where breakage is acceptable.
 
@@ -86,13 +66,13 @@ curl --location --request POST 'https://apis.roblox.com/api-keys/v1/introspect' 
 --data '{"apiKey": "your-api-key"}'
 ```
 
-Returns the key name, authorized user, scopes (with `userId`/`groupId`/`universeId`/`universeDatastore` resource identifiers — `*` means all resources of that type), `enabled`, `expired`, and `expirationTimeUtc`.
+Returns the key name, authorized user, scopes (with `userId`/`groupId`/`universeId`/`universeDatastore` resource identifiers; `*` means all resources of that type), `enabled`, `expired`, and `expirationTimeUtc`.
 
 ## The endpoint map
 
 Base URL: `https://apis.roblox.com/cloud/v2/...` (plus a few `apis.roblox.com/<feature>/v1/...` legacy paths for assets). All v2 endpoints accept `x-api-key`.
 
-### Data & memory stores (the most-used surface)
+### Data and memory stores (the most-used surface)
 
 **Data stores** (`/cloud/v2/universes/{universe_id}/data-stores/...`):
 - `ListDataStores`, `SnapshotDataStores` (daily snapshot trigger).
@@ -111,20 +91,20 @@ Base URL: `https://apis.roblox.com/cloud/v2/...` (plus a few `apis.roblox.com/<f
 - `ListOrderedDataStoreEntries`, `CreateOrderedDataStoreEntry`, `GetOrderedDataStoreEntry`, `UpdateOrderedDataStoreEntry`, `IncrementOrderedDataStoreEntry`, `DeleteOrderedDataStoreEntry`.
 - Same shared experience budget model as standard Data Stores v2 (see error-codes page).
 
-### Universes & places
+### Universes and places
 
 - `GetUniverse`, `UpdateUniverse`.
-- `PublishUniverseMessage` (publish a message to all servers of a universe — external counterpart to `MessagingService`).
+- `PublishUniverseMessage` (publish a message to all servers of a universe; external counterpart to `MessagingService`).
 - `RestartUniverseServers` (restart all live servers of a universe).
-- `GetPlace`, `UpdatePlace` (publish a place version — the CI/CD primitive).
+- `GetPlace`, `UpdatePlace` (publish a place version; the CI/CD primitive).
 - `GetInstance`, `UpdateInstance`.
 
 ### Assets
 
 - `GetAsset`, `ListAssetVersions`, `GetAssetVersion` (v1 path: `apis.roblox.com/assets/v1/assets/{assetId}`).
-- Asset upload (images, audio, models) via the assets API — useful for batch-importing content.
+- Asset upload (images, audio, models) via the assets API. Useful for batch-importing content.
 
-### Users & inventories
+### Users and inventories
 
 - `GetUser`, `GenerateUserThumbnail`.
 - `ListInventoryItems`.
@@ -139,20 +119,20 @@ Base URL: `https://apis.roblox.com/cloud/v2/...` (plus a few `apis.roblox.com/<f
 - Developer products: `CreateDeveloperProduct`, `UpdateDeveloperProduct`, `GetDeveloperProductConfig`, `ListDeveloperProductConfigsByUniverse`.
 - Subscriptions: managed via subscription endpoints; webhook events for `cancelled`/`purchased`/`refunded`/`renewed`.
 
-### Moderation & bans
+### Moderation and bans
 
 - `ListUserRestrictions`, `GetUserRestriction`, `UpdateUserRestriction` (place- and universe-scoped), `ListUserRestrictionLogs`.
 
 ### Luau execution
 
-- `CreateLuauExecutionSessionTask` (run Luau against a universe/place from outside the engine — powerful for automation, treat as privileged).
+- `CreateLuauExecutionSessionTask` (run Luau against a universe/place from outside the engine; treat as privileged).
 
-### Notifications & configs
+### Notifications and configs
 
 - `CreateUserNotification` (send a notification to a user from outside the experience).
 - Configs (CreatorConfigs): `GetConfigRepositoryValues`, draft/publish/revision flow for live configuration.
 
-### Creator Store
+### Creator store
 
 - `CreateCreatorStoreProduct`, `GetCreatorStoreProduct`, `UpdateCreatorStoreProduct`, `CreatorStoreAssetsSearch`.
 
@@ -164,7 +144,7 @@ A subset of Open Cloud endpoints is callable from inside a live game server via 
 
 **Requirements:**
 - Enable **Allow HTTP Requests** in Experience Settings.
-- The API key must be stored as a `Secret` via the [Secrets Store](https://create.roblox.com/docs/en-us/cloud-services/secrets) — retrieve it with `HttpService:GetSecret("APIKey")`. Never hardcode the key in a script.
+- The API key must be stored as a `Secret` via the [Secrets Store](https://create.roblox.com/docs/en-us/cloud-services/secrets). Retrieve it with `HttpService:GetSecret("APIKey")`. Never hardcode the key in a script.
 - Only the `x-api-key` and `content-type` headers are allowed.
 - The `x-api-key` value must be a `Secret` datatype, not a string.
 - The `..` string is **not allowed** in URL path parameters (so data stores/entries containing `..` are inaccessible from `HttpService`).
@@ -175,7 +155,7 @@ A subset of Open Cloud endpoints is callable from inside a live game server via 
 - Open Cloud requests **do not** count against the separate 500-req/min general HTTP limit.
 - Each endpoint also has a per-key-owner limit enforced regardless of where calls originate.
 
-Example — updating a group membership from in-experience:
+Example: update a group membership from an experience.
 
 ```lua
 --!strict
@@ -241,9 +221,9 @@ Open Cloud emits webhooks for certain events, including **subscription** events 
 - [ ] `x-api-key` passed as `Secret` from `HttpService`, not string.
 - [ ] Audit key usage via the introspect endpoint and the Observability Dashboard.
 - [ ] Disable/delete unused keys (they auto-expire after 60 days anyway, but don't rely on that as your only cleanup).
-- [ ] Treat `CreateLuauExecutionSessionTask` as privileged — it runs Luau against your universe.
+- [ ] Treat `CreateLuauExecutionSessionTask` as privileged: it runs Luau against your universe.
 
-## Common mistakes this skill prevents
+## Common mistakes
 
 - Using legacy cookie-auth APIs for production (they break without notice).
 - Storing API keys in scripts or source control.
@@ -279,6 +259,6 @@ Open Cloud emits webhooks for certain events, including **subscription** events 
 <!-- catalog:references:start -->
 ## Reference index
 
-- [auth-and-keys.md](references/auth-and-keys.md)
-- [calling-from-in-experience.md](references/calling-from-in-experience.md)
+- [auth-and-keys.md](references/auth-and-keys.md): Configure API keys, OAuth, scopes, or key rotation.
+- [calling-from-in-experience.md](references/calling-from-in-experience.md): Call supported Open Cloud endpoints through HttpService and handle retries.
 <!-- catalog:references:end -->

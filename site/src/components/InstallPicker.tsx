@@ -1,14 +1,7 @@
 import { useRef, useState } from "react";
 import { useCopy } from "@/lib/useCopy";
 
-/*
- * The closing beat: the last rung of the belief ladder is "installing costs me
- * one command", so the section's job is to prove that literally rather than
- * describe it. Four agents are genuinely parallel options, which would normally
- * invite four identical cards — the banned shape. Instead they are four moulded
- * keys over one shared command panel, and the selected key sits down into its
- * own shadow. The system's press interaction becomes the selection affordance.
- */
+/* Agent tabs share one install command panel. The selected tab remains pressed. */
 
 interface Agent {
   /** The CLI's own `--agent` identifier. Verified against `skills add`. */
@@ -158,12 +151,7 @@ export function InstallPicker({ installCommand, skillCount }: InstallPickerProps
           >
             {command}
           </code>
-          {/*
-            A blocked clipboard used to leave this button looking inert, with
-            the visitor unable to tell whether the click landed. It now says so
-            and the command is selected behind it, so the keyboard shortcut is
-            still a way through. 44px tall: it is the last step before install.
-          */}
+          {/* On clipboard failure, show the manual-copy instruction. Keep the button at least 44px tall. */}
           <button
             type="button"
             onClick={copy}
@@ -176,15 +164,13 @@ export function InstallPicker({ installCommand, skillCount }: InstallPickerProps
               {state === "copied"
                 ? `Install command for ${agent.name} copied`
                 : state === "failed"
-                  ? "Copy failed. The command is selected — press Ctrl+C to copy it."
+                  ? "Copy failed. The command is selected. Press Ctrl+C to copy it."
                   : `Copy install command for ${agent.name}`}
             </span>
           </button>
         </div>
 
-        {/* The CLI's own confirmation line, so the payoff is shown not claimed.
-            Mono is reserved for literal output here; the restart instruction
-            lives in the section lead rather than dressed up as terminal text. */}
+        {/* Show the selected installation target beneath the command. */}
         <p className="border-t border-ink-soft px-4 py-3 font-mono text-[0.8125rem] text-on-ink-muted sm:px-5">
           <span className="text-toy-green" aria-hidden="true">
             ✓{" "}

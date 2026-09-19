@@ -1,4 +1,5 @@
 ---
+read_when: "Select a destination server or inspect a teleport result"
 last_reviewed: 2026-08-18
 ---
 
@@ -27,7 +28,7 @@ last_reviewed: 2026-08-18
 | Method | Purpose |
 | --- | --- |
 | `SetTeleportData(data: Variant)` | Pass data to the destination. Retrieved via `GetLocalPlayerTeleportData()` on the destination client. |
-| `GetTeleportData(): Variant` | Read back what was set — returns the data previously stored by `SetTeleportData()`, or `nil` if no data was set. |
+| `GetTeleportData(): Variant` | Read back what was set; returns the data previously stored by `SetTeleportData()`, or `nil` if no data was set. |
 
 ### Conflicting combinations (error)
 
@@ -39,7 +40,7 @@ Pick exactly one mode: public server (neither), specific server (`ServerInstance
 
 ### Teleport data rules
 
-- Client-retrieved via `TeleportService:GetLocalPlayerTeleportData()` — **client-only**.
+- Client-retrieved via `TeleportService:GetLocalPlayerTeleportData()`: **client-only**.
 - **Spoofable.** Treat as a hint; validate gameplay-affecting claims server-side against DataStores.
 - Supports primitives and engine value types such as `Vector3`, `CFrame`, `Color3`, `UDim2`, sequences, and enum items, including tables/arrays of supported values without mixed keys.
 - Instances, functions, connections, signals, `SharedTable`, and engine-state objects such as `RaycastParams`/`RaycastResult` cannot cross this boundary. Roblox removes disallowed values and logs an error. Convert references to plain IDs or paths.

@@ -129,17 +129,6 @@ for (const slug of slugs) {
   if (!grouped.has(slug)) fail(`skill "${slug}" is not in any group`);
 }
 
-// Corrections shown on the homepage must point at real skills.
-const correctionsSource = await readFile(
-  path.join(siteRoot, "src", "data", "corrections.ts"),
-  "utf8",
-);
-for (const [, slug] of correctionsSource.matchAll(/skill:\s*"([^"]+)"/g)) {
-  if (!slugs.has(slug)) {
-    fail(`corrections.ts references unknown skill "${slug}"`);
-  }
-}
-
 if (errors.length > 0) {
   console.error(`Content validation failed with ${errors.length} problem(s):\n`);
   for (const error of errors) console.error(`  - ${error}`);

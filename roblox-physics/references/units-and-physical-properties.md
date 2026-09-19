@@ -1,8 +1,9 @@
 ---
+read_when: "Tune mass, density, friction, force, or simulation stepping"
 last_reviewed: 2026-06-17
 ---
 
-# Units and Physical Properties
+# Units and physical properties
 
 Official guide: https://create.roblox.com/docs/physics/units
 

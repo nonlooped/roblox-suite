@@ -40,12 +40,7 @@ export function withCode(text: string): string {
   );
 }
 
-/**
- * A citation URL, stripped of its scheme and given a break opportunity before
- * each path separator. Long doc URLs otherwise either get truncated (hiding
- * the page being cited, which is the proof) or break mid-word on a phone.
- * Returns HTML, so it escapes before inserting the `<wbr>` markers.
- */
+/* Strip the scheme and add breaks at path separators so citation URLs remain readable on narrow screens. */
 export function breakableUrl(url: string): string {
   return url
     .replace(/^https:\/\//, "")
@@ -88,86 +83,106 @@ export const groupedSkills = groups.map((group) => ({
   entries: group.skills.map(getSkill),
 }));
 
-export const hubSkill = skills.find((skill) => skill.hub);
-
-const sourceCheckDates = skills
-  .flatMap((skill) => skill.sources.map((source) => source.verified_at))
-  .sort();
-
-/** Oldest and newest citation checks shown by the site. */
-export const oldestSourceCheckAt = sourceCheckDates[0]!;
-export const latestSourceCheckAt = sourceCheckDates.at(-1)!;
-
-export const sourceCount = skills.reduce(
-  (total, skill) => total + skill.sources.length,
-  0,
-);
-
-/** Unique documentation pages backing the suite. */
-export const uniqueSourceUrls = new Set(
-  skills.flatMap((skill) => skill.sources.map((source) => source.url)),
-);
-
-/*
- * Not every citation is Roblox's own page. The Rojo skill cites Rojo's docs
- * and release notes, because Rojo is a third-party tool and Roblox does not
- * document it. Calling all 62 "official Roblox documentation" is the kind of
- * rounding-up the sceptical-developer persona checks first, and being caught
- * on it costs more trust than the five citations are worth. So the split is
- * derived here and stated plainly wherever a count is shown.
- */
-const ROBLOX_DOCS_HOST = "create.roblox.com";
-
-export function isOfficialRobloxSource(url: string): boolean {
-  try {
-    return new URL(url).host === ROBLOX_DOCS_HOST;
-  } catch {
-    return false;
-  }
-}
-
-const allSources = skills.flatMap((skill) => skill.sources);
-
-/** Citations that point at Roblox's own Creator Hub documentation. */
-export const officialSourceCount = allSources.filter((source) =>
-  isOfficialRobloxSource(source.url),
-).length;
-
-/** Citations that point at a tool's own docs (currently Rojo). */
-export const supportingSourceCount = sourceCount - officialSourceCount;
-
-export function skillPath(slug: string): string {
-  return `/skills/${slug}/`;
-}
-
 export const repoUrl = "https://github.com/nonlooped/roblox-suite";
 export const installCommand = "npx skills add nonlooped/roblox-suite";
+
+export function skillInstallCommand(slug: string): string {
+  return `${installCommand} --skill ${slug}`;
+}
 
 /**
  * Plain-language labels for the marketing surfaces. The catalog's own copy is
  * written for agents; these are written for people skimming a page.
+ *
+ * `does` is the job in the reader's words — an imperative, not a subject
+ * heading — because the home page asks "what are you building?" and these are
+ * the answers. Keep each one short enough to sit on two lines in a tile.
  */
-export const plainLabels: Record<string, { name: string; blurb: string }> = {
-  roblox: { name: "Start here", blurb: "Sends your agent to the right skill" },
-  "roblox-core": { name: "Fundamentals", blurb: "Services, types, and how scripts run" },
-  "roblox-networking": { name: "Client & server", blurb: "Stop exploiters from cheating" },
-  "roblox-datastores": { name: "Saving data", blurb: "Don't lose player progress" },
-  "roblox-user-interfaces": { name: "Menus & HUDs", blurb: "UI that fits every screen" },
-  "roblox-animation": { name: "Animation", blurb: "Characters and objects that move" },
-  "roblox-vfx": { name: "Visual effects", blurb: "Particles, beams, and trails" },
-  "roblox-audio": { name: "Sound & music", blurb: "Modern audio that fits the world" },
-  "roblox-gamepasses": { name: "Monetization", blurb: "Passes, products, and Robux" },
-  "roblox-open-cloud": { name: "Outside tools", blurb: "Control your game from the web" },
-  "roblox-teleport": { name: "Teleporting", blurb: "Move players between places" },
-  "roblox-rojo": { name: "Real code files", blurb: "Work in your editor, sync to Studio" },
-  "roblox-mcp": { name: "Agent in Studio", blurb: "Connect your AI straight to Studio" },
-  "roblox-physics": { name: "Physics", blurb: "Vehicles, doors, and moving parts" },
-  "roblox-npcs": { name: "NPCs", blurb: "Enemies that chase and patrol" },
-  "roblox-testing": { name: "Finding bugs", blurb: "Debug and profile your game" },
+export const plainLabels: Record<string, { name: string; blurb: string; does: string }> = {
+  roblox: {
+    name: "Start here",
+    blurb: "Sends your agent to the right skill",
+    does: "Plan a game and pick the right skill",
+  },
+  "roblox-core": {
+    name: "Fundamentals",
+    blurb: "Services, types, and how scripts run",
+    does: "Put scripts in the right place",
+  },
+  "roblox-networking": {
+    name: "Client & server",
+    blurb: "Validate client requests on the server",
+    does: "Stop players from cheating",
+  },
+  "roblox-datastores": {
+    name: "Saving data",
+    blurb: "Save progress and handle write failures",
+    does: "Save coins, levels, and inventories",
+  },
+  "roblox-user-interfaces": {
+    name: "Menus & HUDs",
+    blurb: "Layouts for different screen sizes",
+    does: "Build menus that fit every screen",
+  },
+  "roblox-animation": {
+    name: "Animation",
+    blurb: "Characters and objects that move",
+    does: "Animate characters and UI",
+  },
+  "roblox-vfx": {
+    name: "Visual effects",
+    blurb: "Particles, beams, and trails",
+    does: "Add particles, beams, and trails",
+  },
+  "roblox-audio": {
+    name: "Sound & music",
+    blurb: "Audio routing, spatial sound, and effects",
+    does: "Play music and 3D sound",
+  },
+  "roblox-gamepasses": {
+    name: "Monetization",
+    blurb: "Passes, products, and Robux",
+    does: "Sell passes and dev products",
+  },
+  "roblox-open-cloud": {
+    name: "Outside tools",
+    blurb: "Automate Roblox through REST APIs",
+    does: "Reach your game from outside Roblox",
+  },
+  "roblox-teleport": {
+    name: "Teleporting",
+    blurb: "Move players between places",
+    does: "Move players between places",
+  },
+  "roblox-rojo": {
+    name: "Rojo projects",
+    blurb: "Work in your editor, sync to Studio",
+    does: "Code in your editor, sync to Studio",
+  },
+  "roblox-mcp": {
+    name: "Agent in Studio",
+    blurb: "Connect your AI straight to Studio",
+    does: "Let your agent drive Studio directly",
+  },
+  "roblox-physics": {
+    name: "Physics",
+    blurb: "Vehicles, doors, and moving parts",
+    does: "Build vehicles, doors, and platforms",
+  },
+  "roblox-npcs": {
+    name: "NPCs",
+    blurb: "Enemies that chase and patrol",
+    does: "Make NPCs chase and patrol",
+  },
+  "roblox-testing": {
+    name: "Finding bugs",
+    blurb: "Debug and profile your game",
+    does: "Track down bugs and lag",
+  },
 };
 
 export function plainLabel(slug: string) {
-  return plainLabels[slug] ?? { name: slug, blurb: "" };
+  return plainLabels[slug] ?? { name: slug, blurb: "", does: "" };
 }
 
 export function skillSourceUrl(slug: string): string {

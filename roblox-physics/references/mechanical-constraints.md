@@ -1,8 +1,9 @@
 ---
+read_when: "Connect parts with hinges, springs, ropes, or other mechanical constraints"
 last_reviewed: 2026-06-17
 ---
 
-# Mechanical Constraints
+# Mechanical constraints
 
 Official guide: https://create.roblox.com/docs/physics/mechanical-constraints
 
@@ -97,15 +98,15 @@ You can create constraints via:
 ## Actuator types
 
 Most powered constraints support:
-- **None** — passive constraint, no force applied.
-- **Motor** — continuous motion toward a velocity.
-- **Servo** — moves to and holds a target position/angle.
+- **None**: passive constraint, no force applied.
+- **Motor**: continuous motion toward a velocity.
+- **Servo**: moves to and holds a target position/angle.
 
 Tuning parameters:
-- `MaxForce` / `MaxTorque` — caps applied force.
-- `MotorMaxAcceleration` / `MotorMaxForce` — motor responsiveness.
-- `Responsiveness` — servo stiffness.
-- `Restitution` — bounciness at limits.
+- `MaxForce` / `MaxTorque`: caps applied force.
+- `MotorMaxAcceleration` / `MotorMaxForce`: motor responsiveness.
+- `Responsiveness`: servo stiffness.
+- `Restitution`: bounciness at limits.
 
 ## Constraint visualization
 

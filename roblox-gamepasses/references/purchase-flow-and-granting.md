@@ -1,12 +1,13 @@
 ---
+read_when: "Implement pass purchase prompts, ownership checks, and server grants"
 last_reviewed: 2026-06-17
 ---
 
-# Purchase Flow and Server Granting
+# Purchase flow and server granting
 
-## Full Recommended Flow
+## Full recommended flow
 
-### Client Side (prompting and UI state)
+### Client side (prompting and UI state)
 
 ```lua
 local MarketplaceService = game:GetService("MarketplaceService")
@@ -68,7 +69,7 @@ end)
 -- Optional: refresh state after purchase finished (via Remote or on re-join)
 ```
 
-### Server Side (authoritative granting)
+### Server side (authoritative granting)
 
 The critical part. **Important:** `PromptGamePassPurchaseFinished` fires on both the client and the server. You must grant benefits only in the server handler; the client copy is for UI updates only.
 
@@ -143,7 +144,7 @@ Players.PlayerRemoving:Connect(function(player: Player)
 end)
 ```
 
-## Key Rules for the Flow
+## Key rules for the flow
 
 - `PromptGamePassPurchase` and initial `UserOwnsGamePassAsync` checks can be on the client for UX.
 - All actual granting of power/economy/items **must** happen on the server in the `PromptGamePassPurchaseFinished` event or the `PlayerAdded` re-check.
@@ -154,7 +155,7 @@ end)
 - Use an idempotency guard so benefits are not granted multiple times if the event fires more than once.
 - For developer products, `MarketplaceService.ProcessReceipt` can only be assigned **once** globally. The callback must return `Enum.ProductPurchaseDecision.PurchaseGranted` after successful fulfillment, or `Enum.ProductPurchaseDecision.NotProcessedYet` if fulfillment fails, because Roblox may redeliver the receipt until `PurchaseGranted` is returned.
 
-## Handling Purchase Failures / Edge Cases
+## Handling purchase failures / edge cases
 
 - Network issues during prompt: the `PromptGamePassPurchaseFinished` may fire with `wasPurchased = false`.
 - Player cancels the prompt.
@@ -165,7 +166,7 @@ In the finished handler, only act on `wasPurchased == true`.
 
 For UI, you can listen for the finished event on the client too (via a Remote from server) to update "Owned" state immediately without waiting for re-join.
 
-## Integration with Data Stores
+## Integration with data stores
 
 After granting in the server handler, immediately save the fact that this player owns the pass (or the specific perks) using your data persistence system.
 
@@ -173,6 +174,6 @@ On load (PlayerAdded), prefer the `UserOwnsGamePassAsync` result as the source o
 
 See roblox-datastores skill for safe profile loading patterns.
 
-## Scripts Folder Example
+## Scripts Folder example
 
 A simple client helper can live in scripts/PassPurchaseHelper.lua (adapt and require from your UI modules).

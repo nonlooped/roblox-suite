@@ -1,4 +1,5 @@
 ---
+read_when: "Install Rojo or choose CLI commands and flags"
 last_reviewed: 2026-07-09
 ---
 
@@ -9,13 +10,13 @@ Official docs:
 - https://rojo.space/docs/v7/getting-started/new-game/
 - https://github.com/rojo-rbx/rojo/releases
 
-Rojo has two installable pieces: the **server/CLI** and the **Roblox Studio plugin**. The optional **VS Code extension** can drive menu actions but does **not** put `rojo` on your PATH — install the CLI separately for terminal use.
+Rojo has two installable pieces: the **server/CLI** and the **Roblox Studio plugin**. The optional **VS Code extension** can drive menu actions but does **not** put `rojo` on your PATH. Install the CLI separately for terminal use.
 
 ## Install the CLI
 
 ### Rokit (recommended for projects)
 
-[Rokit](https://github.com/rojo-rbx/rokit) is Rojo’s toolchain manager. After installing Rokit:
+[Rokit](https://github.com/rojo-rbx/rokit) is Rojo's toolchain manager. After installing Rokit:
 
 ```bash
 rokit add rojo-rbx/rojo
@@ -38,7 +39,7 @@ Put the binary on your system `PATH`.
 
 ### crates.io (compile from source)
 
-Requires a current Rust toolchain (Rojo’s README states the MSRV; for 7.7.x this is Rust **1.88+**):
+Requires a current Rust toolchain (Rojo's README states the MSRV; for 7.7.x this is Rust **1.88+**):
 
 ```bash
 cargo install rojo --version ^7
@@ -50,7 +51,7 @@ cargo install rojo --version ^7
 Match the plugin major to the CLI major (Rojo 7 plugin for Rojo 7 CLI).
 
 1. **CLI (preferred):** `rojo plugin install` (also `rojo plugin uninstall`).
-2. **GitHub:** download the release `rbxm` into Studio’s plugins folder (Plugins toolbar → **Plugins Folder**).
+2. **GitHub:** download the release `rbxm` into Studio's plugins folder (Plugins toolbar → **Plugins Folder**).
 3. **Roblox.com:** [Rojo 7 plugin](https://www.roblox.com/library/13916111004/Rojo) (Install on the plugin page).
 
 ## VS Code extension
@@ -76,9 +77,9 @@ Global flags (from CLI): `--verbose` / `-v` (repeatable), `--color auto|always|n
 
 ### Init kinds
 
-- `place` — baseplate-style game project (default).
-- `model` — library/model layout.
-- `plugin` — plugin-oriented template (`rojo init --kind plugin`).
+- `place`: baseplate-style game project (default).
+- `model`: library/model layout.
+- `plugin`: plugin-oriented template (`rojo init --kind plugin`).
 
 Example:
 

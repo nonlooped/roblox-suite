@@ -1,15 +1,11 @@
 ---
+read_when: "Choose an audio system or migrate legacy Sound code"
 last_reviewed: 2026-08-18
 ---
 
-# Audio Graph vs Legacy Sound
+# Audio graph vs legacy Sound
 
-**Official sources:**
-- https://create.roblox.com/docs/en-us/audio/objects (graph)
-- https://create.roblox.com/docs/en-us/reference/engine/classes/Sound (legacy)
-- https://create.roblox.com/docs/en-us/reference/engine/classes/SoundService
-
-The official docs now state that `Sound`, `SoundGroup`, and `SoundEffect` are **discouraged in favor of the more robust functionality of audio objects**. New work should use the graph; legacy `Sound` code that works can stay.
+Roblox recommends audio objects over `Sound`, `SoundGroup`, and `SoundEffect`. New work should use the graph; legacy `Sound` code that works can stay.
 
 ## Capability comparison
 
@@ -36,7 +32,7 @@ The official docs now state that `Sound`, `SoundGroup`, and `SoundEffect` are **
 ## When to keep using `Sound`
 
 - Simple 2D SFX or music with no routing, no effects, no TTS/STT.
-- Existing working code — don't rewrite just to migrate.
+- Existing working code: don't rewrite just to migrate.
 - Quick prototypes and one-shot UI clicks.
 - When you need `SoundService.AmbientReverb`'s preset behavior (it doesn't apply to the graph).
 
@@ -58,7 +54,7 @@ There is no automatic migration. To migrate:
 2. Replace `SoundGroup` volume control with an `AudioFader` that all relevant players wire through.
 3. Replace `EqualizerSoundEffect` etc. with the corresponding `Audio*` effect in the signal path.
 4. For global reverb, either add an `AudioReverb` to the bus or enable `SoundService.AcousticSimulationEnabled`.
-5. Re-tune attenuation: `RollOffMode`/`RollOffMaxDistance` don't map 1:1 to `DistanceAttenuation` (a curve) — redesign the curve by ear.
+5. Re-tune attenuation: `RollOffMode`/`RollOffMaxDistance` don't map 1:1 to `DistanceAttenuation` (a curve). Redesign the curve by ear.
 
 ## Legacy `Sound` quick reference (still useful)
 

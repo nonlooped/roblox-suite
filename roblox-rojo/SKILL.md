@@ -1,12 +1,12 @@
 ---
 name: roblox-rojo
-description: "Rojo project management for Roblox — install the CLI and Studio plugin, init/serve/build/upload/sourcemap/syncback, `.project.json` format, file-to-instance sync rules (`.luau`/`.server.luau`/`.client.luau`/`.plugin.luau`), meta files, `emitLegacyScripts`, live-sync limits, and porting existing places. Use when setting up Rojo, writing project files, live-syncing to Studio, building places/models, or converting a place with syncback."
+description: "Set up or troubleshoot Rojo projects. Use for CLI and plugin installation, project files, live sync, builds, uploads, sourcemaps, and exporting existing places with syncback."
 last_reviewed: 2026-07-09
 ---
 
 # roblox-rojo
 
-**Official sources (always check these for the latest):**
+**Official sources:**
 - https://rojo.space/docs/v7/ (docs index; current major is v7)
 - https://rojo.space/docs/v7/getting-started/installation/
 - https://rojo.space/docs/v7/getting-started/new-game/
@@ -20,23 +20,6 @@ last_reviewed: 2026-07-09
 
 Rojo maps a filesystem project to Roblox instances so you can edit with external tools (VS Code, Git, linters, formatters) and live-sync or build into Studio/place files. This skill covers **Rojo 7** as documented at rojo.space and implemented in the current `rojo-rbx/rojo` release line.
 
-## When to use this skill
-
-Activate when the user is:
-- Installing or upgrading Rojo (CLI, Studio plugin, VS Code extension, Rokit).
-- Creating a new place/model/plugin project (`rojo init`).
-- Writing or fixing `.project.json` / `.project.jsonc` trees.
-- Live-syncing with `rojo serve` + the Studio plugin.
-- Building places/models (`rojo build`) or uploading (`rojo upload`).
-- Generating sourcemaps for Luau LSP (`rojo sourcemap`).
-- Porting an existing place (`rojo syncback`, rbxlx-to-rojo, Lune).
-- Choosing script naming (`.server.luau` vs `.client.luau` vs modules) or `emitLegacyScripts`.
-
-Cross-reference:
-- [roblox/SKILL.md](../roblox/SKILL.md) for architecture and routing.
-- [roblox-core/SKILL.md](../roblox-core/SKILL.md) for services, `RunContext`, and the data model.
-- [roblox-mcp/SKILL.md](../roblox-mcp/SKILL.md) when combining Rojo with Studio MCP / Script Sync for agent workflows.
-
 ## Mental model
 
 | Piece | Role |
@@ -46,13 +29,13 @@ Cross-reference:
 | **Project file** | `*.project.json` / `*.project.jsonc` describing the instance tree and options. |
 | **Filesystem tree** | Scripts, models, JSON/TOML/YAML/CSV/text under `$path` nodes become Instances. |
 
-Rojo is **filesystem → Studio** for live sync (one primary direction). Optional **two-way sync** in the plugin is experimental and incomplete — do not design production workflows around it. For place → files, use **`rojo syncback`** (Rojo 7.7+) or external porting tools.
+Rojo is **filesystem → Studio** for live sync (one primary direction). Optional **two-way sync** in the plugin is experimental and incomplete. Do not design production workflows around it. For place → files, use **`rojo syncback`** (Rojo 7.7+) or external porting tools.
 
-## Quick start (correct order)
+## Quick start
 
 1. Install the **CLI** (Rokit recommended for projects; GitHub binaries or `cargo install rojo --version ^7` also supported).
 2. Install the **Studio plugin** with `rojo plugin install` (or GitHub `rbxm` / Roblox.com plugin for the matching major).
-3. `rojo init my-game` (or open folder + VS Code “Rojo: Open Menu”).
+3. `rojo init my-game` (or open folder + VS Code "Rojo: Open Menu").
 4. `rojo serve` in the project folder.
 5. In Studio: open the Rojo plugin panel → **Connect**.
 6. Edit files on disk; watch them sync. Use `rojo build -o build.rbxlx` for a one-shot place file.
@@ -104,7 +87,7 @@ Important top-level fields (docs + current CLI):
 
 | Field | Purpose |
 | --- | --- |
-| `name` | Project/instance name (optional for `default.project.json` — folder name used). |
+| `name` | Project/instance name (optional for `default.project.json`; folder name used). |
 | `tree` | Root instance description (required). |
 | `servePort` | Default port for `rojo serve` (default **34872**). |
 | `serveAddress` | Default bind address when CLI `--address` omitted. |
@@ -155,7 +138,7 @@ rojo doc
 rojo fmt-project
 ```
 
-## Live-sync limitations (do not ignore)
+## Live-sync limitations
 
 Not all property types apply in real time (Studio plugin API limits). Common cases that may need a full **build + open** instead of live sync:
 
@@ -163,7 +146,7 @@ Not all property types apply in real time (Studio plugin API limits). Common cas
 - `MeshPart.MeshId`
 - `HttpService.HttpEnabled`
 
-Property type coverage for build vs live sync is documented on the Properties page and rbx-dom’s coverage chart. When live sync fails for a class/property, rebuild with `rojo build` and open the place.
+Property type coverage for build vs live sync is documented on the Properties page and rbx-dom's coverage chart. When live sync fails for a class/property, rebuild with `rojo build` and open the place.
 
 `rojo serve` binds to loopback by default. Binding to a network-reachable address exposes the session: recent Rojo versions validate Host/Origin, gate some APIs to local clients, and warn on non-local binds. Prefer localhost; if you must expose, use `serveAllowedHosts` / `--allowed-hosts` deliberately.
 
@@ -176,17 +159,17 @@ Property type coverage for build vs live sync is documented on the Properties pa
 
 Workflows and syncback rules: [references/workflows-and-syncback.md](references/workflows-and-syncback.md).
 
-## Agent checklist (do this, not that)
+## Agent checklist
 
 - **Do** pin CLI + plugin to the **same major** (Rojo 7 plugin with Rojo 7 CLI).
 - **Do** run `rojo plugin install` after upgrading the CLI.
 - **Do** put shared modules under `ReplicatedStorage` paths and server authority under `ServerScriptService`.
-- **Do** use `.luau` (Rojo’s `init` templates use `.luau` since 7.4).
+- **Do** use `.luau` (Rojo's `init` templates use `.luau` since 7.4).
 - **Do** set `emitLegacyScripts: false` only when the team understands modern `RunContext` scripts (and that client files become `Script`+Client, not `LocalScript`).
-- **Do not** invent CLI flags or project keys — if unsure, run `rojo --help` / `rojo <cmd> --help` or re-check docs/changelog.
+- **Do not** invent CLI flags or project keys. If unsure, run `rojo --help` / `rojo <cmd> --help` or re-check docs/changelog.
 - **Do not** commit `.ROBLOSECURITY` cookies or Open Cloud API keys used with `rojo upload`.
 - **Do not** treat experimental two-way sync as reliable source control.
-- **Do not** confuse Rojo with Roblox **Script Sync** or **Studio MCP** — different tools; they can coexist (see roblox-mcp).
+- **Do not** confuse Rojo with Roblox **Script Sync** or **Studio MCP**. Different tools; they can coexist (see roblox-mcp).
 
 ## Verification
 
@@ -194,7 +177,7 @@ Workflows and syncback rules: [references/workflows-and-syncback.md](references/
 - [ ] Studio shows the Rojo 7 plugin; connect succeeds against `rojo serve`.
 - [ ] Editing a `.server.luau` under a mapped `$path` updates the correct service in Studio.
 - [ ] `rojo build -o build.rbxlx` opens cleanly in Studio.
-- [ ] `sourcemap.json` is gitignored if generated (Rojo’s default gitignore template includes it in recent releases).
+- [ ] `sourcemap.json` is gitignored if generated (Rojo's default gitignore template includes it in recent releases).
 
 ## How to proceed
 
@@ -206,8 +189,8 @@ Workflows and syncback rules: [references/workflows-and-syncback.md](references/
 <!-- catalog:references:start -->
 ## Reference index
 
-- [installation-and-cli.md](references/installation-and-cli.md)
-- [project-format.md](references/project-format.md)
-- [sync-details.md](references/sync-details.md)
-- [workflows-and-syncback.md](references/workflows-and-syncback.md)
+- [installation-and-cli.md](references/installation-and-cli.md): Install Rojo or choose CLI commands and flags.
+- [project-format.md](references/project-format.md): Write project trees, properties, paths, or nested projects.
+- [sync-details.md](references/sync-details.md): Map files to instances or diagnose changes that live sync cannot apply.
+- [workflows-and-syncback.md](references/workflows-and-syncback.md): Port an existing place, export Studio changes, or build in CI.
 <!-- catalog:references:end -->

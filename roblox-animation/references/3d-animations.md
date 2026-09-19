@@ -1,17 +1,18 @@
 ---
+read_when: "Author or load rig animations, blend tracks, or configure IK"
 last_reviewed: 2026-06-17
 ---
 
-# 3D Animations (Rigs, Animator, Tracks, IK, Editor)
+# 3D animations (rigs, animator, tracks, IK, editor)
 
 **Core docs:** https://create.roblox.com/docs/animation + editor + inverse-kinematics + events
 
-## Rigs and the Animation System
+## Rigs and the animation system
 
 A "rig" is a model whose parts or bones are connected in a hierarchy that the animation system can drive (historically Motor6D joints, now also AnimationConstraint + Bones).
 
 Roblox provides:
-- R15 / Rthro standard characters — Rthro uses the R15 skeleton with modified proportions, so it remains compatible with catalog and default animations.
+- R15 / Rthro standard characters: Rthro uses the R15 skeleton with modified proportions, so it remains compatible with catalog and default animations.
 - Rig Builder tool for quick test rigs.
 - Custom imported skinned/boned meshes with proper bone hierarchy.
 
@@ -67,9 +68,9 @@ Higher priority animations take precedence in blending.
 - For default character animation replacement, the final keyframe **must** be named exactly "End" (case sensitive) before publishing.
 
 **Accessing local saves in rare cases:**
-The rig gets an AnimSaves folder with an ObjectValue pointing at the saved data. Do not rely on this for gameplay — publish and use asset IDs.
+The rig gets an AnimSaves folder with an ObjectValue pointing at the saved data. Do not rely on this for gameplay. Publish and use asset IDs.
 
-## Runtime Playback (modern)
+## Runtime playback (modern)
 
 ```lua
 local Players = game:GetService("Players")
@@ -131,7 +132,7 @@ end)
 - Play / Stop / AdjustSpeed / AdjustWeight
 - Speed (current), TimePosition, Length, IsPlaying, WeightCurrent/Target
 - Priority (can be changed at runtime)
-- Stopped, Ended, DidLoop, `GetMarkerReachedSignal` (preferred), `KeyframeReached` (legacy — avoid for new work)
+- Stopped, Ended, DidLoop, `GetMarkerReachedSignal` (preferred), `KeyframeReached` (legacy; avoid for new work)
 
 **Track caching:** Calling `Animator:LoadAnimation` with the same `Animation` instance on the same `Animator` returns the same `AnimationTrack` object. This is useful for stopping or reusing a track, but be careful about conflicting Play calls with different fade/weight settings.
 
@@ -153,19 +154,19 @@ end)
 **Blending notes:**
 Multiple tracks can be active. The engine blends poses according to priority and current weights. Use weight < 1.0 for partial overlays (e.g. upper body aim while running).
 
-## IKControl for Procedural Animation
+## IKControl for procedural animation
 
 Add an `IKControl` under the Humanoid (or AnimationController).
 
 **Required properties:**
-- Type (`Position`, `Transform`, `Rotation`, `LookAt`, etc. — Enum.IKControlType)
+- Type (`Position`, `Transform`, `Rotation`, `LookAt`, etc.; Enum.IKControlType)
 - EndEffector (the Bone or BasePart that should reach the target, e.g. LeftHand)
-- Target (any object with a world position — Attachment is convenient for testing)
+- Target (any object with a world position; Attachment is convenient for testing)
 - ChainRoot (the highest joint in the chain that should be affected, e.g. LeftUpperArm for a full arm reach)
 
 **Tuning:**
-- `P` — higher values make the IK more responsive (can overshoot); lower values are smoother.
-- `SmoothTime` — how quickly the effector interpolates toward the target; useful for dampening noise.
+- `P`: higher values make the IK more responsive (can overshoot); lower values are smoother.
+- `SmoothTime`: how quickly the effector interpolates toward the target; useful for dampening noise.
 - Use these together to balance snappiness and stability, especially for head tracking or foot planting.
 
 **Adding natural limits with Constraints:**
@@ -174,30 +175,30 @@ Add an `IKControl` under the Humanoid (or AnimationController).
 - Place constraint attachments at the same joint locations represented by the Motor6D C0/C1 offsets, so limits align with the rig's natural pivot.
 - For Hinge: rotate the PrimaryAxis attachment to the correct bend axis.
 - For BallSocket on wrist: enable LimitsEnabled and set a reasonable UpperAngle (e.g. 80°).
-- Test live — you can create/edit IKControls and constraints during a Play session.
+- Test live: you can create/edit IKControls and constraints during a Play session.
 
-IK is excellent for:
+Use IK for:
 - Hand reaching for interactive objects (doors, levers, pickups).
 - Head/eyes tracking a point of interest.
 - Feet adjusting to uneven terrain or steps (more advanced setups).
 
 Combine with animation tracks: play a "reach" animation at high priority while an IKControl is active, or use markers to enable/disable specific IKControls.
 
-## Curve Animations
+## Curve animations
 
 You can promote a keyframe animation to a curve animation in the editor for per-channel (position/rotation per bone) curve editing. This gives finer artistic control than discrete keyframes.
 
-## Performance & Best Practices
+## Performance and best practices
 
 - Preload Animation asset instances, not AnimationTracks.
 - Cache and reuse Animation instances; `Animator:LoadAnimation` caches tracks when called with the same Animation on the same Animator.
 - Stop and clean up tracks and connections when the character is removed or dies.
 - For replicated characters, understand authority: the client's own character can play animations that replicate via the Animator (subject to asset ownership), while NPCs/other characters are usually server-authoritative.
 - Validate gameplay side-effects from markers on the server; use `task.defer` inside marker handlers to avoid stalling the animation evaluator.
-- High numbers of simultaneous complex animations + particles + UI can be expensive — profile.
+- High numbers of simultaneous complex animations + particles + UI can be expensive. Profile.
 - Markers are far more efficient and maintainable than polling TimePosition every frame.
 
-## Common Pitfalls
+## Common pitfalls
 
 - Using the deprecated Humanoid:LoadAnimation path.
 - Forgetting to set final keyframe name to "End" when replacing default animations.

@@ -1,8 +1,9 @@
 ---
+read_when: "Configure collision groups, touch events, or spatial query filters"
 last_reviewed: 2026-09-19
 ---
 
-# Collisions and Filtering
+# Collisions and filtering
 
 Official sources:
 - https://create.roblox.com/docs/workspace/collisions
@@ -12,8 +13,8 @@ Official sources:
 
 ## Collision events
 
-- `BasePart.Touched` — fires when another part touches.
-- `BasePart.TouchEnded` — fires when contact ends.
+- `BasePart.Touched`: fires when another part touches.
+- `BasePart.TouchEnded`: fires when contact ends.
 - These can fire regardless of `CanCollide`, but both parts must have `CanTouch` enabled.
 
 ## Collision filtering

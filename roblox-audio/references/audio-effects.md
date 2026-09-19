@@ -1,8 +1,9 @@
 ---
+read_when: "Route effects, mix audio buses, duck music, or tune attenuation"
 last_reviewed: 2026-08-18
 ---
 
-# Audio Effects Reference
+# Audio effects reference
 
 **Official source:** https://create.roblox.com/docs/en-us/audio/effects
 
@@ -22,7 +23,7 @@ Audio effects are modular `Audio*` instances that non-destructively modify a str
 | `AudioPitchShifter` | Raise/lower pitch without changing speed | Scale small sounds up or large sounds down |
 | `AudioTremolo` | Volume variation (trembling) | Wavy dreamlike instruments, weather swells |
 | `AudioFader` | Volume control for one or more streams | Music/SFX bus master, group fades |
-| `AudioAnalyzer` | Inspect volume and frequency content | Visualization, debugging — not for audible path |
+| `AudioAnalyzer` | Inspect volume and frequency content | Visualization, debugging; not for audible path |
 
 ## Wiring an effect
 
@@ -62,7 +63,7 @@ player:Play()
 
 ## Routing multiple sources through one effect
 
-The graph lets many `AudioPlayer`s feed one effect — you don't need a per-player effect with identical settings. Wire each player's `Wire.TargetInstance` to the shared effect, then one wire from the effect to the output.
+The graph lets many `AudioPlayer`s feed one effect. You don't need a per-player effect with identical settings. Wire each player's `Wire.TargetInstance` to the shared effect, then one wire from the effect to the output.
 
 ```
 AudioPlayer A ─┐
@@ -84,13 +85,13 @@ vs.
 AudioPlayer → Wire → AudioDistortion → Wire → AudioChorus → Wire → AudioDeviceOutput
 ```
 
-These sound different. There's no "correct" order — choose by ear and by intent (e.g. distortion before reverb so the reverb trails the distorted signal, not the other way around).
+These sound different. There's no "correct" order. Choose by ear and by intent (e.g. distortion before reverb so the reverb trails the distorted signal, not the other way around).
 
 ## Ducking (music under SFX) with AudioCompressor
 
 `AudioCompressor` can duck one stream when another is active (sidechain-style). The pattern: route music through a compressor whose threshold is driven by SFX volume. When SFX play, the compressor reduces music gain, then releases. This keeps SFX audible without a hard music cut.
 
-For a simpler approach, use `AudioFader` to tween music volume down when SFX fire and back up after — see `scripts/AudioBus.lua`.
+For a simpler approach, use `AudioFader` to tween music volume down when SFX fire and back up after. See `scripts/AudioBus.lua`.
 
 ## Tweening volume and effect parameters
 
@@ -115,17 +116,17 @@ end)
 - **Legacy:** `SoundService.AmbientReverb` (an `Enum.ReverbType` preset) applies globally to all `Sound` instances. **It does not affect the audio graph.**
 - **Acoustic simulation:** Enable `SoundService.AcousticSimulationEnabled` and `AcousticSimulationEnabled` on both `AudioEmitter` and `AudioListener` for geometry-based occlusion, diffraction, and reverberation. The current reference removed the individual effect toggles. Profile the result on low-end devices.
 
-## Distance & angle attenuation (updated)
+## Distance and angle attenuation (updated)
 
 - **Custom curve:** `AudioEmitter.DistanceAttenuation` / `AudioListener.DistanceAttenuation` (`NumberSequence`, keys 0..∞ → 0..1) is used only when `DistanceAttenuationMode == Custom`.
 - **Preset modes:** `AudioEmitter.DistanceAttenuationMode` (`Enum.DistanceAttenuationMode`) + `DistanceAttenuationBounds` (`NumberRange`, default `[4, 10000]`) define a preset rolloff (Inverse, Linear, etc.). When a preset is active, `SetDistanceAttenuation`/`GetDistanceAttenuation` still read/write the custom curve but it is ignored for playback.
-- **Angle attenuation:** `SetAngleAttenuation({[0]=1, [90]=0.5, [180]=0})`, `GetAngleAttenuation()` — maps 0–180° to 0–1 volume. Useful for directional sources.
+- **Angle attenuation:** `SetAngleAttenuation({[0]=1, [90]=0.5, [180]=0})`, `GetAngleAttenuation()`: maps 0–180° to 0–1 volume. Useful for directional sources.
 - **Audibility:** `emitter:GetAudibility(listener)` / `listener:GetAudibility(emitter)` returns 0..1 after combined distance+angle attenuation.
 
 ## Performance notes
 
 - Effects cost CPU per active stream passing through them. Reverb and acoustic simulation are the heaviest.
-- `AudioAnalyzer` is inspection-only — don't leave it in audible paths.
+- `AudioAnalyzer` is inspection-only. Don't leave it in audible paths.
 - On low-memory mobile clients the engine may drop effects; design so the experience is still intelligible without them.
 - Don't chain more effects than you can hear; each adds CPU and potential phase artifacts.
 

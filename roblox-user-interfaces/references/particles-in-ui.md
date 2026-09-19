@@ -1,12 +1,13 @@
 ---
+read_when: "Build 2D particle effects or combine UI with 3D previews"
 last_reviewed: 2026-06-17
 ---
 
-# Particles and Effects Inside UI ("Particles in the UI")
+# Particles and effects inside UI
 
 Direct `ParticleEmitter` instances live in the 3D world (parented to BasePart or Attachment) and do not render inside ScreenGui hierarchies. This file covers the practical techniques used in real high-quality Roblox experiences to achieve particle-like, VFX, or animated visual effects *within* 2D UI.
 
-## Technique 1: Scripted 2D Particle Pools (most common for HUD/rewards)
+## Technique 1: scripted 2D particle pools (most common for HUD/rewards)
 
 Create a small pool of ImageLabel (or Frame with UIGradient/UIStroke) instances, usually inside a CanvasGroup or dedicated "Effects" Frame.
 
@@ -21,11 +22,11 @@ On demand (button click, reward, hit marker, level up, etc.):
 - Cap the maximum concurrent particles (e.g. 30-80 depending on device).
 - Recycle instead of Destroy/Instance.new every time.
 - Use small, low-resolution textures with alpha.
-- Test at lowest graphics quality — transparent overdraw adds up fast.
+- Test at lowest graphics quality: transparent overdraw adds up fast.
 
 Many community assets exist (Emitter2D style), but a simple hand-rolled pool inside a ModuleScript is more maintainable and customizable.
 
-## Technique 2: ViewportFrame + 3D Content (best for "3D in UI")
+## Technique 2: ViewportFrame + 3D content (best for "3D in UI")
 
 1. Place a ViewportFrame inside your ScreenGui (or a panel).
 2. Give it a CurrentCamera.
@@ -35,35 +36,33 @@ Many community assets exist (Emitter2D style), but a simple hand-rolled pool ins
 
 **Important:** Real `ParticleEmitter`, `Beam`, `Trail`, and `Light` objects do **not** render inside `ViewportFrame`. Use the viewport's built-in `Ambient`, `LightColor`, and `LightDirection` properties for lighting, or fake particle effects with scripted ImageLabels/CanvasGroup techniques from this reference.
 
-This is the technique behind many polished item inspection screens and ability previews.
-
 **Gotchas:**
 - ViewportFrames have a non-trivial cost. Don't have 5 of them active and visible at once on mobile.
-- Lighting inside the viewport is independent — match or deliberately contrast with the main scene.
+- Lighting inside the viewport is independent: match or deliberately contrast with the main scene.
 - Size the internal content appropriately so it doesn't require extreme camera distances.
 
-## Technique 3: CanvasGroup + Group Effects + UIStroke / Gradient Animation
+## Technique 3: CanvasGroup + group effects + UIStroke / gradient animation
 
 - Wrap a panel or icon in a CanvasGroup.
 - Rapidly tween GroupTransparency + GroupColor3 for "flash", "dissolve", or "pop" group effects.
 - Animate a UIStroke's Thickness/Color/Transparency in a loop (or via a short tween sequence) for energy/shimmer borders.
 - Combine with a UIGradient whose offset or color keys are tweened for moving highlight or charging effects.
 
-These are generally cheaper than dozens of individual ImageLabel particles and look very polished for UI chrome, but CanvasGroup allocates a render target proportional to its on-screen size, so large or stacked CanvasGroups are not free.
+CanvasGroup allocates a render target proportional to its on-screen size. Compare its cost with individual ImageLabel particles; large or stacked CanvasGroups can be expensive.
 
-## Technique 4: Text + MaxVisibleGraphemes + Supporting Particles
+## Technique 4: text + MaxVisibleGraphemes + supporting particles
 
 The typewriter effect (detailed in the animation skill's ui-tweens reference) can be augmented with tiny per-character "dust" or "spark" ImageLabels that are created, tweened outward/upward with slight random variation, and then cleaned up.
 
 This gives a very high-production "magical text" or "holographic" feel without heavy cost.
 
-## Integration with the Rest of the Toolset
+## Integration with the rest of the toolset
 
 - Drive UI particle bursts from AnimationTrack markers (see roblox-animation skill). A "FootStep" or "AbilityCast" marker can call a function that spawns the appropriate 2D reward burst or ViewportFrame effect.
 - Combine with roblox-vfx best practices (flipbooks, proper transparency sequences, low rate + clever size, WindAffectsDrag where relevant) when driving effects from animation markers. Remember that real ParticleEmitters/Beams/Trails do not render inside ViewportFrame.
 - Respect the performance guidance in the roblox-core skill (fill rate, overdraw, mobile caps).
 
-## Concrete Starter Pattern (2D pool)
+## Concrete starter pattern (2D pool)
 
 See `scripts/UIParticlePool.lua` for a basic example module. Typical API:
 - `pool:emit(config)` where config contains texture, count, lifetime, velocity range, size range, color, etc.

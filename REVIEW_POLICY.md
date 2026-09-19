@@ -1,6 +1,6 @@
 # Review policy
 
-Every change must pass required CI and preserve the source-grounded correctness contract.
+Every change must pass required CI. Technical claims need current primary sources.
 
 ## Risk tiers
 

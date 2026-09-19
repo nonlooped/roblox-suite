@@ -1,8 +1,9 @@
 ---
+read_when: "Configure API keys, OAuth, scopes, or key rotation"
 last_reviewed: 2026-06-17
 ---
 
-# Open Cloud Authentication and Keys
+# Open Cloud authentication and keys
 
 > The September 2026 OAuth registration section is experimental guidance pending a second human review; the linked official registration requirements remain authoritative.
 
@@ -14,18 +15,18 @@ last_reviewed: 2026-06-17
 | --- | --- | --- |
 | **API key** (`x-api-key` header) | Most automation, server-to-server, CI/CD | Strong; recommended default |
 | **OAuth 2.0** | Apps acting on behalf of other Roblox users (third-party tools with login) | Strong; regular updates |
-| **Legacy cookie** | Internal one-off tooling only | Minimal; can break without notice — avoid for production |
+| **Legacy cookie** | Internal one-off tooling only | Minimal; can break without notice; avoid for production |
 
 ## Creating an API key
 
 1. Creator Dashboard → [API Keys](https://create.roblox.com/dashboard/credentials?activeTab=ApiKeysTab) → Create API Key.
 2. Name it by purpose (e.g. `PLACE_PUBLISHING_KEY`).
 3. **Access Permissions** → pick an API system. Add multiple if needed.
-4. If supported, restrict to a specific experience (or disable "Restrict by Experience" for all your experiences — broader blast radius).
+4. If supported, restrict to a specific experience (or disable "Restrict by Experience" for all your experiences; broader blast radius).
 5. **Select Operations** → minimum permissions. Each operation documents its required scope (e.g. `FlushMemoryStore` needs `universe.memory-store:flush`). See the [scopes reference](https://create.roblox.com/docs/en-us/cloud/reference/scopes).
 6. **Security** → optional IP allowlist in CIDR notation (e.g. `192.168.0.0/24`). Do **not** use IP restrictions for keys called from Roblox game servers (their IPs aren't predictable).
 7. Optional expiration date.
-8. Save & Generate. **Copy the key now** — you won't see it again.
+8. Save & Generate. **Copy the key now**. You won't see it again.
 9. Verify on the [API Extensions](https://create.roblox.com/dashboard/credentials) page.
 
 The key string is a password. Never share it, never commit it, never paste it in a public channel.
@@ -33,10 +34,10 @@ The key string is a password. Never share it, never commit it, never paste it in
 ## Scopes and resource identifiers
 
 Each scope can carry resource identifiers:
-- `userId` / `groupId` — for creator-targeted scopes.
-- `universeId` — for experience-targeted scopes.
-- `universeDatastore` — `{universeId, datastoreName}` for data-store-object scopes.
-- `*` — all resources of that type (broad; avoid where possible).
+- `userId` / `groupId`: for creator-targeted scopes.
+- `universeId`: for experience-targeted scopes.
+- `universeDatastore`: `{universeId, datastoreName}` for data-store-object scopes.
+- `*`: all resources of that type (broad; avoid where possible).
 
 Example introspect response (see below):
 
@@ -57,7 +58,7 @@ Example introspect response (see below):
 
 ## Group-owned resources: the dedicated account pattern
 
-An API key grants access to **all** resources the owning user can reach — including personal experiences outside the group. If you use your personal key for group automation and it leaks, everything you can touch is exposed.
+An API key grants access to **all** resources the owning user can reach, including personal experiences outside the group. If you use your personal key for group automation and it leaks, everything you can touch is exposed.
 
 Official recommendation:
 1. Create a new, dedicated Roblox account purely for automation.
@@ -72,7 +73,7 @@ This isolates blast radius to just the group.
 
 | Status | Why | Fix |
 | --- | --- | --- |
-| Active | OK | — |
+| Active | OK | - |
 | Disabled | You toggled Enable Key off | Toggle on |
 | Expired | Expiration passed | Remove/set new expiration |
 | **Auto-Expired** | **Unused or unmodified for 60 days** (even without a set expiration) | Disable→enable, or update any property |
@@ -84,7 +85,7 @@ The 60-day auto-expiry is the #1 cause of "my automation stopped working and I d
 
 ## Introspect endpoint
 
-`POST https://apis.roblox.com/api-keys/v1/introspect` — verify a key from the caller's IP and check moderation status. Use this when debugging unexpected 401/403s.
+`POST https://apis.roblox.com/api-keys/v1/introspect`. Verify a key from the caller's IP and check moderation status. Use this when debugging unexpected 401/403s.
 
 ```bash
 curl --location --request POST 'https://apis.roblox.com/api-keys/v1/introspect' \
@@ -102,7 +103,7 @@ curl --location --request POST 'https://apis.roblox.com/api-keys/v1/introspect' 
 - Store keys in a secrets manager; in Roblox places use a [Secrets Store](https://create.roblox.com/docs/en-us/cloud-services/secrets).
 - Never share via public channels.
 - Use the introspect endpoint to diagnose.
-- Disable/delete unused keys — don't rely on auto-expiry as your only cleanup.
+- Disable/delete unused keys: don't rely on auto-expiry as your only cleanup.
 
 ## Sources
 

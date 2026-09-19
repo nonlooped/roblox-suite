@@ -2,7 +2,7 @@
 
 ## Our standard
 
-Be respectful, specific, and evidence-led. Assume good intent, critique claims and code rather than people, and make room for contributors with different experience levels.
+Treat contributors with respect, regardless of experience. Critique claims and code, and support corrections with evidence.
 
 Examples of constructive participation include:
 
@@ -17,4 +17,4 @@ Harassment, discrimination, threats, doxxing, sexualized conduct, sustained disr
 
 Report conduct concerns privately through the repository owner's GitHub profile contact channel. Maintainers may edit or remove contributions and temporarily or permanently restrict participation when needed. Reports will be handled as privately as practical.
 
-This lightweight policy is adapted from the principles of the Contributor Covenant 2.1.
+This policy is adapted from the principles of the Contributor Covenant 2.1.

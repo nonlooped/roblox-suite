@@ -4,10 +4,7 @@ import { repoUrl } from "../data/catalog";
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const here = Astro.url.pathname;
 
-const links = [
-  { href: `${base}/skills/`, label: "Skills" },
-  { href: `${base}/evidence/`, label: "Sources" },
-];
+const links = [{ href: `${base}/skills/`, label: "Skills" }];
 ---
 
 <header class="sticky top-0 z-20 border-b border-ink bg-brand">
@@ -20,12 +17,7 @@ const links = [
       href={`${base}/`}
       class="-mx-1.5 flex min-h-11 items-center gap-2.5 whitespace-nowrap px-1.5 font-display text-base font-bold"
     >
-      <!--
-        Two stacked bricks: the mark is the same object the hero renders.
-        Below 34rem the wordmark drops and the mark alone carries the identity.
-        The alternative was shrinking every label until Star clipped off the
-        viewport, which costs the primary conversion to save a logotype.
-      -->
+      <!-- Hide the wordmark below the xs breakpoint to keep navigation and the Star action visible. -->
       <span class="relative block size-6 shrink-0" aria-hidden="true">
         <span class="absolute left-0 top-0 h-3 w-4.5 rounded-[3px] border-2 border-ink bg-paper"
         ></span>

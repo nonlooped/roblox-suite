@@ -1,28 +1,20 @@
 ---
 import Base from "../layouts/Base.astro";
 import { Hero } from "../components/Hero";
-import { CorrectionPanel } from "../components/CorrectionPanel";
 import { InstallPicker } from "../components/InstallPicker";
-import {
-  installCommand,
-  latestSourceCheckAt,
-  oldestSourceCheckAt,
-  repoUrl,
-  skillCount,
-  sourceCount,
-} from "../data/catalog";
+import JobPicker from "../components/JobPicker.astro";
+import { installCommand, repoUrl, skillCount } from "../data/catalog";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-/* Describes what this actually is — a free developer tool installed from a
-   command line — rather than leaving search engines to infer it from prose. */
+/* Structured metadata identifies the suite as a free developer tool. */
 const schema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: "Roblox Suite",
   applicationCategory: "DeveloperApplication",
   operatingSystem: "Any",
-  description: `${skillCount} skills that keep AI coding agents on Roblox APIs that currently work, each correction traceable to official Roblox documentation.`,
+  description: `${skillCount} skills for AI agents writing Roblox code, with API guidance and links to official documentation.`,
   url: new URL(import.meta.env.BASE_URL, Astro.site).href,
   codeRepository: repoUrl,
   license: "https://opensource.org/licenses/MIT",
@@ -30,43 +22,21 @@ const schema = {
 };
 ---
 
-<!--
-  Three beats on the belief ladder in PRODUCT.md: the claim, the proof, the
-  close. The full correction set and how-it-works live on /skills.
--->
+<!-- Two doors, in the order people arrive at them: the job you have, then the
+     command you run. -->
 <Base
-  title="Roblox Suite — stop your AI writing broken Roblox code"
-  description={`${skillCount} skills that keep AI coding agents on Roblox APIs that actually work, every correction traceable to dated documentation.`}
+  title="Roblox Suite | Roblox docs for coding agents"
+  description={`${skillCount} skills that show your coding agent the right Roblox API, with the official docs attached.`}
   schema={schema}
 >
   <Hero client:load installCommand={installCommand} repoUrl={repoUrl} skillCount={skillCount} />
 
-  <section class="pb-20 sm:pb-28">
-    <div class="mx-auto grid max-w-6xl items-center gap-10 px-6 lg:grid-cols-[1fr_0.9fr] lg:gap-16">
-      <CorrectionPanel client:visible skillsBase={`${base}/skills`} />
+  <JobPicker base={base} />
 
-      <div>
-        <h2 class="text-title">The same six mistakes, over and over</h2>
-        <p class="measure mt-5 text-lead text-on-brand-muted">
-          This is what Roblox Suite changes in an agent's output: specific API guidance with the
-          official page behind each correction.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!--
-    Yellow drench for the close: the brightest surface, saved for the last rung
-    of the ladder — installing costs one command. The evidence and repo links
-    stay, demoted to a single line so the command stays the loudest thing here.
-  -->
-  <section class="bg-toy-yellow py-20 text-ink sm:py-28">
+  <!-- Keep the install command prominent in the closing section. -->
+  <section class="bg-toy-yellow py-16 text-ink sm:py-24">
     <div class="mx-auto max-w-3xl px-6 text-center">
-      <h2 class="text-title">Add it to your agent in one command</h2>
-      <p class="measure mx-auto mt-5 text-lead text-ink/75">
-        Pick the agent you already use. Run the line. Restart it. That is the whole setup — no
-        config file, nothing to maintain per project.
-      </p>
+      <h2 class="text-title">One command, then restart your agent</h2>
 
       <InstallPicker client:visible installCommand={installCommand} skillCount={skillCount} />
 
@@ -75,12 +45,8 @@ const schema = {
           href={repoUrl}
           rel="noopener"
           class="font-medium underline underline-offset-4 hover:no-underline focus-visible:outline-ink"
-          >Star on GitHub</a
-        > or read the <a
-          href={`${base}/evidence/`}
-          class="font-medium underline underline-offset-4 hover:no-underline focus-visible:outline-ink"
-          >{sourceCount} sources</a
-        > behind the corrections, checked {oldestSourceCheckAt} through {latestSourceCheckAt}.
+          >Star it on GitHub</a
+        >.
       </p>
     </div>
   </section>

@@ -1,8 +1,9 @@
 ---
+read_when: "Choose screen or world-space containers and configure layout behavior"
 last_reviewed: 2026-06-17
 ---
 
-# GUI Containers (ScreenGui, CanvasGroup, SurfaceGui, BillboardGui, ScrollingFrame, ViewportFrame)
+# GUI containers (ScreenGui, CanvasGroup, SurfaceGui, BillboardGui, ScrollingFrame, ViewportFrame)
 
 Full details from the Roblox docs for [on-screen containers](https://create.roblox.com/docs/en-us/ui/on-screen-containers) and [in-experience containers](https://create.roblox.com/docs/en-us/ui/in-experience-containers).
 
@@ -68,19 +69,19 @@ Use for in-world computers, vehicle HUDs, keypads, interactive signs, etc.
 ## ViewportFrame (2D rectangle that renders a 3D world)
 
 - Lives inside any Gui container (usually ScreenGui or a Frame inside one).
-- Has its own `.CurrentCamera` (required for rendering). Parent 3D content directly to the ViewportFrame — models, parts, meshes, cameras, and rigs. There is no separate `.World` property.
+- Has its own `.CurrentCamera` (required for rendering). Parent models, parts, meshes, cameras, and rigs directly to the ViewportFrame. There is no separate `.World` property.
 - You can play AnimationTracks on rigs inside the viewport and run IKControl. Real `ParticleEmitter`, `Beam`, `Trail`, and `Light` objects do **not** render inside `ViewportFrame`; use the built-in `Ambient`, `LightColor`, and `LightDirection` properties for lighting.
 - Common for 3D item/character previews in shops or inventories, ability visualizers, "portal" effects, or embedding world particles as "UI particles".
-- Performance cost is real — treat active ViewportFrames like expensive transparent elements. Limit concurrent visible ones and lower internal complexity on low-end devices.
+- Performance cost is real: treat active ViewportFrames like expensive transparent elements. Limit concurrent visible ones and lower internal complexity on low-end devices.
 
-## Common Patterns & Gotchas
+## Common patterns and gotchas
 
 - **Scale vs Offset:** Prefer scale for almost everything responsive. Offset is still the right tool for thin 1px separators/hairlines, crisp borders that must stay 1 pixel wide, fixed-size hit targets (e.g. 44×44 pt minimums), and fixed-width popovers that should not stretch.
 - **UICorner clipping:** `UICorner` only rounds the object's own background; it does **not** clip descendant content to the rounded shape. Use a `CanvasGroup` with `UICorner` when you need rounded clipping.
 - **TextScaled constraints:** `TextScaled` alone can make text shrink or grow without bounds. Add a `UITextSizeConstraint` with sensible `MinTextSize` and `MaxTextSize` values.
 - **Gamepad/keyboard focus:** Set `GuiService.SelectedObject` to the first interactive button when opening a menu, and use `GuiService.SelectedObjectChanged` to keep visual focus indicators in sync. Without this, controller/keyboard players cannot navigate your UI.
 
-## General Container Properties & Patterns
+## General container properties and patterns
 
 - ZIndex (per GuiObject) for layering within one container.
 - For world containers, combine AlwaysOnTop + high Brightness + appropriate MaxDistance to keep important markers visible.

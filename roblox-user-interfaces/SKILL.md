@@ -1,12 +1,12 @@
 ---
 name: roblox-user-interfaces
-description: "Every Roblox GUI container and building block — ScreenGui, SurfaceGui, BillboardGui, CanvasGroup, ScrollingFrame, ViewportFrame, plus layouts and modifiers (UIListLayout, UIGridLayout, UIStroke, UIGradient, UICorner, constraints). Covers positioning, scale vs offset, AnchorPoint, clipping, AutomaticSize, responsive design, interaction, drag detectors, and particle-like VFX inside 2D UI. Use for any HUD, menu, or interface work."
+description: "Build or debug Roblox HUDs, menus, and world-space interfaces. Use for GUI containers, responsive layouts, input handling, ViewportFrame previews, and particle effects in 2D UI."
 last_reviewed: 2026-06-17
 ---
 
 # roblox-user-interfaces
 
-Roblox UI is one of the most powerful and also one of the most commonly poorly-implemented areas. This skill gives precise, up-to-date knowledge of the full hierarchy, properties that actually matter for production (especially cross-device), layout systems that replace manual positioning, and the creative techniques for "particle-like" or VFX behavior inside 2D UI without using the 3D ParticleEmitter directly in ScreenGui.
+Choose a GUI container for the display surface, then use layouts and constraints to handle screen sizes. For particles inside a ScreenGui, use 2D UI objects; ParticleEmitter does not render there.
 
 **Primary sources:**
 - https://create.roblox.com/docs/en-us/ui
@@ -16,14 +16,9 @@ Roblox UI is one of the most powerful and also one of the most commonly poorly-i
 - roblox-animation skill (for motion on these objects)
 - Engine classes: ScreenGui, SurfaceGui, BillboardGui, GuiObject and all descendants, the various UI*Layout and UI*Constraint classes, CanvasGroup, ViewportFrame, etc.
 
-**How this skill is organized:**
-- SKILL.md: decision frameworks, core patterns, responsive design rules, interaction model, "particles in UI" overview, checklists, and pointers to granular references/.
-- references/: deep files for containers (gui-containers.md covers building blocks, layouts, positioning) and particles-in-ui.md.
-- scripts/: UIParticlePool.lua for 2D HUD/reward particle bursts. Add other client utilities as needed.
+For UI motion, read [roblox-animation](../roblox-animation/SKILL.md). For effects in the 3D world, read [roblox-vfx](../roblox-vfx/SKILL.md).
 
-Always cross-reference the roblox-animation skill for motion on these objects and roblox-vfx when embedding 3D effects.
-
-## Container Types — When to Use Each
+## Choose a GUI container
 
 **ScreenGui (on-screen overlay)**
 - Parent to StarterGui for automatic cloning into every player's PlayerGui.
@@ -46,9 +41,9 @@ Always cross-reference the roblox-animation skill for motion on these objects an
 
 **Other / special:**
 - CoreGui (Roblox-owned; control with StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.XXX, false)).
-- ViewportFrame (embed a 3D camera + world inside a 2D rectangle — great for item previews and static 3D models; real ParticleEmitter, Beam, and Trail effects do not render here).
+- ViewportFrame (embed a 3D camera + world inside a 2D rectangle; great for item previews and static 3D models; real ParticleEmitter, Beam, and Trail effects do not render here).
 
-## Building Blocks & Layout System (stop positioning manually)
+## Layout objects and modifiers
 
 The vast majority of modern Roblox UIs are built from:
 - **Frame** or **CanvasGroup** as containers (ClipsDescendants, AutomaticSize = X/Y/XY, Background* properties, Rotation).
@@ -59,18 +54,18 @@ The vast majority of modern Roblox UIs are built from:
 - **ViewportFrame** for 3D content.
 
 **Layout objects (the real power):**
-- UIListLayout / UIGridLayout / UIPageLayout — automatic arrangement, FillDirection, Horizontal/VerticalAlignment, Padding, SortOrder. `UIListLayout` also supports flex features (`HorizontalFlex`, `VerticalFlex`, `ItemLineAlignment`, `Wraps`) and pairs with per-object `UIFlexItem` for flex overrides.
+- UIListLayout / UIGridLayout / UIPageLayout: automatic arrangement, FillDirection, Horizontal/VerticalAlignment, Padding, SortOrder. `UIListLayout` also supports flex features (`HorizontalFlex`, `VerticalFlex`, `ItemLineAlignment`, `Wraps`) and pairs with per-object `UIFlexItem` for flex overrides.
 - These + AutomaticSize on parents = truly responsive UIs that grow/shrink with content or different languages.
 
 **Appearance & constraint modifiers (use these instead of old hacks):**
-- UIStroke (ApplyStrokeMode, Color, Enabled, LineJoinMode, Thickness, Transparency, ZIndex) — modern borders that work on any GuiObject.
+- UIStroke (ApplyStrokeMode, Color, Enabled, LineJoinMode, Thickness, Transparency, ZIndex). Modern borders that work on any GuiObject.
 - UIGradient (`Color` is a `ColorSequence`; `Transparency` is a `NumberSequence`). `Type` selects Linear, Radial, or Conical; `Scale` controls extent and `TileMode` selects Clamp, Repeat, or Mirror. Radial gradients ignore `Rotation`. See https://create.roblox.com/docs/ui/appearance-modifiers#gradient.
-- UICorner (CornerRadius — much better than 9-slice hacks for rounded rectangles).
+- UICorner (CornerRadius; much better than 9-slice hacks for rounded rectangles).
 - UIPadding, UISizeConstraint, UIAspectRatioConstraint, UIScale, UIFlexItem.
 
 **Positioning fundamentals (non-negotiable for quality):**
 - Prefer Scale (0-1) over Offset (pixels) for almost everything.
-- AnchorPoint controls the pivot point of the object (0,0 = top-left; 0.5,0.5 = center — set this before tweening Position or Size).
+- AnchorPoint controls the pivot point of the object (0,0 = top-left; 0.5,0.5 = center; set this before tweening Position or Size).
 - ZIndex for layering inside one container; DisplayOrder for layering whole ScreenGuis.
 - For world-space: StudsOffset on BillboardGui, ZOffset + AlwaysOnTop on both Surface and Billboard.
 
@@ -86,28 +81,28 @@ See references/gui-containers.md for exhaustive property tables, common hierarch
 
 Control default Roblox UI with `StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)` etc. Hide virtual controls with `GuiService.TouchControlsEnabled = false` when you provide custom input.
 
-## "Particles in the UI" (dedicated deep coverage)
+## Particle effects in UI
 
 Direct ParticleEmitter lives in the 3D world (parent to Part or Attachment). For 2D UI you have several excellent options:
 
-1. **Scripted 2D particle pools** — tables of ImageLabels (or a single CanvasGroup with many small children). Use TweenService for Position (in scale or local), Size, Transparency, Rotation, Color. Pool and recycle instances. Great for confetti, sparks, floating numbers, reward bursts, hit markers.
-2. **ViewportFrame embedding** — place a ViewportFrame inside your ScreenGui. Inside, put 3D parts, meshes, cameras, and small rigs. Real `ParticleEmitter`, `Beam`, `Trail`, and `Light` objects do **not** render inside ViewportFrames. Tween the ViewportFrame's own properties or the camera / parts inside. This is how many 3D ability previews or glowing item inspectors are done.
-3. **CanvasGroup + rapid tweens** — for group "pop", shimmer, or dissolve effects.
-4. **UIStroke + UIGradient animated** — energy borders, charging effects, animated lines.
+1. **Scripted 2D particle pools**. Tables of ImageLabels (or a single CanvasGroup with many small children). Use TweenService for Position (in scale or local), Size, Transparency, Rotation, Color. Pool and recycle instances. Great for confetti, sparks, floating numbers, reward bursts, hit markers.
+2. **ViewportFrame embedding**. Place a ViewportFrame inside your ScreenGui. Inside, put 3D parts, meshes, cameras, and small rigs. Real `ParticleEmitter`, `Beam`, `Trail`, and `Light` objects do **not** render inside ViewportFrames. Tween the ViewportFrame's own properties or the camera / parts inside. This is how many 3D ability previews or glowing item inspectors are done.
+3. **CanvasGroup + rapid tweens**. For group "pop", shimmer, or dissolve effects.
+4. **UIStroke + UIGradient animated**. Energy borders, charging effects, animated lines.
 5. **Text + MaxVisibleGraphemes** combined with small image "particles" for fancy dialogue or title sequences.
 
 Performance reality: Transparent overdraw and fill-rate are the enemy on mobile. Keep concurrent UI "particles" low, reuse instances aggressively, use smaller textures, and test at low graphics quality.
 
 See the dedicated references/particles-in-ui.md for concrete pool implementations, ViewportFrame setup patterns, integration with 3D markers, and performance guardrails.
 
-## Responsive & Professional Patterns
+## Responsive layouts
 
 - Design in a canonical resolution/aspect (e.g. 1920x1080 or a common mobile one) but implement everything in scale + constraints.
 - Use UIListLayout + AutomaticSize + Padding for rows/columns instead of manually calculating positions.
 - For different device classes, either use multiple ScreenGui variants toggled by UserInputService or make one layout that flexes via the layout objects + size modifiers.
-- Universal styling (Style Editor + StyleRules) is the Roblox equivalent of CSS — use it for consistent colors, strokes, fonts, and even transitions across many UI pieces.
+- Universal styling (Style Editor + StyleRules) is the Roblox equivalent of CSS. Use it for consistent colors, strokes, fonts, and even transitions across many UI pieces.
 
-## Core Checklists
+## UI review checklist
 
 **New ScreenGui:**
 - [ ] Correct ScreenInsets for the content (interactive → CoreUISafeInsets).
@@ -126,13 +121,12 @@ See the dedicated references/particles-in-ui.md for concrete pool implementation
 - [ ] Tested at lowest graphics quality.
 - [ ] Tied to meaningful gameplay moments (via markers from the animation skill or UI events).
 
-This skill + roblox-animation + roblox-vfx will let you build interfaces that feel alive and integrated with the 3D world rather than bolted-on 2D afterthoughts.
 
 For the definitive list of every property and the latest additions (new layouts, drag detectors, styling features), consult the Engine API reference at https://create.roblox.com/docs/reference/engine.
 
 <!-- catalog:references:start -->
 ## Reference index
 
-- [gui-containers.md](references/gui-containers.md)
-- [particles-in-ui.md](references/particles-in-ui.md)
+- [gui-containers.md](references/gui-containers.md): Choose screen or world-space containers and configure layout behavior.
+- [particles-in-ui.md](references/particles-in-ui.md): Build 2D particle effects or combine UI with 3D previews.
 <!-- catalog:references:end -->

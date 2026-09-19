@@ -1,8 +1,9 @@
 ---
+read_when: "Choose a Studio MCP tool and identify the target Studio instance"
 last_reviewed: 2026-09-19
 ---
 
-# MCP Tool Reference
+# MCP tool reference
 
 Official source: https://create.roblox.com/docs/en-us/studio/mcp
 

@@ -1,8 +1,9 @@
 ---
+read_when: "Implement patrol, chase, combat, or state transitions"
 last_reviewed: 2026-06-17
 ---
 
-# NPC Behavior Patterns
+# NPC behavior patterns
 
 ## State machine
 
@@ -104,7 +105,7 @@ end)
 
 When an NPC respawns with a new character model, create a fresh behavior instance for that model and `Destroy` the old one. Do not reuse followers across models because connections and `Humanoid` references become stale.
 
-## Cleanup / Destroy pattern
+## Cleanup / destroy pattern
 
 Every behavior that connects to `RunService.Heartbeat`, `Humanoid` events, or `Path.Blocked` should expose a `Destroy` method that disconnects everything and releases references:
 

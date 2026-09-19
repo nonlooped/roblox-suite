@@ -1,19 +1,20 @@
 ---
+read_when: "Coordinate lobbies, reserved servers, allocation races, or player-data handoff"
 last_reviewed: 2026-07-16
 ---
 
-# Matchmaking Patterns
+# Matchmaking patterns
 
 **Official sources:**
 - https://create.roblox.com/docs/en-us/projects/teleport
 - https://create.roblox.com/docs/reference/engine/classes/MessagingService
 - https://create.roblox.com/docs/en-us/cloud-services/memory-stores
 
-Matchmaking in Roblox is build-it-yourself — there's no built-in matchmaker. You compose `TeleportService:TeleportAsync` with a coordination layer (`MessagingService`, `MemoryStoreService`, or an external HTTP service) to route players into the right servers.
+Build matchmaking by combining `TeleportService:TeleportAsync` with a coordination layer (`MessagingService`, `MemoryStoreService`, or an external HTTP service) to route players into the right servers.
 
 All patterns respect the **50-player-per-`TeleportAsync`** limit (split larger groups into multiple calls) and the **server-only** rule for `TeleportAsync`.
 
-## Pattern 1: Simple lobby → match (intra-universe)
+## Pattern 1: simple lobby → match (intra-universe)
 
 A dedicated lobby place collects players; when enough are ready, `TeleportAsync` sends them to a game place in the same universe.
 
@@ -49,7 +50,7 @@ end
 
 **Scaling:** if you have multiple lobby servers, use `MessagingService` to broadcast readiness across them, or move to Pattern 3.
 
-## Pattern 2: Reserved server per match
+## Pattern 2: reserved server per match
 
 For instanced dungeons, private matches, or anything that must be isolated: reserve a server, persist the access code, teleport the party in.
 
@@ -99,7 +100,7 @@ end
 
 Reserved server access codes remain valid, but allocation records should carry an expiry so matchmaking state does not live forever. The source can record `teleporting` only after allocation; the destination must separately mark `arrived`. For short-lived queues and locks, prefer a TTL'd MemoryStore record.
 
-## Pattern 3: Server browser via MemoryStoreService
+## Pattern 3: server browser via MemoryStoreService
 
 For experiences with many game servers, maintain a `MemoryStoreService` sorted map of active servers and let players browse/join. This scales better than `MessagingService` fan-out.
 
@@ -162,7 +163,7 @@ end
 
 Use `MemoryStoreService`'s TTL so dead servers age out of the map automatically.
 
-## Pattern 4: External matchmaking service
+## Pattern 4: external matchmaking service
 
 For skill-based matchmaking, party queues, or anything too complex for in-engine coordination, use an external HTTP service as the matchmaker. It returns a destination (place ID + `JobId`, or a fresh reserved-server access code); the lobby then `TeleportAsync`s the party.
 
@@ -178,16 +179,16 @@ For skill-based matchmaking, party queues, or anything too complex for in-engine
 | Complex/skill-based matchmaking, cross-experience, or heavy logic | External HTTP service |
 | Persisting match results or player data | `DataStoreService` |
 
-`MessagingService` is fire-and-forget; if a server isn't listening when the message publishes, it misses it. `MemoryStoreService` is stateful and queryable — better for "what's currently available." External services are the most flexible but add a dependency and latency.
+`MessagingService` is fire-and-forget; if a server isn't listening when the message publishes, it misses it. `MemoryStoreService` is stateful and queryable, so use it to track currently available servers. External services are the most flexible but add a dependency and latency.
 
 ## Security and limits
 
 - **`TeleportAsync` is server-only.** Client-initiated teleports must go through a validated RemoteEvent.
 - **Rate-limit** teleport request Remotes per player.
 - **Whitelist** allowed destination place IDs server-side; don't accept client-supplied place IDs unsanitized.
-- **50 players per `TeleportAsync`** call — split larger parties.
-- **Group teleports are universe-only** — you cannot `TeleportAsync` a group across experiences.
-- **Studio can't test teleports** — publish and test in the Roblox app.
+- **50 players per `TeleportAsync`** call: split larger parties.
+- **Group teleports are universe-only**: you cannot `TeleportAsync` a group across experiences.
+- **Studio can't test teleports**: publish and test in the Roblox app.
 - Reserved-server access codes are long-lived; treat them as semi-secret (anyone with the code can join the reserved server).
 
 ## Sources

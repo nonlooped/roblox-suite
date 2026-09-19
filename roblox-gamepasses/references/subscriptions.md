@@ -1,4 +1,5 @@
 ---
+read_when: "Create recurring benefits or handle subscription status and renewals"
 last_reviewed: 2026-06-17
 ---
 
@@ -8,11 +9,11 @@ last_reviewed: 2026-06-17
 
 Subscriptions offer users recurring benefits for a monthly fee. Unlike [passes](purchase-flow-and-granting.md), whose benefits are granted indefinitely, subscription benefits persist only while the user keeps paying. Subscriptions are managed through `MarketplaceService` and the Creator Dashboard.
 
-## When to Use Subscriptions vs Passes vs Developer Products
+## When to use subscriptions vs passes vs developer products
 
-- **Pass** — one-time permanent unlock (VIP, permanent item).
-- **Developer Product** — repeatable/consumable (currency pack, potion, revive).
-- **Subscription** — recurring monthly benefit (monthly cosmetic bundle, ongoing XP boost, VIP-tier perks that should gate while unpaid).
+- **Pass**: one-time permanent unlock (VIP, permanent item).
+- **Developer Product**: repeatable/consumable (currency pack, potion, revive).
+- **Subscription**: recurring monthly benefit (monthly cosmetic bundle, ongoing XP boost, VIP-tier perks that should gate while unpaid).
 
 ## Characteristics
 
@@ -22,7 +23,7 @@ Subscriptions offer users recurring benefits for a monthly fee. Unlike [passes](
 - Up to **50 subscriptions** per experience (active + inactive combined).
 - Subscriptions are **ineligible for cross-selling** by other experiences and for affiliate fees.
 
-## Robux vs Local Currency
+## Robux vs local currency
 
 |  | Robux | Local currency |
 | --- | --- | --- |
@@ -36,16 +37,16 @@ Subscriptions offer users recurring benefits for a monthly fee. Unlike [passes](
 
 Local-currency earnings follow a 30-day hold; Robux-priced earnings follow the standard ~5-day hold (same as passes/products).
 
-## Product Types
+## Product types
 
 When creating, choose one:
-- **Durable** — permanent items that persist after acquisition (e.g. a weapon). If a bundle mixes durable + consumable, choose Durable.
-- **Consumable** — temporary, re-purchasable, expires after use (e.g. a potion that grants a temporary boost).
-- **Currency** — an in-experience medium of exchange.
+- **Durable**: permanent items that persist after acquisition (e.g. a weapon). If a bundle mixes durable + consumable, choose Durable.
+- **Consumable**: temporary, re-purchasable, expires after use (e.g. a potion that grants a temporary boost).
+- **Currency**: an in-experience medium of exchange.
 
-You **cannot** change the product type after creation. The price of a Robux subscription can be changed only **once every 60 days**, and price increases require Roblox to give users ≥30 days' notice. Local-currency subscription prices cannot be changed — delete and recreate to change price.
+You **cannot** change the product type after creation. The price of a Robux subscription can be changed only **once every 60 days**, and price increases require Roblox to give users ≥30 days' notice. Local-currency subscription prices cannot be changed. Delete and recreate to change price.
 
-## Creating & Activating
+## Creating and activating
 
 1. Creator Dashboard → your experience → Monetization → Subscriptions → Create Subscription.
 2. Upload cover image, unique name, clear description.
@@ -54,12 +55,12 @@ You **cannot** change the product type after creation. The price of a Robux subs
 5. Create.
 6. To put it up for sale: ⋮ → Activate. Active subscriptions appear on the experience's Store tab.
 
-Before first activation you must confirm a **shortened experience name** — this is permanent and cannot be changed, and it appears alongside the subscription name at purchase time. It does **not** change your experience's name on Roblox.
+Before first activation you must confirm a **shortened experience name**. This is permanent and cannot be changed, and it appears alongside the subscription name at purchase time. It does **not** change your experience's name on Roblox.
 
-## Subscription States
+## Subscription states
 
-- **Active** — available for sale; subscribers can renew at the start of the next period.
-- **Inactive** — unavailable for sale.
+- **Active**: available for sale; subscribers can renew at the start of the next period.
+- **Inactive**: unavailable for sale.
 
 To take off sale: ⋯ → Take Off Sale. You can either let existing subscribers renew, or cancel future renewals. If you're not removing the benefits permanently, let subscribers renew.
 
@@ -67,7 +68,7 @@ To take off sale: ⋯ → Take Off Sale. You can either let existing subscribers
 
 Deleting an active subscription triggers **full refunds for active subscribers** and **zero Robux for you**. Prefer: take off sale → cancel renewals → wait out the period → then delete. Deleting a local-currency subscription requires refunding all current subscribers (Robux subscriptions are not refundable). Deletion requires the last four digits of the subscription ID for confirmation.
 
-## API Surface
+## API surface
 
 Subscription IDs are **strings** like `"EXP-11111111"`, not numbers.
 
@@ -196,18 +197,18 @@ local function playerHasSubscription(subscriptionId: string)
 end
 ```
 
-## Replacing a Pass with a Subscription
+## Replacing a pass with a subscription
 
 When migrating, existing pass holders must keep the benefit they paid for; take the pass off sale so new users buy the subscription. Subscription benefits can be revoked (pass benefits cannot), so if you previously persisted pass benefits to a DataStore you must "undo" them when the subscription lapses. Listen for both `PromptGamePassPurchaseFinished` (legacy) and `UserSubscriptionStatusChanged` (new).
 
-## Security Rules (critical)
+## Security rules (critical)
 
 - **Prompt on client, check status on server.** `GetUserSubscriptionStatusAsync` is server-only by design.
 - **Grant/revoke on server only**, in `UserSubscriptionStatusChanged` and the `PlayerAdded` re-check.
 - **Always pcall** `GetUserSubscriptionStatusAsync`, `PromptSubscriptionPurchase`, and the remote fetch.
 - **Re-check on every join.** Don't trust a cached "subscribed" state forever; subscriptions lapse.
 - **Persist nothing sensitive on the client.** Use your DataStore profile (see roblox-datastores) for any subscription-derived state.
-- **Respect region/platform eligibility.** Only offer subscriptions in supported regions and platforms — `PolicyService:IsEligibleToPurchaseSubscription` tells you whether the player can buy (see roblox-gamepasses PolicyService reference).
+- **Respect region/platform eligibility.** Only offer subscriptions in supported regions and platforms. `PolicyService:IsEligibleToPurchaseSubscription` tells you whether the player can buy (see roblox-gamepasses PolicyService reference).
 - **Idempotency guard** your grant/revoke so duplicate `UserSubscriptionStatusChanged` events don't double-apply.
 
 ## Analytics
@@ -215,18 +216,18 @@ When migrating, existing pass holders must keep the benefit they paid for; take 
 Creator Dashboard → Monetization → Subscriptions → Analytics tab tracks:
 - **Subscriptions** (total active), **Estimated revenue** (net of fees).
 - **Subscriber breakdown**: New / Renewed / Resurrected (previously canceled).
-- **Cancellations** (not the same as refunds — canceled = won't renew but paid in full for the cycle).
+- **Cancellations** (not the same as refunds; canceled = won't renew but paid in full for the cycle).
 - **Subscriptions by platform** and **Platform earnings**.
 
 Real-time subscription events (cancelled, purchased, refunded, renewed) are also available via **Open Cloud webhooks** (see roblox-open-cloud skill).
 
 ## Gotchas
 
-- `PromptSubscriptionPurchaseFinished`'s `didTryPurchasing` is **not** a success signal — re-check status after a delay.
+- `PromptSubscriptionPurchaseFinished`'s `didTryPurchasing` is **not** a success signal. Re-check status after a delay.
 - Subscription registration can lag; a 10-second delay before re-checking is the documented pattern.
 - Local-currency refunds within the hold window cancel the payout; outside the window they deduct from your Robux balance (and from the group owner's balance if the group can't cover it).
 - Changing a Robux subscription's price is rate-limited to once per 60 days; local-currency prices are immutable.
-- Shortened experience name is permanent — set it carefully.
+- Shortened experience name is permanent: set it carefully.
 - Subscriptions don't support cross-experience selling or affiliate fees.
 
 ## Sources

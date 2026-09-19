@@ -38,7 +38,6 @@ async function page(...segments) {
 
 const home = await page();
 const skillsIndex = await page("skills");
-const evidence = await page("evidence");
 
 if (home && !/<meta name="google-site-verification" content="[^"]+">/.test(home)) {
   fail("home page is missing Google Search Console verification metadata");
@@ -82,7 +81,6 @@ for (const skill of catalog.skills) {
 for (const [name, html] of [
   ["home", home],
   ["skills index", skillsIndex],
-  ["evidence", evidence],
 ]) {
   if (!html) continue;
   const levels = [...html.matchAll(/<h([1-6])\b/g)].map((match) => Number(match[1]));
@@ -128,9 +126,14 @@ for (const leftover of ["sitemap-index.xml", "sitemap-0.xml"]) {
 const expectedSitemapUrls = [
   SITEMAP_BASE,
   `${SITEMAP_BASE}skills/`,
-  `${SITEMAP_BASE}evidence/`,
   ...catalog.skills.map((skill) => `${SITEMAP_BASE}skills/${skill.slug}/`),
 ];
+
+// The standalone source list was folded into each skill page; a stale route
+// left in the sitemap would advertise a URL that now only redirects.
+if (sitemapContent && /<loc>[^<]*\/evidence\/?<\/loc>/.test(sitemapContent)) {
+  fail("sitemap still lists the removed /evidence/ page");
+}
 
 for (const url of expectedSitemapUrls) {
   if (sitemapContent && !sitemapContent.includes(`<loc>${url}</loc>`)) {
@@ -157,4 +160,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`Built site OK: ${count} skill pages, sitemap, index, evidence, and assets present.`);
+console.log(`Built site OK: ${count} skill pages, sitemap, index, and assets present.`);

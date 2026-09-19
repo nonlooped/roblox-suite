@@ -1,14 +1,13 @@
 ---
+read_when: "Tune particle appearance, motion, emission, or rendering cost"
 last_reviewed: 2026-06-17
 ---
 
-# Particle Emitter Properties Reference
+# Particle emitter properties reference
 
 **Main source:** https://create.roblox.com/docs/en-us/effects/particle-emitters
 
-This reference expands on every significant property with usage notes, interactions, and examples.
-
-## Emission Control
+## Emission control
 
 - **Enabled**: Master switch. Setting false stops new particles but existing ones continue. Use :Clear() to instantly remove active particles.
 - **Rate**: Particles per second (capped ~400 on desktop, ~100 on mobile per emitter). Lower rate + clever lifetime/size is usually better than high rate.
@@ -17,23 +16,23 @@ This reference expands on every significant property with usage notes, interacti
 - **Lifetime**: Seconds or NumberRange (random per particle). Hard capped internally at 20 seconds.
 - **EmissionDirection**: Only relevant when parented to a BasePart (which face emits from). When parented to an Attachment, rotate the Attachment to aim emission; EmissionDirection is ignored.
 
-## Visual Appearance
+## Visual appearance
 
 - **Texture**: The image each particle uses. PNG with transparency is ideal. For grayscale textures, set LightEmission = 1 to make dark areas invisible.
 - **Color**: ColorSequence. Even a constant Color3 in Studio is stored as a one-keypoint ColorSequence. Keypoints define the gradient over particle lifetime.
 - **Size**: NumberSequence. Use envelopes (the pink lines in the sequence editor) for per-particle random variation.
-- **Transparency**: NumberSequence is extremely important. Almost always fade particles toward the end of life (and sometimes at birth) to prevent popping.
+- **Transparency**: Use a NumberSequence to fade particles toward the end of life, and optionally at birth, to prevent popping.
 - **Squash**: NumberSequence for non-uniform scaling (positive = tall & skinny, negative = wide & flat). Useful for stylized effects.
 - **Orientation**: 
   - FacingCamera (default billboard quad)
   - FacingCameraWorldUp (billboard but locked to world Y)
-  - VelocityParallel / VelocityPerpendicular (aligns with movement — great for streaks and sparks)
+  - VelocityParallel / VelocityPerpendicular (aligns with movement; great for streaks and sparks)
 - **LightEmission**: 0 = normal alpha blend, 1 = additive (glowing effect even in darkness).
 - **LightInfluence**: 0 = completely unaffected by world lighting, 1 = fully lit by environment.
 - **Brightness**: Scales the light the emitter contributes when `LightInfluence` is 0. No effect when `LightInfluence` is 1.
 - **ZOffset**: Moves the render layer forward/back in studs without changing 3D position. Useful for layering multiple emitters.
 
-## Shape System
+## Shape system
 
 - **Shape**: Box, Sphere, Cylinder, Disc.
 - **ShapeStyle**: Volume (emit inside the volume) or Surface (emit on the boundary).
@@ -42,7 +41,7 @@ This reference expands on every significant property with usage notes, interacti
 
 **Important parenting note**: Sphere and Cylinder shapes do **not** display correctly when the emitter is parented only to an Attachment. Only use them with a BasePart parent (the part can be tiny and invisible).
 
-## Motion Over Lifetime
+## Motion over lifetime
 
 - **Acceleration**: Constant velocity change per second (Vector3). Primary way to simulate gravity (0, -9.81 or lower, 0).
 - **Drag**: How quickly particles lose speed (half-life style). Higher = quicker slowdown.
@@ -52,7 +51,7 @@ This reference expands on every significant property with usage notes, interacti
 - **TimeScale**: 0-1 speed multiplier for this emitter's particle effect (useful for per-effect slow-motion or speed-up without changing all other numbers).
 - **Rotation** and **RotSpeed**: Initial angle and angular velocity (degrees or ranges). Negative = counter-clockwise.
 
-## Flipbook Animation (Texture Sheets)
+## Flipbook animation (texture sheets)
 
 For animated particles (fire loops, explosions, magic bursts):
 
@@ -65,36 +64,36 @@ For animated particles (fire loops, explosions, magic bursts):
 
 Flipbooks cost more memory. Reuse the same atlas across multiple emitters when possible.
 
-## Other Notable Properties
+## Other notable properties
 
-- **LockedToPart** + **VelocityInheritance** combinations are powerful for attached weapon effects or vehicle exhaust.
+- **LockedToPart** + **VelocityInheritance** control how attached weapon effects or vehicle exhaust follow their source.
 - **Clear()** method: Instantly removes all currently active particles from this emitter.
 - **Emit(numParticles)**: Forces a burst of particles regardless of Rate (very useful for one-shot effects triggered by code or animation markers).
 
-## Replication & Client Authoritative Emission
+## Replication and client authoritative emission
 
 - Continuous emitters replicate their state, and each client simulates its own particles locally. The server does not send individual particles.
 - For one-shot bursts, prefer client-authoritative emission: the server signals that an effect happened, and each client spawns the burst locally. This avoids network chatter and respects per-client quality settings.
 - Use `RemoteEvent:FireClient` or local event systems; keep gameplay logic authoritative on the server.
 
-## LOD & Distance Culling
+## LOD and distance culling
 
 - Disable or reduce emitters when the camera is far away. Typical cutoffs: 100–300 studs for disable, half Rate at half distance.
 - Use `workspace.CurrentCamera` distance checks, tag-based heartbeat systems, or spatial partitions. Avoid per-frame `Magnitude` for many emitters.
 - Preload textures with `ContentProvider:PreloadAsync` for flipbook atlases and prominent effect textures before they are needed (loading screens, before combat).
 
-## Overdraw & Fill-Rate Measurement
+## Overdraw and fill-rate measurement
 
 - The main GPU cost of particles is fill rate: how many transparent pixels overlap on screen.
 - In Studio, use **View → Stats → GPU → Fill Rate** and **Render → Overdraw** to visualize cost. Optimize Size and Transparency before Rate.
 
-## Cleanup for Transient Emitters
+## Cleanup for transient emitters
 
 - Destroy one-shot clones after their maximum lifetime via `Debris:AddItem` or `task.delay`. Do not let disabled emitters accumulate.
 - For continuous emitters, set `Enabled = false` and call `:Clear()` before reparenting or destroying.
 - When pooling, reset Rate, Lifetime, Size, Transparency, and Color to default values before reuse.
 
-## Property Interaction Notes
+## Property interaction notes
 
 Many properties only affect particles at the moment they are emitted. Changing Acceleration after particles exist will affect them, but changing Speed will not.
 

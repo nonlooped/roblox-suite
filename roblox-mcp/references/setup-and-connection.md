@@ -1,8 +1,9 @@
 ---
+read_when: "Enable Studio MCP and connect a client on Windows or macOS"
 last_reviewed: 2026-06-17
 ---
 
-# Setup and Connection
+# Setup and connection
 
 Official guide: https://create.roblox.com/docs/en-us/studio/mcp
 

@@ -2,19 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export type CopyState = "idle" | "copied" | "failed";
 
-/**
- * Clipboard write with a state machine both install surfaces share.
- *
- * The clipboard API fails for reasons the visitor did not cause and cannot
- * see: a non-secure origin, a denied permission, an embedded webview, Firefox
- * without `dom.events.asyncClipboard.clipboardItem`. Swallowing that failure
- * left the button looking inert — the visitor cannot tell whether the click
- * registered, and the one thing standing between them and installing is a
- * command they now have to transcribe by hand.
- *
- * On failure the caller gets `failed` so it can say so, and `selectFallback`
- * puts the command under the visitor's own selection so Ctrl+C still works.
- */
+/* Shared clipboard state for the install controls. On failure, select the command so the user can copy it manually. */
 export function useCopy(text: string) {
   const [state, setState] = useState<CopyState>("idle");
   const timer = useRef<number | undefined>(undefined);

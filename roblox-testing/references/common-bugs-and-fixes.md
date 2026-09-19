@@ -1,8 +1,9 @@
 ---
+read_when: "Trace a symptom to likely causes and a focused fix"
 last_reviewed: 2026-06-17
 ---
 
-# Common Bugs and Fixes
+# Common bugs and fixes
 
 ## Script silently fails
 

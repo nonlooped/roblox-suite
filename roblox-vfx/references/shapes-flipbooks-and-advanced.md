@@ -1,10 +1,11 @@
 ---
+read_when: "Configure emitter shapes, animated textures, bursts, or distance culling"
 last_reviewed: 2026-06-17
 ---
 
-# Shapes, Flipbooks, and Advanced Particle Techniques
+# Shapes, flipbooks, and advanced particle techniques
 
-## Shape System Deep Dive
+## Emitter shapes
 
 The Shape properties give you enormous control over where and how particles are born.
 
@@ -30,7 +31,7 @@ The Shape properties give you enormous control over where and how particles are 
 
 **Important parenting note**: Sphere and Cylinder shapes do **not** display correctly when the emitter is parented directly to an Attachment. Only use them with a BasePart parent (the part can be tiny and invisible).
 
-## Flipbook Best Practices
+## Flipbook best practices
 
 Flipbooks turn a single texture into an animated sprite per particle.
 
@@ -50,20 +51,20 @@ Memory cost is higher than static textures. Prefer reusing a small number of hig
 
 Preload flipbook atlases and large effect textures with `ContentProvider:PreloadAsync` before they appear on screen to avoid pop-in on lower-end devices.
 
-## Advanced Motion Techniques
+## Advanced motion techniques
 
 - **Acceleration + Drag + Wind**: The classic way to make convincing smoke, leaves, or snow that reacts to global wind.
 - **VelocityInheritance + LockedToPart**: Perfect for exhaust, auras, or "particles stuck to a moving character".
 - **TimeScale**: Great for per-emitter slow-motion effects or speeding up a rain storm without touching every property.
 - **Orientation = VelocityParallel**: Turns particles into streaks (good for fast motion, rain, lasers).
 
-## Attachment Orientation
+## Attachment orientation
 
 - When a ParticleEmitter is parented to an Attachment, `EmissionDirection` is ignored.
 - Aim particles by rotating the Attachment (use `Attachment.WorldCFrame` or parent it to a part and rotate the part).
 - This is the preferred way to control direction for weapon muzzles, foot dust, and directional bursts.
 
-## One-Shot vs Continuous Emission
+## One-shot vs continuous emission
 
 Continuous (Rate > 0): Good for ambient effects (campfire, rain, magic aura).
 
@@ -80,7 +81,7 @@ Trigger from:
 
 You can also temporarily raise Rate for a short time and then lower it again, but Emit() is cleaner for discrete bursts.
 
-## Combining Multiple Emitters
+## Combining multiple emitters
 
 Most professional effects use 2-5 emitters parented to the same Attachment or Part:
 - Core flame (bright, fast, high LightEmission)
@@ -90,23 +91,23 @@ Most professional effects use 2-5 emitters parented to the same Attachment or Pa
 
 Layer them with different ZOffset values when needed.
 
-## Client-Authoritative Replication
+## Client-authoritative replication
 
 - For one-shot bursts, fire a remote or local event to tell clients *that* the effect happened, then let each client spawn its own particles.
 - This avoids replicating particle timing over the network and lets low-end clients skip or simplify effects.
 
-## LOD and Distance Culling
+## LOD and distance culling
 
 - Disable emitters beyond 100–300 studs; reduce Rate at half that distance.
 - Use a tagged heartbeat or spatial partition instead of per-frame distance checks for many emitters.
 - Only spawn ambient weather/crowd emitters in the near-camera region.
 
-## Cleanup for Transient Emitters
+## Cleanup for transient emitters
 
 - Destroy one-shot clones after their maximum lifetime. Use `Debris:AddItem` or a `task.delay` tied to the emitter's `Lifetime.Max`.
 - Set `Enabled = false` and `:Clear()` before reparenting or destroying continuous emitters.
 - Reset pooled emitters to default Rate/Lifetime/Size/Transparency/Color before reuse.
 
-## Script Example: Controlled Burst Emitter
+## Script example: controlled burst emitter
 
 See `scripts/EffectBurst.lua` for a clone-and-destroy helper that emits from every ParticleEmitter under a template Attachment or BasePart and schedules cleanup automatically.

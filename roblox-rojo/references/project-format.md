@@ -1,8 +1,9 @@
 ---
+read_when: "Write project trees, properties, paths, or nested projects"
 last_reviewed: 2026-07-09
 ---
 
-# Project Format
+# Project format
 
 Official docs:
 - https://rojo.space/docs/v7/project-format/
@@ -40,7 +41,7 @@ Each node maps to one Instance:
 | Key | Meaning |
 | --- | --- |
 | `$className` | Class name. Optional if `$path` is set **or** the node is a known Roblox service (or Terrain under Workspace). |
-| `$path` | Filesystem path relative to the project file’s folder. Optional if `$className` is set. |
+| `$path` | Filesystem path relative to the project file's folder. Optional if `$className` is set. |
 | `$properties` | Map of properties (implicit or explicit values). |
 | `$attributes` | Attributes map (project format support for `$attributes`). |
 | `$ignoreUnknownInstances` | If true, leave unknown Studio children alone. Default: **`false` if `$path` is set, else `true`**. |
@@ -79,7 +80,7 @@ Each node maps to one Instance:
 }
 ```
 
-**Explicit syntax (Rojo 7)** — type name is the key (not Rojo 6’s `{ "Type", "Value" }`):
+**Explicit syntax (Rojo 7)**. Type name is the key (not Rojo 6's `{ "Type", "Value" }`):
 
 ```json
 {
@@ -182,4 +183,4 @@ Note: `HttpService.HttpEnabled` is listed among properties that often **cannot l
 
 ## Nested projects
 
-A directory containing `default.project.json` or `default.project.jsonc` is replaced by that project’s tree (Rojo 6+). Nested projects should usually describe **models**, not full places. Sync rules do not inherit — redeclare them per project file.
+A directory containing `default.project.json` or `default.project.jsonc` is replaced by that project's tree (Rojo 6+). Nested projects should usually describe **models**, not full places. Sync rules do not inherit. Redeclare them per project file.

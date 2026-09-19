@@ -3,16 +3,7 @@
 @import "@fontsource-variable/hanken-grotesk";
 @import "@fontsource-variable/jetbrains-mono";
 
-/*
- * Roblox Suite — drenched cobalt.
- *
- * Register: brand. The surface IS the colour; sections alternate between the
- * cobalt drench, near-black ink, and paper so the scroll has real rhythm.
- *
- * The form language is injection-moulded plastic: flat saturated fills, solid
- * edges, and hard offset shadows. Deliberately NOT the generated-UI dark
- * theme — no glow shadows, no glassmorphism, no gradient text, no violet.
- */
+/* Site tokens for cobalt surfaces, saturated accents, ink borders, and hard shadows. See site/DESIGN.md. */
 :root {
   /* Cards top out at 12px; only tags and buttons go full pill. */
   --radius: 0.75rem;
@@ -64,11 +55,7 @@
 }
 
 @theme inline {
-  /*
-   * Content-driven, not device-driven. Measured: the header's wordmark (177px)
-   * plus both nav links and the Star button (225px) plus gutters needs 472px,
-   * so below 31rem Star — the primary conversion — is what falls off the edge.
-   */
+  /* The wordmark, navigation, Star button, and gutters need 472px. Collapse the wordmark below 31rem to keep the actions visible. */
   --breakpoint-xs: 31rem;
 
   --color-brand: var(--brand);
@@ -244,6 +231,22 @@
     transform: none;
     box-shadow: var(--shadow-hard);
   }
+}
+
+/*
+ * A text field styled as a panel has to carry the focus ring itself: the ring
+ * belongs on the panel edge, not around the bare input inside it.
+ */
+@utility focus-key {
+  &:focus-within {
+    outline: 3px solid var(--toy-yellow);
+    outline-offset: 3px;
+  }
+}
+
+/* Safari still paints its own disclosure triangle without this. */
+summary::-webkit-details-marker {
+  display: none;
 }
 
 /*

@@ -1,12 +1,12 @@
 ---
 name: roblox-testing
-description: "Testing, debugging, and profiling Roblox experiences — Developer Console, Output, logging discipline, pcall and assertion patterns, TestEZ unit tests, the MicroProfiler (client and server), Scene Analysis, Script Profiler, memory diagnostics, network debugging, Luau type checking, and connection cleanup. Use when something is broken, slow, or unreliable, or when setting up test workflows."
+description: "Test, debug, or profile Roblox experiences. Use for Studio debugging, TestEZ, logging, connection cleanup, memory or network diagnostics, MicroProfiler, Scene Analysis, and Script Profiler."
 last_reviewed: 2026-06-17
 ---
 
 # roblox-testing
 
-**Official sources (always check these for the latest):**
+**Official sources:**
 - https://create.roblox.com/docs/en-us/studio/developer-console
 - https://create.roblox.com/docs/en-us/performance-optimization/identify
 - https://create.roblox.com/docs/en-us/performance-optimization/microprofiler
@@ -14,23 +14,7 @@ last_reviewed: 2026-06-17
 - https://create.roblox.com/docs/en-us/studio/optimization/memory-usage
 - https://create.roblox.com/docs/en-us/studio/optimization/scriptprofiler
 
-This skill is about finding and fixing problems, not just writing code. It focuses on the tools and habits that separate working experiences from broken ones.
-
-## When to use this skill
-
-Activate when:
-- Something is not behaving as expected (scripts, UI, physics, data, networking).
-- Frame rate, memory, or server heartbeat is degrading.
-- Setting up unit tests or reproducible test cases.
-- Trying to isolate whether a bug is on the client or server.
-- Debugging a live issue using the Developer Console.
-
-Cross-reference:
-- [roblox-core/SKILL.md](../roblox-core/SKILL.md) for services and script contexts.
-- [roblox-networking/SKILL.md](../roblox-networking/SKILL.md) for debugging remote flows and network ownership.
-- [roblox-datastores/SKILL.md](../roblox-datastores/SKILL.md) for DataStore retry patterns and debugging data store errors.
-- [roblox-physics/SKILL.md](../roblox-physics/SKILL.md) for debugging physics ownership and sleep.
-- [roblox-npcs/SKILL.md](../roblox-npcs/SKILL.md) for debugging NPC behavior.
+Start with a reproducible failure and identify whether it occurs on the client, server, or both. Choose a debugging or profiling tool based on that evidence.
 
 ## The debugging mindset
 
@@ -79,12 +63,12 @@ assert(config.MaxSpeed > 0, "MaxSpeed must be positive")
 Open with `F9` in-game or in Studio play mode.
 
 Tabs:
-- **Log** — client/server output, errors, warnings.
-- **Memory** — categorized memory usage.
-- **Network** — HTTP and service requests.
-- **Server Stats** — heartbeat, ping, data ping.
-- **Script Profiler** — record script CPU usage.
-- **MicroProfiler** — capture server dumps.
+- **Log**: client/server output, errors, warnings.
+- **Memory**: categorized memory usage.
+- **Network**: HTTP and service requests.
+- **Server Stats**: heartbeat, ping, data ping.
+- **Script Profiler**: record script CPU usage.
+- **MicroProfiler**: capture server dumps.
 
 Toggle Client/Server views to see which side emitted output.
 
@@ -276,20 +260,20 @@ Use it to:
 - Add custom labels with `debug.profilebegin`/`debug.profileend`.
 
 Key colors:
-- **Orange** — worker thread (scripts, physics, animations) bottleneck.
-- **Blue** — render thread bottleneck.
-- **Red** — GPU wait / render complexity.
+- **Orange**: worker thread (scripts, physics, animations) bottleneck.
+- **Blue**: render thread bottleneck.
+- **Red**: GPU wait / render complexity.
 
 ## Scene Analysis
 
 Available in Studio under **Window → Performance Summary → Scene Analysis**.
 
 Views:
-- **Script memory** — per-script Luau heap.
-- **Unparented instances** — potential memory leaks held by scripts.
-- **Instance composition** — counts by category.
-- **Audio/Animation memory** — asset memory usage.
-- **Triangle composition** — draw call breakdown.
+- **Script memory**: per-script Luau heap.
+- **Unparented instances**: potential memory leaks held by scripts.
+- **Instance composition**: counts by category.
+- **Audio/Animation memory**: asset memory usage.
+- **Triangle composition**: draw call breakdown.
 
 Scene Analysis is a Studio UI tool; there is no public `SceneAnalysisService` API.
 
@@ -332,9 +316,9 @@ Enable **Print Join Size Breakdown** in Studio Settings → Network to see the l
 
 ## Scripts
 
-- `scripts/TestRunner.lua` — a minimal TestEZ fallback with nested suites, lifecycle hooks, matchers, async support, and TestService integration.
-- `scripts/Logger.lua` — a structured logger with level filtering and guarded formatting.
-- `scripts/DebugDraw.lua` — utility for drawing rays, points, and boxes in 3D for visual debugging.
+- `scripts/TestRunner.lua`: a minimal TestEZ fallback with nested suites, lifecycle hooks, matchers, async support, and TestService integration.
+- `scripts/Logger.lua`: a structured logger with level filtering and guarded formatting.
+- `scripts/DebugDraw.lua`: utility for drawing rays, points, and boxes in 3D for visual debugging.
 
 ## How to proceed
 
@@ -350,9 +334,9 @@ Enable **Print Join Size Breakdown** in Studio Settings → Network to see the l
 <!-- catalog:references:start -->
 ## Reference index
 
-- [common-bugs-and-fixes.md](references/common-bugs-and-fixes.md)
-- [debugging-tools.md](references/debugging-tools.md)
-- [network-simulation.md](references/network-simulation.md)
-- [performance-profiling.md](references/performance-profiling.md)
-- [testing-patterns.md](references/testing-patterns.md)
+- [common-bugs-and-fixes.md](references/common-bugs-and-fixes.md): Trace a symptom to likely causes and a focused fix.
+- [debugging-tools.md](references/debugging-tools.md): Inspect logs, breakpoints, stack traces, or runtime state.
+- [network-simulation.md](references/network-simulation.md): Reproduce latency, jitter, or packet-loss problems in Studio.
+- [performance-profiling.md](references/performance-profiling.md): Find CPU, GPU, memory, or load-time bottlenecks.
+- [testing-patterns.md](references/testing-patterns.md): Write unit tests, mock dependencies, or test client-server flows.
 <!-- catalog:references:end -->

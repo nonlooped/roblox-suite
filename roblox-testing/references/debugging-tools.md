@@ -1,8 +1,9 @@
 ---
+read_when: "Inspect logs, breakpoints, stack traces, or runtime state"
 last_reviewed: 2026-06-17
 ---
 
-# Debugging Tools
+# Debugging tools
 
 Official guides:
 - https://create.roblox.com/docs/en-us/studio/developer-console
@@ -12,8 +13,8 @@ Official guides:
 ## Developer Console
 
 Shortcuts:
-- `F9` — open console.
-- `/console` — in chat.
+- `F9`: open console.
+- `/console`: in chat.
 
 ### Log tab
 
@@ -22,8 +23,8 @@ Toggle Client/Server to see which side produced output.
 
 ### Memory tab
 
-- **PlaceMemory** — breakdown by assets and engine systems.
-- **Luau heap** — detailed script allocation snapshots.
+- **PlaceMemory**: breakdown by assets and engine systems.
+- **Luau heap**: detailed script allocation snapshots.
 
 ### Network tab
 
@@ -42,8 +43,8 @@ Studio-only output. Shows print/warn/error from edit-mode scripts.
 ## MicroProfiler
 
 Shortcuts:
-- `Ctrl+F6` (`⌘+F6`) — open.
-- `Ctrl+P` (`⌘+P`) — pause.
+- `Ctrl+F6` (`⌘+F6`): open.
+- `Ctrl+P` (`⌘+P`): pause.
 
 Workflow:
 1. Identify a frame-time spike.
@@ -65,11 +66,11 @@ debug.profileend()
 Available in Studio under **Window → Performance Summary → Scene Analysis**.
 
 Useful views:
-- **Script memory** — which scripts allocate the most.
-- **Unparented instances** — references held by scripts after instances are removed.
-- **Instance composition** — total instance counts.
-- **Audio/Animation memory** — asset retention.
-- **Triangle composition** — rendering cost breakdown.
+- **Script memory**: which scripts allocate the most.
+- **Unparented instances**: references held by scripts after instances are removed.
+- **Instance composition**: total instance counts.
+- **Audio/Animation memory**: asset retention.
+- **Triangle composition**: rendering cost breakdown.
 
 Scene Analysis is a Studio UI tool only; there is no public runtime API for it.
 
@@ -85,9 +86,9 @@ Simulate latency, jitter, and packet loss to reproduce multiplayer issues locall
 
 ## Testing modes
 
-- **Play** — local client+server.
-- **Play Here** — spawn at camera.
-- **Multi-client simulation** — test ownership and replication with multiple local players.
+- **Play**: local client+server.
+- **Play Here**: spawn at camera.
+- **Multi-client simulation**: test ownership and replication with multiple local players.
 
 ## Studio Debugger
 
