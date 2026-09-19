@@ -64,7 +64,7 @@ The vast majority of modern Roblox UIs are built from:
 
 **Appearance & constraint modifiers (use these instead of old hacks):**
 - UIStroke (ApplyStrokeMode, Color, Enabled, LineJoinMode, Thickness, Transparency, ZIndex) — modern borders that work on any GuiObject.
-- UIGradient (ColorSequence or TransparencySequence on backgrounds or images).
+- UIGradient (`Color` is a `ColorSequence`; `Transparency` is a `NumberSequence`). `Type` selects Linear, Radial, or Conical; `Scale` controls extent and `TileMode` selects Clamp, Repeat, or Mirror. Radial gradients ignore `Rotation`. See https://create.roblox.com/docs/ui/appearance-modifiers#gradient.
 - UICorner (CornerRadius — much better than 9-slice hacks for rounded rectangles).
 - UIPadding, UISizeConstraint, UIAspectRatioConstraint, UIScale, UIFlexItem.
 

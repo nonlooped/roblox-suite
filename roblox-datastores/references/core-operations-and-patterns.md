@@ -4,6 +4,8 @@ last_reviewed: 2026-08-18
 
 # Core Operations and Patterns
 
+> The September 2026 non-finite-number serialization correction is experimental guidance pending a second human review; verify consumers against the linked Open Cloud format.
+
 Covers GetAsync, SetAsync, UpdateAsync, IncrementAsync, RemoveAsync in depth, with decision guidance, serialization rules, pcall discipline, transform function constraints, and production patterns.
 
 Sources: Official data-stores guide, DataStore/GlobalDataStore/OrderedDataStore class references, versioning guide, error codes page.
@@ -63,12 +65,12 @@ Data is stored as JSON under the hood.
 Supported:
 - nil
 - boolean
-- number (but **never** inf, -inf, or nan — they violate JSON and can make keys unreadable via Open Cloud)
+- number (but **never** inf, -inf, or nan — they are not JSON numbers; Open Cloud represents existing values with tagged objects)
 - string (must be valid UTF-8; a lone byte >127 will fail)
 - buffer
 - table (arrays or dictionaries) containing only the above. No functions, no Instances, no other Roblox datatypes, no cycles.
 
-**Debugging tip:** During development, take any data you plan to save and run it through `HttpService:JSONEncode(data)`. If it succeeds and the result is reasonable size, it will almost certainly store. If it produces an error or "null" for parts of your data, fix the structure before saving.
+**Debugging tip:** During development, take any data you plan to save and run it through `HttpService:JSONEncode(data)`. Successful encoding is only a sanity check: also validate finite numbers, UTF-8, and DataStore size and request limits. If it produces an error or "null" for parts of your data, fix the structure before saving.
 
 Tables with numeric keys that have gaps or are used as dicts can have surprising behavior (numeric keys become strings in some representations). Prefer string keys for clarity when the data is more "record" than "array".
 
@@ -121,3 +123,6 @@ Typical features of a good wrapper:
 - Ignoring the 4-second cache when you actually needed the absolute latest value.
 
 Master the distinction between Set and Update, always force fresh reads after questionable writes, and treat every datastore call as a potentially failing remote operation. This alone eliminates the majority of real-world data loss incidents.
+
+
+Open Cloud returns existing non-finite numbers as `{"m": null, "t": "numeric", "v": "inf"}`, with `"-inf"` or `"nan"` for the other cases. Handle these objects explicitly in inspection/export tools; keep new player data finite. Source: https://create.roblox.com/docs/cloud/guides/data-stores#non-finite-numbers.

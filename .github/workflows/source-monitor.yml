@@ -13,7 +13,7 @@ jobs:
   creator-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Find recent relevant Creator Docs changes
         id: monitor
         env:
@@ -22,7 +22,7 @@ jobs:
         run: |
           set -euo pipefail
           since=$(date -u -d '8 days ago' +%Y-%m-%dT%H:%M:%SZ)
-          pattern='data-store|memory-store|monetization|game-pass|robux-transfer|teleport|open-cloud|cloud/reference|network|security|animation|physics|audio|pathfinding|studio/mcp|scripting/sync'
+          pattern='content/en-us/(reference/engine/|cloud/|cloud-services/|scripting/|projects/|workspace/|ui/|input/|characters/|animation/|audio/|physics/|performance-optimization/|production/monetization/|studio/)'
           : > /tmp/changes.txt
           gh api --paginate "repos/Roblox/creator-docs/commits?since=$since&per_page=30" --jq '.[].sha' |
           while read -r sha; do

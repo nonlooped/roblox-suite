@@ -55,7 +55,7 @@ Root-part priority: anchored > non-massless > higher `RootPriority` > size/name 
 
 ### Collision filtering
 
-Use collision groups (`PhysicsService:RegisterCollisionGroup`, `BasePart.CollisionGroup`) or `NoCollisionConstraint` for part-to-part filtering. `CanCollide`, `CanTouch`, and `CanQuery` control different behaviors; see [references/collisions-and-filtering.md](references/collisions-and-filtering.md).
+Use collision groups (`Workspace:RegisterCollisionGroup` (inherited from `WorldRoot`), `BasePart.CollisionGroup`) or `NoCollisionConstraint` for part-to-part filtering. `CanCollide`, `CanTouch`, and `CanQuery` control different behaviors; see [references/collisions-and-filtering.md](references/collisions-and-filtering.md).
 
 ## Mechanical constraints
 

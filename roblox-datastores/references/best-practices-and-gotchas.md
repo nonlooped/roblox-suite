@@ -4,9 +4,11 @@ last_reviewed: 2026-07-20
 
 # Best Practices and Common Gotchas
 
+> The September 2026 request-scheduling, serialization, and session-locking corrections below are experimental guidance pending a second human review. They follow the linked official sources; the suite does not provide a tested session-lock implementation.
+
 Synthesized from the official "Best practices for data stores" page + all the error codes, limits, versioning, caching, and class reference material.
 
-## Official General Best Practices (verbatim emphasis)
+## Official general best practices
 
 - **Create fewer data stores.** Data stores behave like database tables. Fewer stores + related data grouped together lets you configure and operate them more efficiently.
 - **Use a single object for related data.** Fetch/save a player's entire relevant state in one key when possible (respects the ~4 MB serialized limit, keeps versions consistent, reduces round-trips).
@@ -25,6 +27,14 @@ Synthesized from the official "Best practices for data stores" page + all the er
 - Store player data under per-user *keys* rather than creating per-player data stores.
 - Review usage trends regularly; sudden spikes usually indicate a code bug (e.g. saving inside a loop or on every input).
 
+## Request scheduling
+
+- Randomize each player or server's initial autosave offset; use bounded interval jitter for polling that does not need an exact cadence.
+- Retry transient failures with capped exponential backoff and jitter, preserving operation order per key. An old retry must not overwrite a newer save. An ambiguous write needs reconciliation or idempotency before replay.
+- Use stable identifiers in keys and deterministic shards only when throughput requires them. Keep values that must change atomically in one key.
+
+Source: https://create.roblox.com/docs/cloud-services/data-stores/best-practices.
+
 ## Caching Gotchas
 
 - Cache is per DataStore *instance* (different scope or AllScopes setting = different cache).
@@ -34,7 +44,7 @@ Synthesized from the official "Best practices for data stores" page + all the er
 
 ## Serialization & Data Shape Gotchas
 
-- Only the documented types. inf/-inf/nan will fail or corrupt accessibility.
+- Prefer finite numbers. Existing inf/-inf/nan values are represented as tagged JSON objects by Open Cloud, not ordinary JSON numbers; see [serialization rules](core-operations-and-patterns.md).
 - UTF-8 strings only. Lone high bytes are fatal.
 - Test suspect data with HttpService:JSONEncode before trusting a save path.
 - Large objects or very deep tables increase latency and risk ValueTooLarge.
@@ -65,22 +75,15 @@ Synthesized from the official "Best practices for data stores" page + all the er
 
 ## Session Locking
 
-For player data that must not be edited by two servers simultaneously (e.g. complex inventories, trades, or currency), use a session lock in a dedicated key.
+For profiles that must not be edited by two servers simultaneously, coordinate ownership in the profile key's metadata and check it in the same `UpdateAsync` transform as the data write. A lock in a separate key does not make the profile write atomic with the ownership check.
 
-**Pattern:**
-1. When a server loads a player's profile, claim the lock by writing `{ServerJobId = game.JobId, Expires = now + leaseSeconds}` to `locks/User_1234` using `UpdateAsync`.
-2. The transform should only claim the lock if it is absent, expired, or already owned by this server.
-3. Heartbeat-extend the lease while the player is present (`UpdateAsync` with same owner check).
-4. On `PlayerRemoving`/`BindToClose`, stop extending, save the profile, then release the lock.
-5. Another server that finds an active lock for a different server must either wait or load the player in read-only/safe mode.
+- Acquire a unique lock token only when the existing lock is absent or expired.
+- Every save and lease renewal must verify that the token is still this session's token. A session that loses ownership must stop saving; an absent lock later does not restore its ownership.
+- Choose the lease and renewal interval together so throttling and normal save delays do not cause routine expiry. Keep periodic saves shorter than the lease.
+- Save and release through the same key's ownership-checked update. Reconcile ambiguous failures before assuming the final save or release succeeded.
+- Keep transforms free of side effects and preserve user IDs and metadata. Serializing requests per key is still necessary.
 
-**Critical rules:**
-- Always use `pcall`; never let a lock failure crash the load flow.
-- Keep lease durations short (5–15 seconds) and extend frequently.
-- Always release the lock after final save, even on error paths where possible.
-- Combine with `UpdateAsync` for profile writes so race protection still exists if the lock fails.
-
-For a battle-tested implementation, study established profile-service modules rather than building from scratch, but make sure you understand the lease/extend/release lifecycle.
+Study the official [player data and purchasing sample](https://create.roblox.com/docs/cloud-services/data-stores/player-data-purchasing#session-locking) before implementing this protocol. The suite's `SafeDataStore` helper is not a session-locking system; adapt and integration-test ownership transfer and crash recovery separately.
 
 ## Security & Privacy
 

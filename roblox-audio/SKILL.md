@@ -138,7 +138,7 @@ The emitter's **parent position** determines where audio emits from. `AudioEmitt
 
 **Distance model:** `AudioEmitter.DistanceAttenuationMode` selects the rolloff formula (`Custom` by default — uses your `DistanceAttenuation` curve; other presets use `DistanceAttenuationBounds` which defaults to `[4, 10000]` and ignore the custom curve). `GetDistanceAttenuation()` always returns the custom curve even when a preset is active — don't assume it reflects the audible rolloff unless `Mode == Custom`. `SetDistanceAttenuation(curve)` only affects playback when `Mode == Custom`. Angle attenuation is set via `SetAngleAttenuation({[angle]=volume})` (0–180° → 0–1); use for directional sources (e.g. avatar voice projects forward).
 
-**Acoustic simulation (occlusion/diffraction/reverb):** Enable globally via `SoundService` and per-instance via `AudioEmitter.AcousticSimulationEnabled` / `AudioListener.AcousticSimulationEnabled`, then fine-tune with `OcclusionEnabled`/`DiffractionEnabled`/`ReverbEnabled` (each is a `SimulationMode`: `Default` inherits from `SoundService`, `Enabled`/`Disabled` override). Both emitter and listener must have the effect enabled for it to apply; diffraction requires occlusion. `SoundService:GetAudibility(emitter, listener)`-style helpers (`GetAudibility` on the instances) include distance+angle attenuation (0–1).
+**Acoustic simulation (occlusion/diffraction/reverb):** Enable `SoundService.AcousticSimulationEnabled` and `AcousticSimulationEnabled` on both the emitter and listener. The current reference no longer exposes the separate per-instance `OcclusionEnabled`, `DiffractionEnabled`, and `ReverbEnabled` toggles; do not generate calls to them. Use `emitter:GetAudibilityFor(listener)` or `listener:GetAudibilityFor(emitter)` for combined distance and angle attenuation (0–1).
 
 ## Listener location
 
@@ -201,7 +201,7 @@ Profile audio with the MicroProfiler (audio appears under worker threads) and th
 
 ## Text-to-speech (TTS)
 
-`AudioTextToSpeech` converts text (≤300 chars per request) to audio with an artificial voice. The available `VoiceId` values are 1–11 (English variants), 101–102 (Spanish), 201–202 (German), 301–302 (Italian), 401–402 (French), 501–502 (Chinese), 601–602 (Hindi), 701–702 (Japanese), 801–802 (Arabic), 901–902 (Korean), and 1001–1002 (Portuguese); odd IDs are male and even IDs are female for the locale-specific pairs. Wire it like an `AudioPlayer`: for 2D, `AudioTextToSpeech` → `Wire` → `AudioDeviceOutput`; for 3D, `AudioTextToSpeech` → `Wire` → `AudioEmitter` (plus the listener→output wire). Set `Text`, `VoiceId`, `Volume` on the `AudioTextToSpeech`. `:WaitForSpeechReady()` yields until `AssetFetchStatus` is `Success` (or `Failure`). All text must comply with Roblox Community Standards and Terms of Use.
+`AudioTextToSpeech` converts text (≤300 chars per request) to audio with an artificial voice. The available `VoiceId` values are 1–11 (English variants), 101–102 (Spanish), 201–202 (German), 301–302 (Italian), 401–402 (French), 501–502 (Mandarin Chinese), 601–602 (Hindi), 701–702 (Japanese), 801–802 (Arabic), 901–902 (Korean), and 1001–1002 (Portuguese); odd IDs are male and even IDs are female for the locale-specific pairs. Wire it like an `AudioPlayer`: for 2D, `AudioTextToSpeech` → `Wire` → `AudioDeviceOutput`; for 3D, `AudioTextToSpeech` → `Wire` → `AudioEmitter` (plus the listener→output wire). Set `Text`, `VoiceId`, `Volume` on the `AudioTextToSpeech`. `:WaitForSpeechReady()` yields until `AssetFetchStatus` is `Success` (or `Failure`). All text must comply with Roblox Community Standards and Terms of Use.
 
 **Audio analysis:** `AudioAnalyzer` window is controlled by `AudioWindowSize` — `Small` (lowest latency, low frequency resolution), `Medium` (balanced), `Large` (highest resolution, more latency).
 
@@ -255,3 +255,6 @@ To use STT without broadcasting voice to other players, disable `VoiceChatServic
 - [audio-effects.md](references/audio-effects.md)
 - [audio-graph-vs-sound.md](references/audio-graph-vs-sound.md)
 <!-- catalog:references:end -->
+
+
+Acoustic API references: https://create.roblox.com/docs/reference/engine/classes/AudioEmitter and https://create.roblox.com/docs/reference/engine/classes/AudioListener.

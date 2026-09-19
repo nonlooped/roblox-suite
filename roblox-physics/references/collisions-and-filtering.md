@@ -1,28 +1,37 @@
 ---
-last_reviewed: 2026-08-10
+last_reviewed: 2026-09-19
 ---
 
 # Collisions and Filtering
 
-Official guide: https://create.roblox.com/docs/workspace/collisions
+Official sources:
+- https://create.roblox.com/docs/workspace/collisions
+- https://create.roblox.com/docs/reference/engine/classes/WorldRoot
+- https://create.roblox.com/docs/reference/engine/classes/PhysicsService
+- https://create.roblox.com/docs/reference/engine/classes/BasePart
 
 ## Collision events
 
 - `BasePart.Touched` — fires when another part touches.
 - `BasePart.TouchEnded` — fires when contact ends.
-- These fire regardless of `CanCollide`.
+- These can fire regardless of `CanCollide`, but both parts must have `CanTouch` enabled.
 
 ## Collision filtering
 
 ### Collision groups
 
+Collision group configuration belongs to each `WorldRoot` (`Workspace` or a `WorldModel`). The current API reference deprecates `PhysicsService` in favor of these methods; existing service calls forward to `Workspace`. Configure the world containing the parts.
+
 ```lua
-local PhysicsService = game:GetService("PhysicsService")
+local world = workspace
 
-PhysicsService:RegisterCollisionGroup("Players")
-PhysicsService:RegisterCollisionGroup("Projectiles")
+for _, name in { "Players", "Projectiles" } do
+    if not world:IsCollisionGroupRegistered(name) then
+        world:RegisterCollisionGroup(name)
+    end
+end
 
-PhysicsService:CollisionGroupSetCollidable("Players", "Projectiles", false)
+world:CollisionGroupSetCollidable("Players", "Projectiles", false)
 
 part.CollisionGroup = "Projectiles"
 ```
@@ -46,7 +55,7 @@ noCollide.Parent = partA
 | --- | --- |
 | `CanCollide` | Physical collision response |
 | `CanTouch` | Fires `Touched`/`TouchEnded` events |
-| `CanQuery` | Included in spatial queries (`FindPartOnRay`, `GetPartsInPart`, etc.) |
+| `CanQuery` | Included in spatial queries (`Raycast`, `GetPartsInPart`, etc.; disabling `CanQuery` takes effect when `CanCollide` is false) |
 
 Important: these are **not** confidentiality controls. They affect physics and queries, not replication or rendering.
 

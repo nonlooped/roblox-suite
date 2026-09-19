@@ -46,7 +46,7 @@ This reduces the chance of accidental or unintended agent actions.
 ### `execute_luau` returns an error
 
 - The code runs inside Studio, so it must be valid Luau in the current context.
-- Remember the client/server boundary: code runs in Studio's edit context unless play mode is active.
+- Use `get_studio_state` to inspect available contexts and pass `datamodel_type` explicitly: `Edit`, `Client`, or `Server`.
 - Check that instances referenced in the code exist.
 
 ### Script Sync changes are not showing up
@@ -65,7 +65,7 @@ This reduces the chance of accidental or unintended agent actions.
 ### Multiple Studio instances are confusing the agent
 
 - Use `list_roblox_studios` to see all open instances.
-- Use `set_active_studio` to lock the target instance.
+- Pass the intended `studio_id` on every call; there is no shared active-instance selection to lock.
 - Close unused Studio windows when possible.
 
 ## JSON syntax quick check

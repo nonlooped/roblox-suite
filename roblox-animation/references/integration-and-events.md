@@ -83,3 +83,12 @@ Many polished games do a hybrid: client plays a predictive animation immediately
 - [ ] Track cleanup on death/remove or when the action is cancelled (disconnect marker/Stopped/Ended connections).
 
 Mastering authored animations + precise marker timing + lightweight UI tweens + targeted IK is what makes Roblox experiences feel "next level" instead of "it moves when I press the button."
+
+
+## Fixed simulation and animation callbacks
+
+`RunService:BindToAnimation()` runs at a fixed frequency. With `Workspace.UseFixedSimulation` enabled, it runs before Animator updates; otherwise it runs immediately before `BindToSimulation` callbacks, so do not assume pre-animation ordering. The returned connection can be disconnected for cleanup.
+
+Server-authority rollback can replay simulation callbacks and property-change signals. Keep synchronized simulation state separate from one-shot presentation or network side effects; `RunService:IsResimulating()` identifies replay steps where duplicate effects should be suppressed. Unsynchronized property access is restricted inside simulation callbacks.
+
+Source: https://create.roblox.com/docs/reference/engine/classes/RunService.

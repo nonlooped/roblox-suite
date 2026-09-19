@@ -4,6 +4,8 @@ last_reviewed: 2026-08-18
 
 # TeleportOptions and TeleportAsyncResult
 
+> The September 2026 teleport value-type, GUI-reference, and arrival-confirmation corrections are experimental guidance pending a second human review. Test cross-place behavior in a published test experience.
+
 **Official sources:**
 - https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportOptions
 - https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportAsyncResult
@@ -17,7 +19,7 @@ last_reviewed: 2026-08-18
 | Property | Type | Purpose |
 | --- | --- | --- |
 | `ServerInstanceId` | string | Target a specific server by its `JobId`. Conflicts with `ReservedServerAccessCode` and `ShouldReserveServer`. |
-| `ReservedServerAccessCode` | string | Join an existing reserved server by its access code (from `ReserveServerAsync`). Conflicts with `ServerInstanceId` and `ShouldReserveServer`. |
+| `ReservedServerAccessCode` | string | Join an existing reserved server by its access code (from `ReserveServerAsync` or `TeleportAsyncResult.ReservedServerAccessCode`). Conflicts with `ServerInstanceId` and `ShouldReserveServer`. |
 | `ShouldReserveServer` | boolean | Create a new reserved server and teleport the players into it. Conflicts with `ServerInstanceId` and `ReservedServerAccessCode`. |
 
 ### Methods
@@ -39,11 +41,13 @@ Pick exactly one mode: public server (neither), specific server (`ServerInstance
 
 - Client-retrieved via `TeleportService:GetLocalPlayerTeleportData()` — **client-only**.
 - **Spoofable.** Treat as a hint; validate gameplay-affecting claims server-side against DataStores.
-- Can carry any serializable value (tables, strings, numbers, booleans).
+- Supports primitives and engine value types such as `Vector3`, `CFrame`, `Color3`, `UDim2`, sequences, and enum items, including tables/arrays of supported values without mixed keys.
+- Instances, functions, connections, signals, `SharedTable`, and engine-state objects such as `RaycastParams`/`RaycastResult` cannot cross this boundary. Roblox removes disallowed values and logs an error. Convert references to plain IDs or paths.
+- `SetTeleportSetting` uses the same value-only restriction. A custom teleport GUI preserves references inside its own tree, but references to instances outside that tree are cleared; include required dependencies in the GUI tree.
 
 ## TeleportAsyncResult
 
-Returned by `TeleportAsync` when a `TeleportOptions` is passed. Provides information about the final teleport destination — useful for confirming where a player ended up, especially when `ShouldReserveServer` was used (the destination is a fresh reserved server).
+Returned by `TeleportAsync` when a `TeleportOptions` is passed. Describes the selected destination, including a newly reserved server when `ShouldReserveServer` is used. It does not prove that the player arrived; observe arrival separately in the destination server.
 
 Inspect its properties per the class reference; typical fields include the destination place ID and instance/access-code identifiers.
 

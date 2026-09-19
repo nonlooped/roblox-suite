@@ -234,10 +234,10 @@ Use `BasePart:GetNetworkOwner()` to inspect ownership. Vehicles and held items s
 
 ## DataStore retry pattern
 
-Wrap DataStore calls with exponential backoff and jitter:
+For retry-safe reads, use bounded retries with exponential backoff and jitter. Do not use this generic loop to replay writes: a failed response can hide a committed write, and independently retried requests can execute out of order. See roblox-datastores for write reconciliation and per-key ordering.
 
 ```lua
-local function dataStoreWithRetry(fn, maxAttempts)
+local function readWithRetry(fn, maxAttempts)
     maxAttempts = maxAttempts or 5
     for attempt = 1, maxAttempts do
         local ok, result = pcall(fn)
@@ -315,7 +315,7 @@ Records CPU time per script. Use it when MicroProfiler points to scripts but you
 - Check **Network** tab in Developer Console for HTTP/DataStore failures.
 - Use `Shift+F3` in-game for network debug stats.
 - Distinguish network ping (round-trip time) from data ping (replication queue).
-- Simulate latency/jitter with Studio Network Simulation (`Alt+S`).
+- Use Studio's beta Network Simulator for separate inbound/outbound latency, jitter, and packet loss. Enable **New Device Simulator** in Beta Features, restart Studio, then open **Test → Device Simulator → Network**. Select **Apply** to activate staged changes. **Ideal Fiber** still adds 8 ms each way; use all-zero custom values for a zero-added-delay baseline. See [network simulation](references/network-simulation.md).
 
 ## Load time debugging
 
@@ -352,6 +352,7 @@ Enable **Print Join Size Breakdown** in Studio Settings → Network to see the l
 
 - [common-bugs-and-fixes.md](references/common-bugs-and-fixes.md)
 - [debugging-tools.md](references/debugging-tools.md)
+- [network-simulation.md](references/network-simulation.md)
 - [performance-profiling.md](references/performance-profiling.md)
 - [testing-patterns.md](references/testing-patterns.md)
 <!-- catalog:references:end -->

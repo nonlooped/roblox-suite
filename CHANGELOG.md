@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.9.0 — 2026-09-19
+
+### Corrected and added
+
+- Updated Studio MCP to explicit `studio_id` targeting, current tool names, and explicit Edit/Client/Server execution contexts.
+- Migrated collision-group examples from deprecated `PhysicsService` methods to per-world `WorldRoot` methods.
+- Removed withdrawn per-instance audio effect toggles, corrected `GetAudibilityFor` and `AudioPlayer.Volume`, and clarified Mandarin TTS voices.
+- Corrected Open Cloud non-finite-number serialization, teleport value-type and GUI-reference rules, and the distinction between teleport initiation and confirmed arrival.
+- Updated DataStore scheduling and session-locking guidance, and limited the generic testing retry example to retry-safe reads.
+- Added Studio Network Simulator guidance, current UIGradient controls, fixed simulation animation callbacks, and OAuth app review requirements.
+- Recorded the source-drift review in [the September review report](reviews/2026-09-19-source-drift.md). Critical guidance corrections are explicitly experimental pending second human review under the repository review policy. Existing script maturity labels remain unchanged.
+
+### Dependencies and verification
+
+- Updated site packages, including Astro 7.3.3, React 19.3.0, Motion 13.4.0, Lucide React 1.47.0, and the fast-uri security update; refreshed the lockfile and install-script approvals. The private site package now matches the suite's 1.9.0 release version.
+- Updated the pinned toolchain to luau-lsp 1.69.0 and Rojo 7.7.0, refreshed vendored Roblox API definitions and checksum, and updated typos to 1.50.2.
+- Expanded source monitoring to cover all engine reference files and relevant guide directories, including APIs whose class names lack the old keyword patterns.
+
 ## 1.8.0 — 2026-08-18
 
 ### Corrected

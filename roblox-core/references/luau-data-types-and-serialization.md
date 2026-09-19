@@ -52,7 +52,7 @@ Supported after JSON round-trip (DataStores / HttpService):
 - Tables containing only the above (recursively, with no cycles)
 
 **Never store in DataStores / JSON:**
-- `inf`, `-inf`, `nan` (they break JSON and can make keys unreadable via Open Cloud)
+- `inf`, `-inf`, `nan` (they are not JSON numbers; Open Cloud represents existing values with tagged objects)
 - Functions
 - Threads / coroutines
 - **Instances** or other Roblox datatypes (`Vector3`, `CFrame`, `Color3`, `NumberSequence`, etc.) unless you convert them to plain tables or strings first
@@ -88,3 +88,6 @@ Luau supports gradual typing:
 This catches many bugs at edit time with zero runtime cost.
 
 See the type-checking subpage for more.
+
+
+Open Cloud returns existing non-finite numbers as `{"m": null, "t": "numeric", "v": "inf"}`, with `"-inf"` or `"nan"` for the other cases. Handle these objects explicitly in inspection/export tools; keep new player data finite. Source: https://create.roblox.com/docs/cloud/guides/data-stores#non-finite-numbers.

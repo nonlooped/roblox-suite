@@ -4,6 +4,8 @@ last_reviewed: 2026-06-17
 
 # Open Cloud Authentication and Keys
 
+> The September 2026 OAuth registration section is experimental guidance pending a second human review; the linked official registration requirements remain authoritative.
+
 **Official source:** https://create.roblox.com/docs/en-us/cloud/auth/api-keys
 
 ## Three auth models
@@ -107,3 +109,9 @@ curl --location --request POST 'https://apis.roblox.com/api-keys/v1/introspect' 
 - https://create.roblox.com/docs/en-us/cloud/auth/api-keys
 - https://create.roblox.com/docs/en-us/cloud/reference/scopes
 - https://create.roblox.com/docs/en-us/cloud-services/secrets
+
+## OAuth app registration and review
+
+Select one app category before choosing scopes; the available scopes follow that category. Request only permissions used by implemented functionality. Public review requires a demo video of at most one minute showing the signed-out state, consent flow, redirect, and resulting app experience, plus a justification for the category and scopes. The app remains private while review is pending.
+
+Source: https://create.roblox.com/docs/cloud/auth/oauth2-registration.

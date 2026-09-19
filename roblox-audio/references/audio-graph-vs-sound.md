@@ -25,13 +25,13 @@ The official docs now state that `Sound`, `SoundGroup`, and `SoundEffect` are **
 | Text-to-speech | Not available | `AudioTextToSpeech` |
 | Speech-to-text | Not available | `AudioSpeechToText` |
 | Microphone capture | Not directly | `AudioDeviceInput` |
-| Acoustic occlusion/diffraction | Not available | `AudioEmitter`/`AudioListener` `AcousticSimulationEnabled` + per-instance `OcclusionEnabled`/`DiffractionEnabled`/`ReverbEnabled` (`SimulationMode`) |
+| Acoustic occlusion/diffraction | Not available | `SoundService.AcousticSimulationEnabled` plus `AcousticSimulationEnabled` on both emitter and listener |
 | Routing multiple sources through one effect | Hard (per-group effects only) | Native (many wires → one effect → one output) |
-| Tweenable parameter | `Sound.Volume` (number) | `AudioPlayer.TimeVolume` and other number props |
+| Tweenable parameter | `Sound.Volume` (number) | `AudioPlayer.Volume` and other number props |
 
 ## Text-to-speech voice IDs
 
-`AudioTextToSpeech` accepts the English voices 1–11 and locale-specific pairs: Spanish 101–102, German 201–202, Italian 301–302, French 401–402, Chinese 501–502, Hindi 601–602, Japanese 701–702, Arabic 801–802, Korean 901–902, and Portuguese 1001–1002. The odd ID is male and the even ID is female in every locale-specific pair.
+`AudioTextToSpeech` accepts the English voices 1–11 and locale-specific pairs: Spanish 101–102, German 201–202, Italian 301–302, French 401–402, Chinese (Mandarin) 501–502, Hindi 601–602, Japanese 701–702, Arabic 801–802, Korean 901–902, and Portuguese 1001–1002. The odd ID is male and the even ID is female in every locale-specific pair.
 
 ## When to keep using `Sound`
 
@@ -84,3 +84,5 @@ There is no automatic migration. To migrate:
 - https://create.roblox.com/docs/en-us/reference/engine/classes/Sound
 - https://create.roblox.com/docs/en-us/reference/engine/classes/SoundGroup
 - https://create.roblox.com/docs/en-us/reference/engine/classes/SoundService
+
+Acoustic API references: https://create.roblox.com/docs/reference/engine/classes/AudioEmitter and https://create.roblox.com/docs/reference/engine/classes/AudioListener.

@@ -149,7 +149,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-networking",
@@ -247,7 +247,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-08-18"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-user-interfaces",
@@ -276,6 +276,11 @@
           "label": "Engine API Reference",
           "url": "https://create.roblox.com/docs/reference/engine",
           "verified_at": "2026-06-17"
+        },
+        {
+          "label": "UIGradient",
+          "url": "https://create.roblox.com/docs/reference/engine/classes/UIGradient",
+          "verified_at": "2026-09-19"
         }
       ],
       "risk": "lower",
@@ -289,7 +294,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-animation",
@@ -344,7 +349,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-vfx",
@@ -428,7 +433,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-08-18"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-gamepasses",
@@ -537,7 +542,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-08-18"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-teleport",
@@ -584,7 +589,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-08-18"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-rojo",
@@ -677,7 +682,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-physics",
@@ -716,6 +721,11 @@
           "label": "Engine API Reference",
           "url": "https://create.roblox.com/docs/reference/engine",
           "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Per-world collision groups",
+          "url": "https://create.roblox.com/docs/reference/engine/classes/WorldRoot",
+          "verified_at": "2026-09-19"
         }
       ],
       "risk": "medium",
@@ -741,7 +751,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-09-19"
     },
     {
       "slug": "roblox-npcs",
@@ -825,6 +835,11 @@
           "label": "Script Profiler",
           "url": "https://create.roblox.com/docs/en-us/studio/optimization/scriptprofiler",
           "verified_at": "2026-06-17"
+        },
+        {
+          "label": "Studio Network Simulator",
+          "url": "https://create.roblox.com/docs/studio/network-simulator",
+          "verified_at": "2026-09-19"
         }
       ],
       "risk": "medium",
@@ -846,7 +861,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-07-16"
+      "last_changed_at": "2026-09-19"
     }
   ]
 }

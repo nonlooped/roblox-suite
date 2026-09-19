@@ -113,7 +113,7 @@ end)
 
 - **Graph:** `AudioReverb` instance in the signal path. Apply per-bus or per-emitter.
 - **Legacy:** `SoundService.AmbientReverb` (an `Enum.ReverbType` preset) applies globally to all `Sound` instances. **It does not affect the audio graph.**
-- **Acoustic simulation:** `SoundService.AcousticSimulationEnabled = true` plus per-instance `AcousticSimulationEnabled` on `AudioEmitter`/`AudioListener` enables automatic occlusion/diffraction/reverberation based on world geometry. Since Aug 2026, each emitter/listener also exposes `OcclusionEnabled`, `DiffractionEnabled`, `ReverbEnabled` (each `SimulationMode`: `Default` inherits from `SoundService`, `Enabled`/`Disabled` override). Both sides must enable a given effect; diffraction requires occlusion. Global defaults also exist on `SoundService`. This is the most realistic option but the most expensive — profile on low-end devices.
+- **Acoustic simulation:** Enable `SoundService.AcousticSimulationEnabled` and `AcousticSimulationEnabled` on both `AudioEmitter` and `AudioListener` for geometry-based occlusion, diffraction, and reverberation. The current reference removed the individual effect toggles. Profile the result on low-end devices.
 
 ## Distance & angle attenuation (updated)
 
@@ -137,3 +137,5 @@ end)
 - https://create.roblox.com/docs/en-us/reference/engine/classes/AudioReverb
 - https://create.roblox.com/docs/en-us/reference/engine/classes/AudioFader
 - https://create.roblox.com/docs/en-us/reference/engine/classes/SoundService (`AcousticSimulationEnabled`, `AmbientReverb`)
+
+Acoustic API references: https://create.roblox.com/docs/reference/engine/classes/AudioEmitter and https://create.roblox.com/docs/reference/engine/classes/AudioListener.

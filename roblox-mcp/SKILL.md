@@ -66,17 +66,18 @@ After connecting, verify with:
 
 ## What you can do with the MCP tools
 
-The server exposes tools in several categories. The full list, parameters, and example prompts are in [references/tool-reference.md](references/tool-reference.md).
+The server exposes tools in several categories. The current tool names and usage guidance are in [references/tool-reference.md](references/tool-reference.md).
 
 | Category | Examples |
 | --- | --- |
 | **Scripts** | `script_read`, `multi_edit`, `script_search`, `script_grep` |
-| **Data model** | `search_game_tree`, `inspect_instance`, `explore_subagent` |
+| **Data model** | `search_game_tree`, `inspect_instance`, `subagent` (`explore`) |
 | **Luau execution** | `execute_luau` |
-| **Asset generation & insertion** | `generate_mesh`, `generate_material`, `generate_procedural_model`, `insert_from_creator_store` |
-| **Playtesting** | `start_stop_play`, `console_output`, `screen_capture`, `playtest_subagent` |
-| **Input simulation** | `character_navigation`, `keyboard_input`, `mouse_input` |
-| **Session management** | `list_roblox_studios`, `set_active_studio` |
+| **Asset generation & insertion** | `generate_mesh`, `generate_material`, `generate_procedural_model`, `wait_job_finished`, `search_asset`, `insert_asset`, `upload_image`, `store_image` |
+| **Playtesting** | `start_stop_play`, `get_studio_state`, `get_console_output`, `screen_capture`, `subagent` (`playtest`) |
+| **Input simulation** | `character_navigation`, `user_keyboard_input`, `user_mouse_input` |
+| **Documentation** | `http_get`, `skill` |
+| **Instance discovery** | `list_roblox_studios`; pass `studio_id` on subsequent calls |
 
 ## MCP + Script Sync: the complete agent workflow
 
@@ -91,9 +92,7 @@ See [references/script-sync-integration.md](references/script-sync-integration.m
 
 ## Multi-instance handling
 
-You can connect one MCP client to multiple Studio windows. The server usually picks the right instance from context (for example, an object path that only exists in one place). To switch manually, use:
-- `list_roblox_studios` — show all connected Studio instances.
-- `set_active_studio` — target a specific instance for subsequent calls.
+Call `list_roblox_studios` to discover connected windows, their Studio instance IDs, and place IDs. Local places without a place ID are listed by name. Pass the selected instance's `studio_id` on every subsequent tool call; do not rely on a shared active window or infer the target from an object path. Re-list instances when a window closes or the target changes.
 
 ## Security and trust
 
