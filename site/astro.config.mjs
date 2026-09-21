@@ -5,7 +5,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  site: "https://roblox-suite.vercel.app",
+  site: "https://roblox-suite.nonlooped.xyz",
   base: "/",
   trailingSlash: "always",
   build: {

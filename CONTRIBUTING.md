@@ -1,6 +1,6 @@
 # Contributing
 
-Roblox Suite contains agent skills and example code. The [website](https://roblox-suite.vercel.app/) builds its catalog from this repository.
+Roblox Suite contains agent skills and example code. The [website](https://roblox-suite.nonlooped.xyz/) builds its catalog from this repository.
 
 ## Verify technical claims
 

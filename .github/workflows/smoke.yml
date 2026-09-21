@@ -22,7 +22,7 @@ jobs:
       - name: Verify live catalog routes
         shell: bash
         env:
-          BASE_URL: https://roblox-suite.vercel.app
+          BASE_URL: https://roblox-suite.nonlooped.xyz
         run: |
           set -euo pipefail
           base="$BASE_URL"
@@ -46,4 +46,4 @@ jobs:
             curl -fsSL --retry 3 "$base/skills/$slug/" >/dev/null
           done
           curl -fsSL --retry 3 "$base/sitemap.xml" | grep -q '<urlset'
-          curl -fsSL --retry 3 "$base/robots.txt" | grep -q 'Sitemap: https://roblox-suite.vercel.app/sitemap.xml'
+          curl -fsSL --retry 3 "$base/robots.txt" | grep -q 'Sitemap: https://roblox-suite.nonlooped.xyz/sitemap.xml'

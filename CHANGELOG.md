@@ -65,7 +65,7 @@
 
 ### Site
 
-- Moved the documentation site from GitHub Pages (`nonlooped.github.io/roblox-suite`) to Vercel at [roblox-suite.vercel.app](https://roblox-suite.vercel.app/), with root-base URLs and updated sitemap/robots canonicals.
+- Moved the documentation site to [roblox-suite.nonlooped.xyz](https://roblox-suite.nonlooped.xyz/), with root-base URLs and updated sitemap/robots canonicals.
 - Added Google Search Console verification for the Vercel host and serve a single `sitemap.xml` for indexing.
 
 ### Dependencies
