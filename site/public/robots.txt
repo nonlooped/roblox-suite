@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://roblox-suite.nonlooped.xyz/sitemap.xml
+Sitemap: https://roblox.nonlooped.xyz/sitemap.xml

@@ -12,7 +12,7 @@ const siteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const repoRoot = path.resolve(siteRoot, "..");
 const dist = path.join(siteRoot, "dist");
 
-const SITE_ORIGIN = "https://roblox-suite.nonlooped.xyz";
+const SITE_ORIGIN = "https://roblox.nonlooped.xyz";
 const SITEMAP_BASE = `${SITE_ORIGIN}/`;
 
 const errors = [];

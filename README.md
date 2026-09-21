@@ -7,7 +7,7 @@ API guidance for AI agents writing Roblox Luau. The skills cover API selection, 
 [![Docs](https://shieldcn.dev/badge/Docs-Engine_Reference-10B981.svg?logo=ri:GoBook&variant=branded)](https://create.roblox.com/docs/reference/engine)
 [![License](https://shieldcn.dev/badge/License-MIT-6366F1.svg?logo=ri:GoLaw&variant=branded)](LICENSE)
 
-Browse the [skill catalog](https://roblox-suite.nonlooped.xyz/skills/) for coverage, examples, and sources with review dates.
+Browse the [skill catalog](https://roblox.nonlooped.xyz/skills/) for coverage, examples, and sources with review dates.
 
 ## Install
 
@@ -27,7 +27,7 @@ npx skills add nonlooped/roblox-suite --skill roblox-datastores
 
 Agents can suggest deprecated APIs such as `Humanoid:LoadAnimation` or use `SetAsync` where concurrent writes could overwrite player data. Roblox Suite describes the alternatives, their constraints, and the official sources for checking them.
 
-Each [skill page](https://roblox-suite.nonlooped.xyz/skills/) lists its sources with the date each was checked. The [first paired evaluation](evals/reports/2026-07-16-codex-gpt-5.6-sol.md) includes the prompts, outputs, and limits of that run. Script files are examples with maturity labels; adapt and test them before production use.
+Each [skill page](https://roblox.nonlooped.xyz/skills/) lists its sources with the date each was checked. The [first paired evaluation](evals/reports/2026-07-16-codex-gpt-5.6-sol.md) includes the prompts, outputs, and limits of that run. Script files are examples with maturity labels; adapt and test them before production use.
 
 ## Manage the installation
 

@@ -16,7 +16,7 @@ const { title, description, noindex = false, schema } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const asset = (file: string) =>
   new URL(`${import.meta.env.BASE_URL}/${file}`.replace(/\/+/g, "/"), Astro.site).href;
-// Google Search Console HTML-tag verification for roblox-suite.nonlooped.xyz.
+// Google Search Console HTML-tag verification for roblox.nonlooped.xyz.
 const googleSiteVerification = "Ri5YRxBLp5tUFERvt908GtJ83VTj97RY3vbpHJQwVxs";
 ---
 
