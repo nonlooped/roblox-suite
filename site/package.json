@@ -13,7 +13,7 @@
     "test": "npm run check:content && npm run check && npm run build && npm run check:dist"
   },
   "dependencies": {
-    "@astrojs/react": "^6.0.6",
+    "@astrojs/react": "^7.0.1",
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/hanken-grotesk": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
@@ -21,9 +21,9 @@
     "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "astro": "^7.3.3",
+    "astro": "^7.3.8",
     "clsx": "^2.1.1",
-    "lucide-react": "^1.47.0",
+    "lucide-react": "^1.55.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "tailwind-merge": "^3.7.0",
@@ -34,7 +34,10 @@
     "typescript": "^6.0.3"
   },
   "allowScripts": {
-    "sharp@0.35.4": true,
+    "sharp@0.35.5": true,
     "esbuild@0.28.2": true
+  },
+  "overrides": {
+    "sharp": "0.35.5"
   }
 }
