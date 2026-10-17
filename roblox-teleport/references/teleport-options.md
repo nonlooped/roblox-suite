@@ -1,6 +1,6 @@
 ---
 read_when: "Select a destination server or inspect a teleport result"
-last_reviewed: 2026-08-18
+last_reviewed: 2026-10-17
 ---
 
 # TeleportOptions and TeleportAsyncResult

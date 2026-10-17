@@ -219,12 +219,12 @@
         {
           "label": "Error codes & limits",
           "url": "https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits",
-          "verified_at": "2026-08-18"
+          "verified_at": "2026-10-17"
         },
         {
           "label": "Best practices",
           "url": "https://create.roblox.com/docs/cloud-services/data-stores/best-practices",
-          "verified_at": "2026-08-18"
+          "verified_at": "2026-10-17"
         },
         {
           "label": "Engine API Reference",
@@ -451,7 +451,7 @@
         {
           "label": "Passes (monetization)",
           "url": "https://create.roblox.com/docs/en-us/production/monetization/passes",
-          "verified_at": "2026-06-17"
+          "verified_at": "2026-10-17"
         },
         {
           "label": "Creator Rewards",
@@ -542,7 +542,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-09-19"
+      "last_changed_at": "2026-10-17"
     },
     {
       "slug": "roblox-teleport",
@@ -565,12 +565,12 @@
         {
           "label": "TeleportService",
           "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportService",
-          "verified_at": "2026-08-18"
+          "verified_at": "2026-10-17"
         },
         {
           "label": "TeleportOptions",
           "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportOptions",
-          "verified_at": "2026-08-18"
+          "verified_at": "2026-10-17"
         },
         {
           "label": "TeleportAsyncResult",

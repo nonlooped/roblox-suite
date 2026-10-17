@@ -1,6 +1,6 @@
 ---
 read_when: "Design player profiles, session locking, saves, or deletion workflows"
-last_reviewed: 2026-07-20
+last_reviewed: 2026-10-17
 ---
 
 # Best practices and common gotchas

@@ -193,6 +193,10 @@ end
 
 Open Cloud emits webhooks for certain events, including **subscription** events (`cancelled`, `purchased`, `refunded`, `renewed`). Set up a webhook endpoint in your app, register it via the Cloud API, and Roblox will POST event payloads to it. This is the real-time path for subscription analytics without polling `GetUserSubscriptionPaymentHistoryAsync`. See https://create.roblox.com/docs/en-us/cloud/webhooks/webhook-notifications.
 
+The **Transaction Refunded** trigger is separate from the subscription events. It covers developer products, passes, private servers, and paid access, but not subscriptions. Its payload includes the buyer, product type and ID, the Robux amount (the product's original price, not what the buyer paid), the universe and place, the transaction or receipt ID, and the refund time. A refunded pass or avatar item is revoked by Roblox automatically; a refunded developer product's benefit exists only in your experience's code, so remove it from player data yourself when this notification arrives.
+
+> The October 2026 refund-trigger note is experimental guidance pending a second human review (critical tier). Verify the payload on a test purchase before relying on it.
+
 ## Decision tree: in-engine vs Open Cloud
 
 | Need | Use |

@@ -1,6 +1,6 @@
 ---
 read_when: "Diagnose throttling, inspect budgets, or plan request and storage usage"
-last_reviewed: 2026-08-18
+last_reviewed: 2026-10-17
 ---
 
 # Limits, quotas, throttling, and error codes

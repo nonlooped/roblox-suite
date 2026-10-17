@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.11.0 — 2026-10-17
+
+### Corrected and added
+
+- Added the Transaction Refunded webhook scope to the Open Cloud guidance: it covers developer products, passes, private servers, and paid access, not subscriptions. Developer-product benefits must be revoked in your own data. Labeled experimental pending a second human review.
+
+### Verification
+
+- Recorded the October source-drift review in [the October review report](reviews/2026-10-17-source-drift.md). Verification dates were updated for DataStore limits, DataStore best practices, teleport options, and the game pass policy reference, along with matching catalog sources. Other guidance is unchanged.
+
+### Dependencies
+
+- Updated Astro to 7.3.8, Lucide React to 1.55.0, and @astrojs/react to 7.0.1. The React integration no longer accepts a babel option; the site does not use one.
+- Pinned sharp to 0.35.5 through an override to fix GHSA-wq5f-xc86-pv6w, a high-severity advisory on the version astro depended on.
+- Pinned actions/setup-node to v7.1.0 and crate-ci/typos to v1.51.1 in CI.
+
 ## 1.10.0 — 2026-09-19
 
 ### Website

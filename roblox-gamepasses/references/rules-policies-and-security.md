@@ -1,6 +1,6 @@
 ---
 read_when: "Review monetization restrictions, paid random items, or purchase security"
-last_reviewed: 2026-07-16
+last_reviewed: 2026-10-17
 ---
 
 # Rules, policies, and security for game passes
