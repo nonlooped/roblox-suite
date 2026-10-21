@@ -1,7 +1,7 @@
 ---
 name: roblox-user-interfaces
 description: "Build or debug Roblox HUDs, menus, and world-space interfaces. Use for GUI containers, responsive layouts, input handling, ViewportFrame previews, and particle effects in 2D UI."
-last_reviewed: 2026-06-17
+last_reviewed: 2026-10-21
 ---
 
 # roblox-user-interfaces
@@ -59,7 +59,7 @@ The vast majority of modern Roblox UIs are built from:
 
 **Appearance & constraint modifiers (use these instead of old hacks):**
 - UIStroke (ApplyStrokeMode, Color, Enabled, LineJoinMode, Thickness, Transparency, ZIndex). Modern borders that work on any GuiObject.
-- UIGradient (`Color` is a `ColorSequence`; `Transparency` is a `NumberSequence`). `Type` selects Linear, Radial, or Conical; `Scale` controls extent and `TileMode` selects Clamp, Repeat, or Mirror. Radial gradients ignore `Rotation`. See https://create.roblox.com/docs/ui/appearance-modifiers#gradient.
+- UIGradient (`Color` is a `ColorSequence`; `Transparency` is a `NumberSequence`). `Type` selects Linear, Radial, Conical, or Elliptical (Elliptical is part of the beta "Upgraded UIGradients" feature); `Scale` controls extent and `TileMode` selects Clamp, Repeat, or Mirror. Radial gradients ignore `Rotation`. See https://create.roblox.com/docs/ui/appearance-modifiers#gradient.
 - UICorner (CornerRadius; much better than 9-slice hacks for rounded rectangles).
 - UIPadding, UISizeConstraint, UIAspectRatioConstraint, UIScale, UIFlexItem.
 

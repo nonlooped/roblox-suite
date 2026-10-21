@@ -1,6 +1,6 @@
 ---
 read_when: "Inspect versions, preserve metadata, or recover data after an incident"
-last_reviewed: 2026-07-16
+last_reviewed: 2026-10-21
 ---
 
 # Versioning, metadata, and recovery
@@ -135,7 +135,7 @@ A snapshot taken at 3:29 UTC protects all data written before that time even if 
 - Revert a key to a previous version (requires Edit Data Stores permission).
 - Mark data store or individual key for deletion (cooldown period; a deleted key can be restored during the cooldown by calling `UpdateAsync` from the Engine API or `UpdateDataStoreEntry` from Open Cloud).
 
-Permissions (group experiences): View Data Stores, Edit Data Stores, Delete Data Stores, plus the broad "Edit all group experiences".
+Permissions (group experiences): View Data Stores, Edit Data Stores, Delete Data Stores, plus the broad **Edit experiences** permission, which gives full access to all group games' Data Stores Manager features.
 
 ## Best practices around versioning and recovery
 

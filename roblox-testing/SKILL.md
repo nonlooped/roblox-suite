@@ -1,7 +1,7 @@
 ---
 name: roblox-testing
 description: "Test, debug, or profile Roblox experiences. Use for Studio debugging, TestEZ, logging, connection cleanup, memory or network diagnostics, MicroProfiler, Scene Analysis, and Script Profiler."
-last_reviewed: 2026-06-17
+last_reviewed: 2026-10-21
 ---
 
 # roblox-testing
@@ -312,7 +312,7 @@ game.Loaded:Connect(function()
 end)
 ```
 
-Enable **Print Join Size Breakdown** in Studio Settings → Network to see the largest replicated instances.
+Run this from a `LocalScript` in `ReplicatedFirst`. It starts timing when `ReplicatedFirst` replicates and stops when `game.Loaded` fires, so it excludes the time to connect to the server and load the avatar. Load time as players experience it, from clicking **Play** to the world rendering, is longer. Enable **Print Join Size Breakdown** in Studio Settings → Network to see the largest replicated instances.
 
 ## Scripts
 

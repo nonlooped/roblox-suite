@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.12.0 — 2026-10-21
+
+### Corrected and added
+
+- Added the Elliptical UIGradient type to the user interface guidance. It is part of the beta "Upgraded UIGradients" feature.
+- Corrected the Data Stores permission name for full group access from "Edit all group experiences" to **Edit experiences**. This is a label correction, not a behavior change.
+- Clarified where the load-time sample script runs and what it measures. It starts when ReplicatedFirst replicates and stops at `game.Loaded`, so it excludes server connection and avatar load.
+
+### Verification
+
+- Recorded the October 21 source-drift review in [the October 21 review report](reviews/2026-10-21-source-drift.md) for [issue #66](https://github.com/nonlooped/roblox-suite/issues/66). Verification dates were updated for the user interface skill, the Data Stores versioning reference, and the testing skill, after checking the affected claims. Other guidance is unchanged.
+
+### Dependencies
+
+- Updated lucide-react to 1.57.0 in the site.
+- Bumped the suite and site version to 1.12.0.
+
 ## 1.11.0 — 2026-10-17
 
 ### Corrected and added
