@@ -23,7 +23,7 @@
     "@types/react-dom": "^19.3.0",
     "astro": "^7.3.8",
     "clsx": "^2.1.1",
-    "lucide-react": "^1.57.0",
+    "lucide-react": "^1.59.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "tailwind-merge": "^3.7.0",
