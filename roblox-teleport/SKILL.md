@@ -146,7 +146,7 @@ A lobby place collects players; when enough are ready, `TeleportAsync` sends the
 
 ### Pattern 2: reserved server per match
 
-For instanced dungeons or private matches: `ReserveServerAsync` → persist the access code in a DataStore keyed by match ID → teleport the party with `ReservedServerAccessCode` → players arrive in an isolated server.
+For instanced dungeons or private matches: generate a GUID on the server → atomically persist the winning ID in a DataStore keyed by match ID → initiate the party teleport with `ReservedServerId` → confirm arrival separately on the destination server.
 
 ### Pattern 3: server browser via MemoryStoreService
 
