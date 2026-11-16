@@ -11,6 +11,10 @@ As of **May 30, 2026**, cross-experience game pass and developer product sales a
 
 If your game previously relied on cross-experience pass sales (common in donation/tipping games), migrate to experience-specific passes and/or the [Robux Transfers API](https://create.roblox.com/docs/en-us/production/monetization/robux-transfers). `MarketplaceService:PromptRobuxTransferAsync` must be called from the server. Only **Roblox Plus** subscribers can initiate transfers, transfer amounts must be between **10 and 500 Robux**, and the sender cannot equal the receiver. The recipient receives **90%** and the experience earns the other **10%**; Roblox takes no transfer fee. A `BindReceiptHandler` callback must process transfer receipts. Roblox permits items or perks after a successful transfer receipt. Avoiding quid-pro-quo rewards can still be a useful anti-abuse or game-design choice, but it is not a platform requirement.
 
+> November 2026 testing clarification: experimental pending a second human review. Studio mock purchases do not enforce the same-experience ownership check for passes or developer products. A cross-experience prompt can appear to succeed in Studio and fail in production, even if you own both experiences. Verify that every prompted ID belongs to the current experience before publishing.
+>
+> Source: https://create.roblox.com/docs/en-us/reference/engine/classes/MarketplaceService
+
 ## What game passes can and cannot do
 
 Allowed:

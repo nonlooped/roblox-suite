@@ -1,9 +1,11 @@
 ---
 read_when: "Coordinate lobbies, reserved servers, allocation races, or player-data handoff"
-last_reviewed: 2026-07-16
+last_reviewed: 2026-11-16
 ---
 
 # Matchmaking patterns
+
+> The November 2026 GUID routing migration is experimental pending a second human review and Studio integration tests. Existing v2 access-code records are not migrated; drain active sessions before adopting the helper's separate v3 store.
 
 **Official sources:**
 - https://create.roblox.com/docs/en-us/projects/teleport
@@ -52,34 +54,32 @@ end
 
 ## Pattern 2: reserved server per match
 
-For instanced dungeons, private matches, or anything that must be isolated: reserve a server, persist the access code, teleport the party in.
+For instanced dungeons, private matches, or anything that must be isolated: generate a GUID, atomically persist the winning ID, teleport the party in.
 
 ```lua
 --!strict
 local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
 local DataStoreService = game:GetService("DataStoreService")
 
 local PLACE_ID = game.PlaceId
-local codes = DataStoreService:GetDataStore("MatchServerCodes")
+local serverIds = DataStoreService:GetDataStore("MatchServerIds_v2")
 
-local function getOrCreateCode(matchId: string): string?
-    local reserveOk, code = pcall(function()
-        return select(1, TeleportService:ReserveServerAsync(PLACE_ID))
-    end)
-    if not reserveOk or typeof(code) ~= "string" then return nil end
+local function getOrCreateServerId(matchId: string): string?
+    local serverId = HttpService:GenerateGUID(false)
 
     local now = os.time()
-    local candidate = { accessCode = code, expiresAt = now + 3600, state = "allocated" }
+    local candidate = { reservedServerId = serverId, expiresAt = now + 3600, state = "allocated" }
     local publishOk, winner = pcall(function()
-        return codes:UpdateAsync("match_" .. matchId, function(current)
-            if type(current) == "table" and type(current.accessCode) == "string" and current.expiresAt > now then
+        return serverIds:UpdateAsync("match_" .. matchId, function(current)
+            if type(current) == "table" and type(current.reservedServerId) == "string" and current.expiresAt > now then
                 return current
             end
             return candidate
         end)
     end)
     if publishOk and type(winner) == "table" then
-        return winner.accessCode -- all concurrent allocators use the atomic winner
+        return winner.reservedServerId -- all concurrent allocators use the atomic winner
     end
     -- A failed write can be ambiguous. Reconcile with GetAsync(UseCache=false)
     -- before deciding whether allocation failed; see scripts/TeleportHelper.lua.
@@ -87,10 +87,10 @@ local function getOrCreateCode(matchId: string): string?
 end
 
 local function sendPartyToMatch(matchId: string, party: { Player })
-    local code = getOrCreateCode(matchId)
-    if not code then return end
+    local serverId = getOrCreateServerId(matchId)
+    if not serverId then return end
     local options = Instance.new("TeleportOptions")
-    options.ReservedServerAccessCode = code
+    options.ReservedServerId = serverId
     options:SetTeleportData({ matchId = matchId })
     pcall(function()
         TeleportService:TeleportAsync(PLACE_ID, party, options)
@@ -98,7 +98,7 @@ local function sendPartyToMatch(matchId: string, party: { Player })
 end
 ```
 
-Reserved server access codes remain valid, but allocation records should carry an expiry so matchmaking state does not live forever. The source can record `teleporting` only after allocation; the destination must separately mark `arrived`. For short-lived queues and locks, prefer a TTL'd MemoryStore record.
+Reserved server IDs remain valid, but allocation records should carry an expiry so matchmaking state does not live forever. The source can record `teleporting` only after allocation; the destination must separately mark `arrived`. For short-lived queues and locks, prefer a TTL'd MemoryStore record.
 
 ## Pattern 3: server browser via MemoryStoreService
 
@@ -165,7 +165,7 @@ Use `MemoryStoreService`'s TTL so dead servers age out of the map automatically.
 
 ## Pattern 4: external matchmaking service
 
-For skill-based matchmaking, party queues, or anything too complex for in-engine coordination, use an external HTTP service as the matchmaker. It returns a destination (place ID + `JobId`, or a fresh reserved-server access code); the lobby then `TeleportAsync`s the party.
+For skill-based matchmaking, party queues, or anything too complex for in-engine coordination, use an external HTTP service as the matchmaker. It returns a destination (place ID + `JobId`, or a server-generated reserved-server GUID); the lobby then `TeleportAsync`s the party.
 
 - See roblox-networking for the `HttpService` security model (server-only, validate responses, don't trust client-supplied destinations).
 - See roblox-open-cloud for in-experience Open Cloud calls if your matchmaker needs to read/write Roblox resources.
@@ -188,8 +188,8 @@ For skill-based matchmaking, party queues, or anything too complex for in-engine
 - **Whitelist** allowed destination place IDs server-side; don't accept client-supplied place IDs unsanitized.
 - **50 players per `TeleportAsync`** call: split larger parties.
 - **Group teleports are universe-only**: you cannot `TeleportAsync` a group across experiences.
-- **Studio can't test teleports**: publish and test in the Roblox app.
-- Reserved-server access codes are long-lived; treat them as semi-secret (anyone with the code can join the reserved server).
+- **Studio testing**: use `TeleportAsync` in Test or Team Test within one experience; see the skill entry point for limitations.
+- Generate reserved-server IDs on the server and validate who may request a join.
 
 ## Sources
 

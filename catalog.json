@@ -247,7 +247,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-09-19"
+      "last_changed_at": "2026-11-16"
     },
     {
       "slug": "roblox-user-interfaces",
@@ -475,7 +475,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-09-19"
+      "last_changed_at": "2026-11-16"
     },
     {
       "slug": "roblox-open-cloud",
@@ -560,7 +560,7 @@
         {
           "label": "Teleport",
           "url": "https://create.roblox.com/docs/en-us/projects/teleport",
-          "verified_at": "2026-08-18"
+          "verified_at": "2026-11-16"
         },
         {
           "label": "TeleportService",
@@ -570,26 +570,26 @@
         {
           "label": "TeleportOptions",
           "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportOptions",
-          "verified_at": "2026-10-17"
+          "verified_at": "2026-11-16"
         },
         {
           "label": "TeleportAsyncResult",
           "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportAsyncResult",
-          "verified_at": "2026-08-18"
+          "verified_at": "2026-11-16"
         }
       ],
       "risk": "critical",
       "created_at": "2026-06-17",
       "examples": {
-        "status": "reviewed",
+        "status": "experimental",
         "files": [
           {
             "path": "scripts/TeleportHelper.lua",
-            "status": "reviewed"
+            "status": "experimental"
           }
         ]
       },
-      "last_changed_at": "2026-09-19"
+      "last_changed_at": "2026-11-16"
     },
     {
       "slug": "roblox-rojo",
@@ -682,7 +682,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-09-19"
+      "last_changed_at": "2026-11-16"
     },
     {
       "slug": "roblox-physics",

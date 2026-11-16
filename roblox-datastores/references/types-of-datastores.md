@@ -82,3 +82,11 @@ The Engine API (inside experiences) is different from the Open Cloud REST Data S
 **Key takeaway:** Choose the variant deliberately at creation time. You cannot easily convert an OrderedDataStore into a versioned DataStore later without migration code (see best-practices-and-gotchas.md and versioning-metadata-recovery.md for migration and recovery patterns).
 
 Always test listing, versioning, and quota behavior on dedicated test experiences.
+
+## MemoryStore quota recovery
+
+> November 2026 operational guidance: experimental pending a second human review.
+
+When memory quota is exhausted, requests that increase memory use fail. Delete unneeded items or wait for expiry. If capacity must grow, evaluate Extended Services and its budget limits. Open Cloud can flush a universe's MemoryStores, but a flush clears every queue, sorted map, and hash map in the selected LIVE or TEST scope, including active matchmaking state; it is not an individual-item cleanup operation. Studio and production scopes are isolated.
+
+Source: https://create.roblox.com/docs/en-us/cloud-services/memory-stores#recover-from-memory-quota-exhaustion

@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.13.0 — 2026-11-16
+
+### Guidance and examples
+
+- Migrated reserved-server examples to server-generated GUIDs and `TeleportOptions.ReservedServerId`; documented VIP routing, destination results, legacy migration, and Studio teleport testing limits.
+- Kept atomic allocation and ambiguous-write reconciliation in TeleportHelper, isolated GUID records in a v3 store, and added regression coverage for legacy-record rejection and expiry. Drain legacy sessions before adopting the new helper.
+- Updated Studio MCP tools, place saving, cross-place playtests, and Script Sync team-workflow guidance.
+- Added Studio purchase-mock limits, DataStore deletion cache timing, and MemoryStore quota-recovery cautions.
+- Critical guidance changes and the migrated helper are experimental pending a second human review and Roblox integration tests.
+
+### Dependencies and maintenance
+
+- Updated Astro to 7.4.12, React integration to 7.1.9, React/React DOM to 19.3.1, Lucide React to 1.73.0, Tailwind to 4.3.5, sitemap to 3.7.5, and fast-uri to 3.1.9. Full npm audit reports zero vulnerabilities.
+- Updated Luau tooling, vendored Roblox definitions/checksum, and the pinned typos action. Added effects coverage and commit-file pagination to source monitoring.
+- Recorded the October 21–November 14 official-source drift review in [the November 16 review report](reviews/2026-11-16-source-drift.md), including coverage, checks, and limitations. Verification dates were renewed only for the scoped teleport guidance and MCP tool reference.
+
+### Validation
+
+- Site content/type/build/route checks, all Luau formatting/lint/analysis, Rojo fixture build, allocation regression checks, and spelling pass. Studio and production integration remain untested.
+
 ## 1.12.0 — 2026-10-21
 
 ### Corrected and added

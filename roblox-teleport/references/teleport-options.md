@@ -1,9 +1,11 @@
 ---
 read_when: "Select a destination server or inspect a teleport result"
-last_reviewed: 2026-10-17
+last_reviewed: 2026-11-16
 ---
 
 # TeleportOptions and TeleportAsyncResult
+
+> The November 2026 GUID routing migration is experimental pending a second human review and Studio integration tests.
 
 > The September 2026 teleport value-type, GUI-reference, and arrival-confirmation corrections are experimental guidance pending a second human review. Test cross-place behavior in a published test experience.
 
@@ -13,15 +15,17 @@ last_reviewed: 2026-10-17
 
 ## TeleportOptions
 
-`Instance.new("TeleportOptions")` creates an options object you pass as the third argument to `TeleportService:TeleportAsync(placeId, players, options)`. If omitted, `TeleportAsync` returns no result.
+`Instance.new("TeleportOptions")` creates an options object you pass as the third argument to `TeleportService:TeleportAsync(placeId, players, options)`. The class reference documents a `TeleportAsyncResult` for VIP or reserved destinations when options are supplied; do not assume every public teleport returns one.
 
 ### Properties
 
 | Property | Type | Purpose |
 | --- | --- | --- |
-| `ServerInstanceId` | string | Target a specific server by its `JobId`. Conflicts with `ReservedServerAccessCode` and `ShouldReserveServer`. |
-| `ReservedServerAccessCode` | string | Join an existing reserved server by its access code (from `ReserveServerAsync` or `TeleportAsyncResult.ReservedServerAccessCode`). Conflicts with `ServerInstanceId` and `ShouldReserveServer`. |
-| `ShouldReserveServer` | boolean | Create a new reserved server and teleport the players into it. Conflicts with `ServerInstanceId` and `ReservedServerAccessCode`. |
+| `ServerInstanceId` | string | Target a running server by `JobId`. |
+| `ReservedServerId` | string | Server-generated GUID; first use creates a reserved server, reuse routes to it. |
+| `VipServerId` | string | Target a player-purchased VIP server by `PrivateServerId` in its owning experience. |
+
+`ReservedServerAccessCode` and `ShouldReserveServer` are deprecated legacy fields. Use `HttpService:GenerateGUID(false)` and `ReservedServerId` for new work. Existing access-code servers continue to work; a stored legacy code is not a new GUID allocation.
 
 ### Methods
 
@@ -30,13 +34,9 @@ last_reviewed: 2026-10-17
 | `SetTeleportData(data: Variant)` | Pass data to the destination. Retrieved via `GetLocalPlayerTeleportData()` on the destination client. |
 | `GetTeleportData(): Variant` | Read back what was set; returns the data previously stored by `SetTeleportData()`, or `nil` if no data was set. |
 
-### Conflicting combinations (error)
+### Routing conflicts
 
-- `ReservedServerAccessCode` + `ServerInstanceId`
-- `ShouldReserveServer` + `ServerInstanceId`
-- `ShouldReserveServer` + `ReservedServerAccessCode`
-
-Pick exactly one mode: public server (neither), specific server (`ServerInstanceId`), existing reserved (`ReservedServerAccessCode`), or new reserved (`ShouldReserveServer`).
+Set at most one of `ServerInstanceId`, `ReservedServerId`, `VipServerId`, `ReservedServerAccessCode`, or `ShouldReserveServer`. With none set, the engine can choose a public server or a VIP server the player recently joined.
 
 ### Teleport data rules
 
@@ -48,9 +48,9 @@ Pick exactly one mode: public server (neither), specific server (`ServerInstance
 
 ## TeleportAsyncResult
 
-Returned by `TeleportAsync` when a `TeleportOptions` is passed. Describes the selected destination, including a newly reserved server when `ShouldReserveServer` is used. It does not prove that the player arrived; observe arrival separately in the destination server.
+Returned by `TeleportAsync` for a VIP or reserved destination when options are passed. Describes the selected destination, including a reserved or VIP server. It does not prove that the player arrived; observe arrival separately in the destination server.
 
-Inspect its properties per the class reference; typical fields include the destination place ID and instance/access-code identifiers.
+`PrivateServerId` identifies the selected private destination. `ReservedServerAccessCode` is populated only for legacy access-code teleports, not GUID or VIP routing.
 
 ## Common patterns
 
@@ -67,7 +67,7 @@ TeleportService:TeleportAsync(DESTINATION_PLACE_ID, { player }, options)
 
 ```lua
 local options = Instance.new("TeleportOptions")
-options.ShouldReserveServer = true
+options.ReservedServerId = game:GetService("HttpService"):GenerateGUID(false)
 options:SetTeleportData({ matchId = "abc123" })
 local result = TeleportService:TeleportAsync(DESTINATION_PLACE_ID, party, options)
 -- result carries info about the newly created reserved server
@@ -77,7 +77,7 @@ local result = TeleportService:TeleportAsync(DESTINATION_PLACE_ID, party, option
 
 ```lua
 local options = Instance.new("TeleportOptions")
-options.ReservedServerAccessCode = savedAccessCode
+options.ReservedServerId = savedReservedServerId
 TeleportService:TeleportAsync(PLACE_ID, { player }, options)
 ```
 

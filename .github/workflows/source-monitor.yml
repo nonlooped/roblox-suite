@@ -22,11 +22,11 @@ jobs:
         run: |
           set -euo pipefail
           since=$(date -u -d '8 days ago' +%Y-%m-%dT%H:%M:%SZ)
-          pattern='content/en-us/(reference/engine/|cloud/|cloud-services/|scripting/|projects/|workspace/|ui/|input/|characters/|animation/|audio/|physics/|performance-optimization/|production/monetization/|studio/)'
+          pattern='content/en-us/(reference/engine/|cloud/|cloud-services/|scripting/|projects/|workspace/|ui/|input/|characters/|animation/|effects/|audio/|physics/|performance-optimization/|production/monetization/|studio/)'
           : > /tmp/changes.txt
           gh api --paginate "repos/Roblox/creator-docs/commits?since=$since&per_page=30" --jq '.[].sha' |
           while read -r sha; do
-            files=$(gh api "repos/Roblox/creator-docs/commits/$sha" --jq '.files[].filename' | grep -Ei '\.(md|mdx|ya?ml|json)$' | grep -Ei "$pattern" || true)
+            files=$(gh api --paginate "repos/Roblox/creator-docs/commits/$sha" --jq '.files[].filename' | grep -Ei '\.(md|mdx|ya?ml|json)$' | grep -Ei "$pattern" || true)
             if [ -n "$files" ]; then
               summary=$(gh api "repos/Roblox/creator-docs/commits/$sha" --jq '.commit.message' | head -1)
               url="https://github.com/Roblox/creator-docs/commit/$sha"

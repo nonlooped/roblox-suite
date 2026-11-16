@@ -1,7 +1,8 @@
 --!strict
--- Status: reviewed
--- Last verified: 2026-07-16
+-- Status: experimental
+-- Last verified: 2026-11-16
 -- Test coverage: concurrent-allocation fixture in tests/TeleportHelper.spec.lua; Studio integration still required.
+-- Experimental GUID routing migration pending second human review and Studio integration.
 -- Intended use: example; choose DataStore or MemoryStore coordination for your matchmaking lifetime.
 --[[
 TeleportHelper.lua
@@ -19,13 +20,13 @@ local TeleportService = game:GetService("TeleportService")
 
 local ALLOCATION_LIFETIME_SECONDS = 60 * 60
 local MAX_MATCH_ID_LENGTH = 20
-local reservedCodes = DataStoreService:GetDataStore("ReservedServerAllocations_v2")
+local reservedServers = DataStoreService:GetDataStore("ReservedServerAllocations_v3")
 
 export type TeleportData = { [string]: any }
 export type AllocationState = "allocated" | "teleporting" | "arrived"
 export type AllocationRecord = {
     allocationId: string,
-    accessCode: string,
+    reservedServerId: string,
     placeId: number,
     matchId: string,
     state: AllocationState,
@@ -99,7 +100,7 @@ end
 local function isAllocation(value: any): boolean
     return type(value) == "table"
         and type(value.allocationId) == "string"
-        and type(value.accessCode) == "string"
+        and type(value.reservedServerId) == "string"
         and type(value.expiresAt) == "number"
 end
 
@@ -107,7 +108,7 @@ local function freshAllocation(key: string): AllocationRecord?
     local getOptions = Instance.new("DataStoreGetOptions")
     getOptions.UseCache = false
     local ok, value = pcall(function()
-        return reservedCodes:GetAsync(key, getOptions)
+        return reservedServers:GetAsync(key, getOptions)
     end)
     if ok and isAllocation(value) then
         return value :: AllocationRecord
@@ -127,17 +128,10 @@ function TeleportHelper._selectAllocation(
 end
 
 local function allocate(placeId: number, matchId: string): (AllocationRecord?, any?)
-    local reserveOk, accessCode = pcall(function()
-        return select(1, TeleportService:ReserveServerAsync(placeId))
-    end)
-    if not reserveOk or type(accessCode) ~= "string" then
-        return nil, accessCode
-    end
-
     local now = os.time()
     local candidate: AllocationRecord = {
         allocationId = HttpService:GenerateGUID(false),
-        accessCode = accessCode,
+        reservedServerId = HttpService:GenerateGUID(false),
         placeId = placeId,
         matchId = matchId,
         state = "allocated",
@@ -147,7 +141,7 @@ local function allocate(placeId: number, matchId: string): (AllocationRecord?, a
     }
     local key = allocationKey(placeId, matchId)
     local publishOk, winner = pcall(function()
-        return reservedCodes:UpdateAsync(key, function(current: any): AllocationRecord?
+        return reservedServers:UpdateAsync(key, function(current: any): AllocationRecord?
             return TeleportHelper._selectAllocation(current, candidate, now)
         end)
     end)
@@ -156,7 +150,7 @@ local function allocate(placeId: number, matchId: string): (AllocationRecord?, a
     end
 
     -- UpdateAsync failures can be ambiguous. Read without cache and use the
-    -- backend winner rather than reserving/publishing another code.
+    -- backend winner rather than reserving/publishing another ID.
     local reconciled = freshAllocation(key)
     if reconciled and reconciled.expiresAt > now then
         return reconciled, nil
@@ -171,7 +165,7 @@ local function updateState(
 ): (AllocationRecord?, any?)
     local key = allocationKey(allocation.placeId, allocation.matchId)
     local ok, updated = pcall(function()
-        return reservedCodes:UpdateAsync(key, function(current: any): AllocationRecord?
+        return reservedServers:UpdateAsync(key, function(current: any): AllocationRecord?
             if not isAllocation(current) then
                 return nil
             end
@@ -263,7 +257,7 @@ function TeleportHelper.teleportToReservedServer(
     if not optionsOk then
         return false, { state = "allocated", allocation = trackingRecord, error = options }
     end
-    options.ReservedServerAccessCode = trackingRecord.accessCode
+    options.ReservedServerId = trackingRecord.reservedServerId
     local started, teleportError = teleport(players, placeId, options)
     if not started then
         return false, { state = "allocated", allocation = trackingRecord, error = teleportError }

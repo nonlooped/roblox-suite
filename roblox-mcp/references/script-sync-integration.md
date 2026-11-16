@@ -81,9 +81,9 @@ Script Sync handles scripts that map to disk. MCP handles everything else:
 | Edit a `.luau` file in `ServerScriptService/` | Script Sync |
 | Create a script inside `StarterGui` | MCP `multi_edit` |
 | Inspect a `Part`'s properties | MCP `inspect_instance` |
-| Insert a Creator Store model | MCP `insert_from_creator_store` |
+| Insert a Creator Store model | MCP `search_asset` + `insert_asset` |
 | Run a quick test snippet | MCP `execute_luau` |
-| Start play mode and check output | MCP `start_stop_play` + `console_output` |
+| Start play mode and check output | MCP `start_stop_play` + `get_console_output` |
 | Capture a screenshot | MCP `screen_capture` |
 
 ## End-to-end verification prompt
@@ -95,7 +95,7 @@ After both Script Sync and MCP are connected, ask your agent:
 This confirms:
 - MCP can create and edit scripts.
 - Script Sync maps the expected folders.
-- `execute_luau` and `console_output` work.
+- `execute_luau` and `get_console_output` work.
 - Play mode starts and stops cleanly.
 
 ## Script Sync warnings and limitations
@@ -113,3 +113,5 @@ This confirms:
 - Use Script Sync for long-lived code; use MCP for ad-hoc Studio operations.
 - When an agent edits a script via MCP, verify the change in the Explorer or with `script_read`.
 - Run playtests frequently when iterating with an agent.
+
+For team workflow choices, compare the official [file-based workflows](https://create.roblox.com/docs/en-us/projects/file-based-workflows). Script Sync keeps scripts and folders in Git, not models, parts, attributes, or tags; merging a Git branch does not update the shared place for teammates. Coordinate who syncs each script.

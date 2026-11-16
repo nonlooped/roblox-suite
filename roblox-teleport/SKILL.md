@@ -1,10 +1,12 @@
 ---
 name: roblox-teleport
 description: "Move Roblox players between places, public servers, or reserved servers. Use for TeleportAsync, matchmaking, loading screens, teleport failures, and persistent-data handoff."
-last_reviewed: 2026-08-18
+last_reviewed: 2026-11-16
 ---
 
 # roblox-teleport
+
+> The November 2026 GUID routing migration is experimental pending a second human review and Studio integration tests. Existing v2 access-code records are not migrated; drain active sessions before adopting the helper's separate v3 store.
 
 **Official sources:**
 - https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportService
@@ -37,6 +39,7 @@ A **universe** (experience) can contain multiple **places**. Each place has its 
 ```lua
 --!strict
 local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 
 local DESTINATION_PLACE_ID = 1234567890
@@ -44,8 +47,7 @@ local DESTINATION_PLACE_ID = 1234567890
 local function teleportToPlace(player: Player)
     local options = Instance.new("TeleportOptions")
     -- options.ServerInstanceId = "..." -- to target a specific server
-    -- options.ReservedServerAccessCode = "..." -- to join a reserved server
-    -- options.ShouldReserveServer = true -- to create+join a new reserved server
+    -- options.ReservedServerId = HttpService:GenerateGUID(false) -- create a reserved destination
     options:SetTeleportData({ reason = "lobby_choice", mode = "classic" })
 
     local ok, result = pcall(function()
@@ -55,7 +57,7 @@ local function teleportToPlace(player: Player)
         warn("TeleportAsync failed:", tostring(result))
         return false
     end
-    -- result is a TeleportAsyncResult with info about the destination
+    -- Private destinations can return TeleportAsyncResult; success is not arrival.
     return true
 end
 ```
@@ -67,89 +69,32 @@ end
 
 ### Conflicting TeleportOptions
 
-These combinations error with "Incompatible Parameters":
-- `ReservedServerAccessCode` + `ServerInstanceId`
-- `ShouldReserveServer` + `ServerInstanceId`
-- `ShouldReserveServer` + `ReservedServerAccessCode`
+Set at most one routing field: `ServerInstanceId`, `ReservedServerId`, `VipServerId`, or either legacy field (`ReservedServerAccessCode`, `ShouldReserveServer`). Combining them errors.
 
 ## TeleportOptions
 
 | Property | Purpose |
 | --- | --- |
 | `ServerInstanceId` | Target a specific server by `JobId`. |
-| `ReservedServerAccessCode` | Join an existing reserved server by its access code. |
-| `ShouldReserveServer` | Create a new reserved server and teleport into it. |
-| `SetTeleportData(data)` / `GetTeleportData()` | Pass data to the destination (retrieved via `GetLocalPlayerTeleportData`). |
+| `ReservedServerId` | A server-generated GUID; first use creates a reserved server, reuse targets the same destination. |
+| `VipServerId` | Target a player-purchased VIP server by its `PrivateServerId`, within that VIP server's experience. |
+| `SetTeleportData(data)` / `GetTeleportData()` | Pass non-sensitive hints to the destination. |
 
-## TeleportAsyncResult
+Legacy `ReservedServerAccessCode` and `ShouldReserveServer` are deprecated. Replace `ReserveServerAsync` with `HttpService:GenerateGUID(false)` for new work. Existing access-code servers remain compatible; do not reinterpret stored access codes as new IDs.
 
-When `TeleportOptions` is passed, `TeleportAsync` returns a `TeleportAsyncResult` with information about the final teleport destination. Useful for confirming where a player ended up.
+## TeleportAsyncResult and failures
 
-## TeleportInitFailed (error handling)
+With options and a VIP or reserved destination, `TeleportAsync` can return destination information, not proof of arrival. `PrivateServerId` identifies a reserved or VIP destination; `ReservedServerAccessCode` is populated only for legacy routing. Track arrival separately on the destination server.
 
-`TeleportService.TeleportInitFailed` fires when a teleport fails to start. Connect to it to show a retry UI. Failure reasons include invalid place ID, empty player list, non-Player instances, wrong teleport options type, client-called `TeleportAsync`, and conflicting parameters.
+Wrap `TeleportAsync` in `pcall` and handle `TeleportInitFailed` for failures after initiation. Its arguments are player, `Enum.TeleportResult`, message, place ID, and options. Retry only suitable failures with bounded backoff and the same destination ID. VIP access is checked for each player, so a group can partially fail.
 
-```lua
-TeleportService.TeleportInitFailed:Connect(function(
-    player: Player,
-    reason: Enum.TeleportResult,
-    errMsg: string,
-    placeId: number,
-    options: TeleportOptions
-)
-    warn(`Teleport failed for {player.Name} to {placeId}: {reason.Name} - {errMsg}`)
-    -- Show retry UI, log options, etc.
-end)
-```
+## Reserved and VIP servers
 
-## Reserved servers
+Generate a GUID on the server, atomically publish it with `UpdateAsync`, and use the winning `ReservedServerId` for every member of a match. See [matchmaking](references/matchmaking.md) and the experimental helper for allocation races and ambiguous writes.
 
-`TeleportService:ReserveServerAsync(placeId)` (server-only, yields) returns an access code plus a `PrivateServerId`. Players can only join a reserved server via that access code. They can't join through normal matchmaking.
+For VIP servers, set `VipServerId` to the target VIP server's `PrivateServerId`. Carry the origin VIP ID separately when returning from a reserved match; the match's own `PrivateServerId` is not the origin VIP ID. Validate requests server-side. Leaving routing unset lets the engine choose a public server or a VIP server the player has recent context for.
 
-- A server starts when the access code is first used.
-- Access codes remain valid indefinitely; a reserved server can be rejoined even if no server is currently running (a new one starts).
-- Detect reserved-server context: `local isReserved = game.PrivateServerId ~= "" and game.PrivateServerOwnerId == 0`.
-- `PrivateServerId` is constant across server instances for the same access code; `JobId` is not.
-- **Cross-platform caveat:** Xbox/PlayStation players with cross-play disabled land in a different server than cross-play-enabled players. Multiple servers can share a `PrivateServerId`. Use `game.MatchmakingType` to differentiate.
-
-```lua
---!strict
-local TeleportService = game:GetService("TeleportService")
-local DataStoreService = game:GetService("DataStoreService")
-local Players = game:GetService("Players")
-
--- Reserve a candidate, then atomically publish-or-use the winner.
-local store = DataStoreService:GetDataStore("ReservedServerAllocations_v2")
-local reserveOk, candidateCode = pcall(function()
-    return select(1, TeleportService:ReserveServerAsync(game.PlaceId))
-end)
-local code: string? = nil
-if reserveOk and typeof(candidateCode) == "string" then
-    local now = os.time()
-    local candidate = { accessCode = candidateCode, expiresAt = now + 3600, state = "allocated" }
-    local publishOk, winner = pcall(function()
-        return store:UpdateAsync("DungeonRoom_1", function(current)
-            if type(current) == "table" and type(current.accessCode) == "string" and current.expiresAt > now then
-                return current
-            end
-            return candidate
-        end)
-    end)
-    if publishOk and type(winner) == "table" then
-        code = winner.accessCode -- every racing allocator uses the same winner
-    end
-end
-
-local function sendToDungeon(player: Player)
-    if not code then return end
-    local options = Instance.new("TeleportOptions")
-    options.ReservedServerAccessCode = code
-    options:SetTeleportData({ room = 1 })
-    pcall(function()
-        TeleportService:TeleportAsync(game.PlaceId, { player }, options)
-    end)
-end
-```
+In production, a reserved server has `game.PrivateServerId ~= ""` and `game.PrivateServerOwnerId == 0`. Its ID stays constant across restarts; `JobId` identifies one running instance. Cross-play settings can split players across instances sharing a private server ID.
 
 ## Passing data across teleports
 
@@ -173,6 +118,7 @@ Client-only, stored locally, preserved across teleports within the same game. Go
 --!strict
 -- At the destination, in ReplicatedFirst
 local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
@@ -208,7 +154,7 @@ Maintain a `MemoryStoreService` sorted map of active servers (keyed by `JobId`, 
 
 ### Pattern 4: external matchmaking service
 
-For complex matchmaking (skill-based, party queues), use an external HTTP service as the matchmaker. It returns a `placeId` + `JobId` or a fresh reserved-server access code; the lobby then `TeleportAsync`s the party. See roblox-networking for the `HttpService` security model and roblox-open-cloud for in-experience Open Cloud calls.
+For complex matchmaking (skill-based, party queues), use an external HTTP service as the matchmaker. It returns a `placeId` + `JobId` or a server-generated reserved-server GUID; the lobby then `TeleportAsync`s the party. See roblox-networking for the `HttpService` security model and roblox-open-cloud for in-experience Open Cloud calls.
 
 All matchmaking must respect the **50-player-per-`TeleportAsync`** limit; split larger groups into multiple calls.
 
@@ -229,9 +175,16 @@ To move player state between places:
 - **Teleport data is spoofable.** Treat it as a hint; re-validate any gameplay-affecting claim on the destination server against DataStores.
 - **`GetLocalPlayerTeleportData` is client-only** and returns client-controlled data. Don't use it for authoritative decisions on the server.
 
-## Studio limitation
+## Studio testing
 
-**TeleportService does not work during Studio playtesting.** You must publish the experience and test teleports in the Roblox application. Plan for this in your testing workflow. Teleport logic can only be verified live.
+`TeleportAsync` supports Studio **Test** and **Team Test**, including MCP playtest automation, without publishing. Destinations open as new test servers. Only places in the starting experience are supported.
+
+- In Test, `PrivateServerId` and `JobId` are empty. In Team Test, every server is private, including public destinations.
+- Team Test may give a destination `PrivateServerId` different from the supplied `ReservedServerId`; reuse the original reserved ID for subsequent joins.
+- `VipServerId` teleports and `GetPlayerPlaceInstanceAsync` do not work in testing. Deprecated teleport methods are unsupported.
+- Check VIP access, cross-experience behavior, and production server identity in a published test experience.
+
+Source: https://create.roblox.com/docs/en-us/projects/teleport#test-teleports-in-studio
 
 ## Gotchas
 
@@ -241,21 +194,21 @@ To move player state between places:
 - Cross-platform (Xbox/PS with cross-play off) can split a reserved server into multiple servers with the same `PrivateServerId`.
 - Group teleports are universe-only; you cannot `TeleportAsync` a group across experiences.
 - The 50-player limit is per call. Larger groups need multiple calls, and ordering matters for "arrive together" semantics.
-- Follow-friend: `Players.PlayerAdded` → check `player.FollowUserId` → `GetPlayerPlaceInstanceAsync(followId)` → `TeleportToPlaceInstance`. Note `GetPlayerPlaceInstanceAsync` returns `JobId`, not the reserved-server access code, so it won't work to follow a friend into a reserved server.
+- Follow-friend: `Players.PlayerAdded` → check `player.FollowUserId` → `GetPlayerPlaceInstanceAsync(followId)` → `TeleportAsync` with `ServerInstanceId`. Note `GetPlayerPlaceInstanceAsync` returns `JobId`, not the reserved-server access code, so it won't work to follow a friend into a reserved server.
 
 ## Scripts
 
-- `scripts/TeleportHelper.lua`: a reviewed server-side example with atomic reserved-code publication, expiry, ambiguous-allocation reconciliation, and separate `teleporting`/`arrived` states.
+- `scripts/TeleportHelper.lua`: an experimental server-side example with atomic reserved-ID publication, expiry, ambiguous-allocation reconciliation, and separate `teleporting`/`arrived` states.
 
 ## How to proceed
 
 1. Decide your place architecture: primary place + sub-places in one universe.
 2. For cross-place teleports, use `TeleportAsync` (server) + `TeleportOptions`.
-3. For reserved servers, reserve a candidate and publish it through `UpdateAsync`; use whichever allocation wins. Track teleport initiation separately from destination arrival.
+3. For reserved servers, generate a candidate GUID and publish it through `UpdateAsync`; use whichever allocation wins. Track teleport initiation separately from destination arrival.
 4. Pass non-sensitive hints via teleport data; pass authoritative state via DataStores.
 5. Connect `TeleportInitFailed` for retry UI.
 6. Validate and rate-limit any client-initiated teleport Remote.
-7. Test in the Roblox app (not Studio) with a published experience.
+7. Test `TeleportAsync` in Studio, then verify production-specific behavior in a published test experience.
 
 <!-- catalog:references:start -->
 ## Reference index

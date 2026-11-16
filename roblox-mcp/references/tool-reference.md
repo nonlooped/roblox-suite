@@ -1,6 +1,6 @@
 ---
 read_when: "Choose a Studio MCP tool and identify the target Studio instance"
-last_reviewed: 2026-09-19
+last_reviewed: 2026-11-16
 ---
 
 # MCP tool reference
@@ -44,6 +44,8 @@ Check state before choosing an execution context. For a server-side test, start 
 
 | Tool | Use |
 | --- | --- |
+| `generate_animation` | Generate an R15 animation (up to 10 seconds) or convert an R6 animation by asset ID. |
+| `generate_avatar` | Generate a rigged R15 avatar from a prompt. |
 | `generate_mesh` | Generate a textured mesh from a prompt. |
 | `generate_material` | Generate a material variant and retrieve its base material and name. |
 | `generate_procedural_model` | Generate a configurable model from primitive parts, optionally with image references. |
@@ -68,3 +70,11 @@ Local places without place IDs are listed by name. If names collide, distinguish
 ## Migration from older tool names
 
 Use `subagent` with the appropriate type instead of `explore_subagent` or `playtest_subagent`; `search_asset`/`insert_asset` replace the old insertion workflow. Use `get_console_output`, `user_keyboard_input`, and `user_mouse_input` in current calls. The current documentation uses explicit `studio_id` targeting rather than `set_active_studio`.
+
+## Place management and teleport tests
+
+`save_place` saves a cloud-opened place as a new place version, or saves a local place back to its file, without a dialog. Confirm the target and intended save before calling it. `submit_feedback` sends feedback to Roblox; use it only when the user asks to send feedback.
+
+Playtest automation can follow `TeleportAsync` between places in the same experience without publishing. Inspect the destination output and state; Test and Team Test differ from production server IDs and do not support VIP routing. See [teleport testing](../../roblox-teleport/SKILL.md#studio-testing).
+
+For Open Cloud calls through the signed-in Studio session, consult https://create.roblox.com/docs/en-us/studio/mcp-open-cloud and inspect the live tool schema and permissions. This does not grant arbitrary API access or require pasting an API key into prompts.

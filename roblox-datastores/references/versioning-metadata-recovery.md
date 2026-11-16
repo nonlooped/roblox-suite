@@ -147,3 +147,11 @@ Permissions (group experiences): View Data Stores, Edit Data Stores, Delete Data
 - For very large experiences, combine versioning with the Batch Processor / Open Cloud for bulk recovery or inspection when the Manager becomes impractical (experiences with >100 data stores may hide some aggregate numbers).
 
 Versioning is an important recovery tool. Use `ListVersionsAsync`, `GetVersionAsync`, `GetVersionAtTimeAsync`, the Manager UI, and snapshots proactively rather than only after a disaster; restore by writing a new current version.
+
+## Deletion and backend caches
+
+> November 2026 clarification: experimental pending a second human review.
+
+Scheduling a data store for permanent deletion does not immediately stop every read and write. Backend caches can allow reads for up to 24 hours and writes for several minutes. Do not use deletion as an immediate access-control mechanism or treat a successful read as proof that deletion was canceled.
+
+Source: https://create.roblox.com/docs/en-us/cloud-services/data-stores/data-stores-manager#delete-data-stores-and-keys
