@@ -6,7 +6,7 @@
 
 - Migrated reserved-server examples to server-generated GUIDs and `TeleportOptions.ReservedServerId`; documented VIP routing, destination results, legacy migration, and Studio teleport testing limits.
 - Kept atomic allocation and ambiguous-write reconciliation in TeleportHelper, isolated GUID records in a v3 store, and added regression coverage for legacy-record rejection and expiry. Drain legacy sessions before adopting the new helper.
-- Updated Studio MCP tools, place saving, cross-place playtests, and Script Sync team-workflow guidance.
+- Updated Studio MCP tools, place saving, cross-place playtests, and Script Sync team-workflow guidance. Replaced the broken Skills CLI documentation link with its current official reference.
 - Added Studio purchase-mock limits, DataStore deletion cache timing, and MemoryStore quota-recovery cautions.
 - Critical guidance changes and the migrated helper are experimental pending a second human review and Roblox integration tests.
 

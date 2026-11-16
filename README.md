@@ -38,7 +38,7 @@ npx skills remove roblox-datastores   # remove one skill
 npx skills remove --all               # remove all installed skills; follow the CLI confirmation prompts
 ```
 
-Use `--agent` to target an agent and `--global` for a global installation. See the [CLI options](https://vercel-labs-skills.mintlify.app/api/cli-options) for supported targets.
+Use `--agent` to target an agent and `--global` for a global installation. See the [CLI options](https://github.com/vercel-labs/skills/blob/main/docs/commands.md) for supported targets.
 
 If your agent cannot find the skills, run `npx skills list` and check the installation scope and agent target. Restart the agent to reload its skill files. Run `npx skills update` before reporting stale guidance.
 

@@ -29,7 +29,7 @@ Matched changed upstream files against Creator Docs URLs in the suite's skill an
 - Clean `npm ci` and `npm test`: content validation, Astro checks, build, and all 16 generated skill routes pass.
 - Formatting, Selene, Rojo fixture build/sourcemap, and luau-lsp analysis pass for all Luau examples and fixtures with the updated pins and definitions.
 - Allocation fixture runs in Luau 0.747 with service stubs for module initialization: concurrent winner reuse, expiry replacement (including exact expiry), and rejection of legacy access-code records pass. This does not test Roblox service behavior.
-- typos 1.52.2 passes. GitHub CI supplies the external Markdown link check.
+- typos 1.52.2 passes. GitHub CI caught a retired Skills CLI documentation URL in README; replaced it with the official repository CLI reference and reran validation. Production smoke also passed for 20 routes.
 - No signed-in Studio or production teleport integration was run. The helper remains experimental; no script was promoted to tested.
 - Critical guidance changes (teleport routing/testing, deletion, MemoryStore recovery, and purchase testing) are explicitly experimental pending the second human reviewer required by REVIEW_POLICY.md. Prior experimental guidance remains experimental.
 - Full OpenAPI schema review, uncited engine APIs, new Device Trust implementation, new Rojo tutorials, and character-controller APIs are outside this drift review. Their existence is not a claim that the suite now covers them.
