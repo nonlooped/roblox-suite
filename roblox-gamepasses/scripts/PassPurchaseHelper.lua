@@ -1,7 +1,7 @@
 --!strict
 -- Status: experimental
--- Last verified: 2026-06-17
--- Test coverage: no automated coverage
+-- Last verified: 2026-11-20
+-- Test coverage: mocked ownership and prompt flow; no Studio integration coverage
 -- Intended use: example; adapt and test before production.
 
 --[[
@@ -13,6 +13,7 @@ local PassHelper = require(...)
 local helper = PassHelper.new(PASS_ID)
 helper:connectButton(myBuyButton)
 helper:refreshState()
+The helper checks purchase status for display; never use it to authorize perks.
 ]]
 
 local MarketplaceService = game:GetService("MarketplaceService")
@@ -33,7 +34,6 @@ export type PassPurchaseHelper = typeof(setmetatable(
     {} :: {
         passID: number,
         _player: Player?,
-        _owns: boolean,
         _button: TextButton?,
         _activatedConnection: RBXScriptConnection?,
         _promptFinishedConnection: RBXScriptConnection?,
@@ -52,7 +52,6 @@ function PassPurchaseHelper.new(passID: number): PassPurchaseHelper
     local self = setmetatable({
         passID = passID,
         _player = Players.LocalPlayer,
-        _owns = false,
         _button = nil :: TextButton?,
         _activatedConnection = nil :: RBXScriptConnection?,
         _promptFinishedConnection = nil :: RBXScriptConnection?,
@@ -61,8 +60,7 @@ function PassPurchaseHelper.new(passID: number): PassPurchaseHelper
     self._promptFinishedConnection = MarketplaceService.PromptGamePassPurchaseFinished:Connect(
         function(player: Player, purchasedPassID: number, purchaseSuccess: boolean)
             if player == self._player and purchaseSuccess and purchasedPassID == self.passID then
-                self._owns = true
-                self:_updateButton("Owned", false)
+                self:refreshState()
             end
         end
     )
@@ -110,13 +108,15 @@ function PassPurchaseHelper:checkOwnership(): (boolean, boolean?, string?)
         return false, nil, "LocalPlayer not available"
     end
     local success, result = pcall(function()
-        return MarketplaceService:UserOwnsGamePassAsync(player.UserId, self.passID)
+        return MarketplaceService:GetPassOwnershipAsync(player, self.passID)
     end)
-    if success then
-        self._owns = result :: boolean
-        return true, result :: boolean, nil
+    if not success then
+        return false, nil, tostring(result)
     end
-    return false, nil, tostring(result)
+    if type(result) ~= "table" or type(result.Owned) ~= "boolean" then
+        return false, nil, "Invalid pass ownership response"
+    end
+    return true, result.Owned, nil
 end
 
 function PassPurchaseHelper:promptPurchase(): (boolean, string?)

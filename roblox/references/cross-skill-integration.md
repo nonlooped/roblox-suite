@@ -8,8 +8,8 @@ last_reviewed: 2026-06-17
 ## Data + client-server + monetization
 
 - Client prompts purchase (roblox-gamepasses skill).
-- Server receives `PromptGamePassPurchaseFinished`, validates, grants perks, and immediately saves ownership + perks via your data manager (roblox-datastores skill).
-- On every PlayerAdded, re-verify with `UserOwnsGamePassAsync` (monetization) and load profile (data), then apply benefits.
+- The server rechecks paid ownership after `PromptGamePassPurchaseFinished` and on join before any permanent purchase bonus. If you save a one-time bonus, record it atomically with its deduplication marker (roblox-datastores skill).
+- Recheck active access when a perk is used. Do not save trial benefits or use a saved ownership flag as authorization. See [pass granting](../../roblox-gamepasses/references/purchase-flow-and-granting.md).
 - All sensitive Remotes that touch money or perks go through validation + rate limiting (roblox-networking skill).
 
 ## Animation + particles + UI

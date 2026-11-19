@@ -19,7 +19,7 @@ last_reviewed: 2026-06-17
 ## Visual appearance
 
 - **Texture**: The image each particle uses. PNG with transparency is ideal. For grayscale textures, set LightEmission = 1 to make dark areas invisible.
-- **Color**: ColorSequence. Even a constant Color3 in Studio is stored as a one-keypoint ColorSequence. Keypoints define the gradient over particle lifetime.
+- **Color**: ColorSequence. Use a constant color or a ColorSequence gradient over the particle lifetime.
 - **Size**: NumberSequence. Use envelopes (the pink lines in the sequence editor) for per-particle random variation.
 - **Transparency**: Use a NumberSequence to fade particles toward the end of life, and optionally at birth, to prevent popping.
 - **Squash**: NumberSequence for non-uniform scaling (positive = tall & skinny, negative = wide & flat). Useful for stylized effects.

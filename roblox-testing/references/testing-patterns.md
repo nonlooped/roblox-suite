@@ -60,18 +60,11 @@ For tests that return a Promise, TestEZ waits for resolution. See TestEZ documen
 - **Unit tests** run fast and don't need a running game.
 - **Integration tests** require services, instances, or network state. Run them in Studio play mode.
 
-## TestService (legacy)
+## In-playtest tests with TestService
 
-`TestService:Error(msg)` marks a test failure visibly in Studio output. It is useful for simple in-Studio checks, but new projects should prefer TestEZ.
+Roblox documents [TestService](https://create.roblox.com/docs/en-us/reference/engine/classes/TestService) for Studio playtests and Team Test servers, not Edit mode or live servers. Check `TestService.Enabled` before calling the API. Use `RegisterTest()` or `RegisterSuite()` to register callbacks, then `RunTestsAsync()` and check the returned `TestRunResult.Status` against `Enum.TestRunStatus.Pass`. In callbacks, `TestCase:Check()` records a failed comparison and continues; `TestCase:Require()` stops that test on failure.
 
-```lua
-local TestService = game:GetService("TestService")
-
-local ok, err = pcall(someTest)
-if not ok then
-    TestService:Error(err)
-end
-```
+The current reference no longer lists legacy `TestService:Error()` as a test API. Keep existing TestEZ suites or the standalone runner until you've validated a migration in your Studio build.
 
 ## Running tests
 

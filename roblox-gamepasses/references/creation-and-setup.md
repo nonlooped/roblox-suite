@@ -28,6 +28,7 @@ This ID (a number like 1234567890) is what you use in all `MarketplaceService` c
 - `GetProductInfoAsync(id, Enum.InfoType.GamePass)` (preferred; the non-async `GetProductInfo` still exists but `GetProductInfoAsync` is recommended)
 - `PromptGamePassPurchase(player, id)`
 - `UserOwnsGamePassAsync(userId, id)`
+- `GetPassOwnershipAsync(player, id)` (`Owned` for paid ownership, `Active` for access)
 
 ## Enabling sales (external / game page store)
 
@@ -61,79 +62,12 @@ When publishing the animation or pass:
 - If a backend API used in Studio requires it, enable **Studio Access to API Services** only for a dedicated test experience. Do not grant Studio sessions access to production data.
 - Create a separate test experience/universe that mirrors your production one.
 - Test the full flow: prompt → purchase (use small test Robux if possible, or Roblox test accounts).
-- Verify `UserOwnsGamePassAsync` returns true after purchase on new servers.
-- Test re-join behavior.
+- Check `GetPassOwnershipAsync(...).Owned` after purchase on a new server, and test that a trial never grants a permanent reward.
+- Follow the [purchase flow test cases](purchase-flow-and-granting.md#test-on-a-dedicated-experience).
 
-## Initial Script skeleton (before full flow)
+## Server setup
 
-Place in ServerScriptService:
-
-```lua
-local MarketplaceService = game:GetService("MarketplaceService")
-local Players = game:GetService("Players")
-
-local PASS_ID = 1234567890  -- Replace with your pass ID
-local granted = {} -- idempotency guard: granted[player][passID]
-
-local function grantPassBenefits(player: Player, passID: number)
-    if not player or not player:IsDescendantOf(Players) then
-        return
-    end
-    local playerGranted = granted[player]
-    if not playerGranted then
-        playerGranted = {}
-        granted[player] = playerGranted
-    end
-    if playerGranted[passID] then
-        return
-    end
-    playerGranted[passID] = true
-
-    -- Apply permanent benefit here
-    -- e.g. player:SetAttribute("HasVIP", true)
-    -- or save to DataStore via your data manager
-end
-
--- Server grant handler
-MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player: Player, passID: number, wasPurchased: boolean)
-    -- This event also fires on the client; never grant benefits from the client copy.
-    if not player or typeof(passID) ~= "number" then
-        return
-    end
-    if wasPurchased and passID == PASS_ID then
-        local ok, err = pcall(function()
-            grantPassBenefits(player, PASS_ID)
-        end)
-        if not ok then
-            warn("Failed to grant pass benefits:", err)
-        end
-    end
-end)
-
--- Re-apply on join
-Players.PlayerAdded:Connect(function(player: Player)
-    local owns = false
-    local ok, err = pcall(function()
-        owns = MarketplaceService:UserOwnsGamePassAsync(player.UserId, PASS_ID)
-    end)
-    if ok and owns then
-        local grantOk, grantErr = pcall(function()
-            grantPassBenefits(player, PASS_ID)
-        end)
-        if not grantOk then
-            warn("Failed to apply owned pass benefits:", grantErr)
-        end
-    elseif not ok then
-        warn("Failed to check gamepass ownership for", player.Name, err)
-    end
-end)
-
-Players.PlayerRemoving:Connect(function(player: Player)
-    granted[player] = nil
-end)
-```
-
-See the purchase-flow reference for the complete client prompting code and error handling.
+Use the [server grant pattern](purchase-flow-and-granting.md#verify-before-granting) in ServerScriptService.
 
 ## Common setup mistakes
 

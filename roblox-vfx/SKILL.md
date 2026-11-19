@@ -10,7 +10,7 @@ last_reviewed: 2026-06-17
 
 Tune particle lifetime, size, transparency, and rate together. Profile overlapping transparent effects on the lowest target device.
 
-For marker-triggered bursts, read [roblox-animation](../roblox-animation/SKILL.md). For UI particles, read [roblox-user-interfaces](../roblox-user-interfaces/SKILL.md); ParticleEmitters do not render inside ViewportFrame.
+For marker-triggered bursts, read [roblox-animation](../roblox-animation/SKILL.md). For native beta or scripted UI particles, read [roblox-user-interfaces](../roblox-user-interfaces/SKILL.md); ParticleEmitters do not render inside ViewportFrame.
 
 ## Core creation and parenting
 
@@ -21,7 +21,7 @@ For marker-triggered bursts, read [roblox-animation](../roblox-animation/SKILL.m
 ## Tune particle appearance
 
 1. Texture (prefer .png with alpha; grayscale + LightEmission=1 to hide dark areas).
-2. Color (ColorSequence; even a single Color3 in Studio is stored as a one-keypoint ColorSequence; use it for gradients over lifetime).
+2. Color (use a constant color or a ColorSequence gradient over the particle lifetime).
 3. Size (NumberSequence, often with envelope for natural variation). **Warning:** Large sizes = high GPU fill-rate cost.
 4. Transparency (NumberSequence). Fade particles in or out to avoid popping.
 5. Lifetime (or NumberRange for per-particle random).

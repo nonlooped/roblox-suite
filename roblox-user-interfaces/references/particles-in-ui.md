@@ -5,7 +5,11 @@ last_reviewed: 2026-06-17
 
 # Particles and effects inside UI
 
-Direct `ParticleEmitter` instances live in the 3D world (parented to BasePart or Attachment) and do not render inside ScreenGui hierarchies. This file covers the practical techniques used in real high-quality Roblox experiences to achieve particle-like, VFX, or animated visual effects *within* 2D UI.
+The 3D `ParticleEmitter` belongs under a BasePart or Attachment. It does not render in GUI hierarchies or inside a ViewportFrame's 3D scene.
+
+## Native UI particles (beta)
+
+Enable **UI Particles** in Studio Beta Features. Parent a [ParticleEmitter2D](https://create.roblox.com/docs/en-us/ui/2D-particle-emitters) to a `GuiObject` in a `ScreenGui`, `SurfaceGui`, or `BillboardGui`. Set `Enabled` and `Rate` for continuous effects, or call `Emit()` for a burst. `Size` is an offset-unit sequence; each value is half the rendered particle size. Test on target clients before relying on the beta. If it is unavailable, use the scripted pool below.
 
 ## Technique 1: scripted 2D particle pools (most common for HUD/rewards)
 

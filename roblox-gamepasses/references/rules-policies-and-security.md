@@ -44,20 +44,14 @@ Do not apply a blanket "API Services required" rule to all `MarketplaceService` 
 ## Security rules (critical)
 
 1. **Prompt on client only.** Never call `PromptGamePassPurchase` from the server in response to untrusted client input.
-2. **Grant on server only.** The `PromptGamePassPurchaseFinished` handler (and `PlayerAdded` re-check) are the only places that should mutate player state based on pass ownership.
-3. **Always re-verify.** Even after a successful purchase event, call `UserOwnsGamePassAsync` on the next join. Do not cache the "just purchased" state forever.
+2. **Grant on the server.** Treat `PromptGamePassPurchaseFinished` as a signal to recheck. A trial can report success.
+3. **Verify the right state.** Use `UserOwnsGamePassAsync` at the point of access and confirm `GetPassOwnershipAsync(...).Owned` before any permanent award. See the [experimental free-trial guidance](purchase-flow-and-granting.md).
 4. **pcall everything.** Marketplace calls can fail due to network, throttling, or player actions.
 5. **Do not trust client signals.** A RemoteEvent saying "I just bought the pass" must be ignored for granting purposes.
 
 ## Data persistence integration
 
-When a player owns a pass, you typically want to:
-- Apply runtime benefits (attributes, speed multipliers, access flags)
-- Persist the ownership or derived perks in your DataStore profile
-
-Recommended: Treat `UserOwnsGamePassAsync` as the source of truth on load. Use your DataStore only for additional pass-related custom data (e.g. "unlocked skin variants for this pass").
-
-See roblox-datastores skill for proper loading/saving patterns around this.
+Treat pass access as runtime state. Never persist active access or trial perks. A deliberate one-time bonus needs a separate idempotent grant record after verified paid ownership; the record is not proof of current access. See the [server grant pattern](purchase-flow-and-granting.md#verify-before-granting) and roblox-datastores for persistence.
 
 ## Right to be forgotten (RTBF)
 

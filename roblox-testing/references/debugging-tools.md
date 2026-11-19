@@ -38,7 +38,9 @@ Toggle Client/Server to see which side produced output.
 
 ## Output window
 
-Studio-only output. Shows print/warn/error from edit-mode scripts.
+Studio **Output** shows print, warn, and error messages. During [Team Test](https://create.roblox.com/docs/en-us/studio/testing-modes#collaborator-logs), choose collaborators under **Sources** in the context filter and use **Remote Client** to show or hide their output. The **Sources** list contains clients, not the server; sharing stops when a collaborator leaves.
+
+On a Team Test participant's client, [`LogService:GetLogHistoryAsync(user)`](https://create.roblox.com/docs/en-us/reference/engine/classes/LogService#GetLogHistoryAsync) fetches up to 512 recent entries. Pass the collaborator's `Player.User` or `User.fromId(0)` for the server. Wrap it in `pcall`; it yields, can fail, and isn't available in solo playtests or production.
 
 ## MicroProfiler
 

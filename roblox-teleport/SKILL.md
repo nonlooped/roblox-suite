@@ -6,7 +6,7 @@ last_reviewed: 2026-11-16
 
 # roblox-teleport
 
-> The November 2026 GUID routing migration is experimental pending a second human review and Studio integration tests. Existing v2 access-code records are not migrated; drain active sessions before adopting the helper's separate v3 store.
+> The November 2026 GUID routing migration is experimental pending a second human review and Studio integration tests. The public-routing and VIP purchase notes are experimental pending a second human review and published-experience verification. Existing v2 access-code records are not migrated; drain active sessions before adopting the helper's separate v3 store.
 
 **Official sources:**
 - https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportService
@@ -69,7 +69,7 @@ end
 
 ### Conflicting TeleportOptions
 
-Set at most one routing field: `ServerInstanceId`, `ReservedServerId`, `VipServerId`, or either legacy field (`ReservedServerAccessCode`, `ShouldReserveServer`). Combining them errors.
+Set at most one routing field: `ServerInstanceId`, `ReservedServerId`, `VipServerId`, `ForcePublicServer` (when true), or either legacy field (`ReservedServerAccessCode`, `ShouldReserveServer`). Combining them errors.
 
 ## TeleportOptions
 
@@ -78,6 +78,7 @@ Set at most one routing field: `ServerInstanceId`, `ReservedServerId`, `VipServe
 | `ServerInstanceId` | Target a specific server by `JobId`. |
 | `ReservedServerId` | A server-generated GUID; first use creates a reserved server, reuse targets the same destination. |
 | `VipServerId` | Target a player-purchased VIP server by its `PrivateServerId`, within that VIP server's experience. |
+| `ForcePublicServer` (bool) | Force a public destination for this teleport instead of letting the engine infer a VIP return. |
 | `SetTeleportData(data)` / `GetTeleportData()` | Pass non-sensitive hints to the destination. |
 
 Legacy `ReservedServerAccessCode` and `ShouldReserveServer` are deprecated. Replace `ReserveServerAsync` with `HttpService:GenerateGUID(false)` for new work. Existing access-code servers remain compatible; do not reinterpret stored access codes as new IDs.
@@ -92,7 +93,9 @@ Wrap `TeleportAsync` in `pcall` and handle `TeleportInitFailed` for failures aft
 
 Generate a GUID on the server, atomically publish it with `UpdateAsync`, and use the winning `ReservedServerId` for every member of a match. See [matchmaking](references/matchmaking.md) and the experimental helper for allocation races and ambiguous writes.
 
-For VIP servers, set `VipServerId` to the target VIP server's `PrivateServerId`. Carry the origin VIP ID separately when returning from a reserved match; the match's own `PrivateServerId` is not the origin VIP ID. Validate requests server-side. Leaving routing unset lets the engine choose a public server or a VIP server the player has recent context for.
+For VIP servers, set `VipServerId` to the target VIP server's `PrivateServerId`. Carry the origin VIP ID separately when returning from a reserved match; the match's own `PrivateServerId` is not the origin VIP ID. Validate requests server-side. With no routing field set, a single-player teleport can infer a return to a VIP server the player originally joined. `ForcePublicServer = true` bypasses that inference for this teleport only; it defaults to `false` and does not clear VIP context for later teleports.
+
+For a purchase prompt, [`MarketplaceService:PromptVIPServerPurchase(player)`](https://create.roblox.com/docs/en-us/reference/engine/classes/MarketplaceService#PromptVIPServerPurchase) prompts for a VIP server in the current experience. It returns immediately without a purchase result and does not route anyone. Verify availability in a published test experience.
 
 In production, a reserved server has `game.PrivateServerId ~= ""` and `game.PrivateServerOwnerId == 0`. Its ID stays constant across restarts; `JobId` identifies one running instance. Cross-play settings can split players across instances sharing a private server ID.
 

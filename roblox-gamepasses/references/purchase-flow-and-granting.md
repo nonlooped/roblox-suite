@@ -1,179 +1,58 @@
 ---
 read_when: "Implement pass purchase prompts, ownership checks, and server grants"
-last_reviewed: 2026-06-17
+last_reviewed: 2026-11-20
 ---
 
 # Purchase flow and server granting
 
-## Full recommended flow
+> Experimental pending a second human review and Studio integration tests. Roblox documents free trials for enabled passes starting December 2, 2026. New passes have trials off by default.
 
-### Client side (prompting and UI state)
+Sources: [Passes and free trials](https://create.roblox.com/docs/en-us/production/monetization/passes#free-trials), [MarketplaceService](https://create.roblox.com/docs/en-us/reference/engine/classes/MarketplaceService).
 
-```lua
-local MarketplaceService = game:GetService("MarketplaceService")
-local Players = game:GetService("Players")
+## Decide whether you need access or ownership
 
-local player = Players.LocalPlayer
-local PASS_ID = 1234567890  -- Replace with your pass ID
+| Decision | Server check |
+| --- | --- |
+| Can the player use a VIP area, tool, or ability now? | `UserOwnsGamePassAsync(player.UserId, passId)` is true for an owner or an active trial. Recheck on use, including after respawn. |
+| Can this player get a permanent one-time purchase bonus? | `GetPassOwnershipAsync(player, passId)` must succeed and return `Owned == true`. |
 
-local function getProductInfoAsync()
-    local success, productInfo = pcall(function()
-        return MarketplaceService:GetProductInfoAsync(PASS_ID, Enum.InfoType.GamePass)
-    end)
-    if success then
-        return productInfo
-    end
-    warn("Failed to get product info:", productInfo)
-    return nil
-end
+`GetPassOwnershipAsync` also returns `Active` for current access, plus `StartTime` and `EndTime` during a trial. On the client it can only query the local player. Use `Owned` in the shop so trial players can still buy. Prompt with `PromptGamePassPurchase(player, passId)`; never grant from client UI or a Remote claiming a purchase succeeded.
 
-local function updatePassButton(button)
-    local success, owns = pcall(function()
-        return MarketplaceService:UserOwnsGamePassAsync(player.UserId, PASS_ID)
-    end)
-    
-    if success then
-        if owns then
-            button.Text = "Owned"
-            button.Active = false
-        else
-            button.Text = "Buy Pass"
-            button.Active = true
-        end
-    else
-        button.Text = "Check Failed"
-    end
-end
+## Verify before granting
 
--- Example button connection
-local buyButton = script.Parent
-buyButton.Activated:Connect(function()
-    local success, owns = pcall(function()
-        return MarketplaceService:UserOwnsGamePassAsync(player.UserId, PASS_ID)
-    end)
-    
-    if success and not owns then
-        local promptOk, promptErr = pcall(function()
-            MarketplaceService:PromptGamePassPurchase(player, PASS_ID)
-        end)
-        if not promptOk then
-            warn("Failed to prompt purchase:", promptErr)
-        end
-    elseif success and owns then
-        -- Already owns
-    else
-        warn("Ownership check failed")
-    end
-end)
-
--- Optional: refresh state after purchase finished (via Remote or on re-join)
-```
-
-### Server side (authoritative granting)
-
-The critical part. **Important:** `PromptGamePassPurchaseFinished` fires on both the client and the server. You must grant benefits only in the server handler; the client copy is for UI updates only.
+`PromptGamePassPurchaseFinished` can report success when a trial starts. Use the server event only as a cue to recheck, and check on join to catch purchases made elsewhere. A trial lasts for one game session and does not fire an expiry event. Check access where the benefit is used; do not save the pass flag or any trial-derived perk in a DataStore. Call the engine again on subsequent checks rather than keeping your own positive cache. The engine itself may take time to reflect an external purchase in the current session.
 
 ```lua
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
+local PASS_ID = 1234567890
 
-local PASS_ID = 1234567890  -- Replace with your pass ID
-local granted = {} -- idempotency guard: granted[player][passID]
-
-local function grantPassBenefits(player: Player, passID: number)
-    if not player or not player:IsDescendantOf(Players) then
+local function checkPermanentGrant(player: Player)
+    local ok, ownership = pcall(function()
+        return MarketplaceService:GetPassOwnershipAsync(player, PASS_ID)
+    end)
+    if not ok then
+        warn("Pass ownership check failed:", ownership)
         return
     end
-    local playerGranted = granted[player]
-    if not playerGranted then
-        playerGranted = {}
-        granted[player] = playerGranted
-    end
-    if playerGranted[passID] then
+    if player.Parent ~= Players or type(ownership) ~= "table" or ownership.Owned ~= true then
         return
     end
-    playerGranted[passID] = true
 
-    -- Apply the benefit. This must be server-only.
-    -- Examples:
-    -- player:SetAttribute("VIP", true)
-    -- YourDataManager:GrantPassPerks(player, PASS_ID)
-    -- Fire a RemoteEvent to client for visual unlock (but don't trust client to apply logic)
-
-    -- Persist if needed (cross-ref roblox-datastores skill)
+    -- If you offer a one-time purchase bonus, apply it here. Commit the
+    -- award and its deduplication marker in the same atomic profile write.
 end
 
--- Handle new purchases
-MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player: Player, purchasedID: number, wasPurchased: boolean)
-    if not player or typeof(purchasedID) ~= "number" then
-        return
+Players.PlayerAdded:Connect(checkPermanentGrant)
+MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, passId, success)
+    if passId == PASS_ID and success then
+        checkPermanentGrant(player)
     end
-    if wasPurchased and purchasedID == PASS_ID then
-        print(player.Name .. " successfully purchased the pass.")
-
-        local ok, err = pcall(function()
-            grantPassBenefits(player, PASS_ID)
-        end)
-        if not ok then
-            warn("Failed to grant pass benefits:", err)
-        end
-    end
-end)
-
--- Re-grant on every join (in case of data loss, new server, etc.)
-Players.PlayerAdded:Connect(function(player: Player)
-    local success, ownsPass = pcall(function()
-        return MarketplaceService:UserOwnsGamePassAsync(player.UserId, PASS_ID)
-    end)
-
-    if success and ownsPass then
-        local ok, err = pcall(function()
-            grantPassBenefits(player, PASS_ID)
-        end)
-        if not ok then
-            warn("Failed to apply owned pass benefits for", player.Name, err)
-        end
-    elseif not success then
-        warn("Gamepass ownership check failed for", player.Name)
-        -- Optionally retry later or fall back to cached data
-    end
-end)
-
-Players.PlayerRemoving:Connect(function(player: Player)
-    granted[player] = nil
 end)
 ```
 
-## Key rules for the flow
+Failure to verify is not a grant. Retry later rather than trusting a client signal or a prior entitlement. For developer products use `ProcessReceipt`, not this pattern.
 
-- `PromptGamePassPurchase` and initial `UserOwnsGamePassAsync` checks can be on the client for UX.
-- All actual granting of power/economy/items **must** happen on the server in the `PromptGamePassPurchaseFinished` event or the `PlayerAdded` re-check.
-- `PromptGamePassPurchaseFinished` fires on the client too; never grant benefits from the client copy.
-- Always wrap ownership and prompt calls in `pcall`.
-- `UserOwnsGamePassAsync` will return true for a freshly purchased pass when the player joins a new server after the purchase.
-- Do not rely solely on the purchase-finished event for players who bought the pass while offline or on another server.
-- Use an idempotency guard so benefits are not granted multiple times if the event fires more than once.
-- For developer products, `MarketplaceService.ProcessReceipt` can only be assigned **once** globally. The callback must return `Enum.ProductPurchaseDecision.PurchaseGranted` after successful fulfillment, or `Enum.ProductPurchaseDecision.NotProcessedYet` if fulfillment fails, because Roblox may redeliver the receipt until `PurchaseGranted` is returned.
+## Test on a dedicated experience
 
-## Handling purchase failures / edge cases
-
-- Network issues during prompt: the `PromptGamePassPurchaseFinished` may fire with `wasPurchased = false`.
-- Player cancels the prompt.
-- Insufficient Robux.
-- The pass is no longer for sale.
-
-In the finished handler, only act on `wasPurchased == true`.
-
-For UI, you can listen for the finished event on the client too (via a Remote from server) to update "Owned" state immediately without waiting for re-join.
-
-## Integration with data stores
-
-After granting in the server handler, immediately save the fact that this player owns the pass (or the specific perks) using your data persistence system.
-
-On load (PlayerAdded), prefer the `UserOwnsGamePassAsync` result as the source of truth, then merge with any local saved state.
-
-See roblox-datastores skill for safe profile loading patterns.
-
-## Scripts Folder example
-
-A simple client helper can live in scripts/PassPurchaseHelper.lua (adapt and require from your UI modules).
+Test trial start, access while active, expiry with no lingering benefit, purchase during a trial, and repeat delivery/rejoin without duplicate bonuses. Studio playtest trials last one hour; verify the relevant live paths in a published test experience before relying on them.

@@ -11,6 +11,8 @@ last_reviewed: 2026-06-17
 
 A "rig" is a model whose parts or bones are connected in a hierarchy that the animation system can drive (historically Motor6D joints, now also AnimationConstraint + Bones).
 
+For an experience-wide rig change, follow Roblox's [R6-only to R15-only migration checklist](https://create.roblox.com/docs/en-us/characters/r6-only-to-r15-only). Test custom animations and character scripts before switching the avatar setting.
+
 Roblox provides:
 - R15 / Rthro standard characters: Rthro uses the R15 skeleton with modified proportions, so it remains compatible with catalog and default animations.
 - Rig Builder tool for quick test rigs.

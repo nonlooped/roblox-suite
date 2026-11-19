@@ -16,6 +16,7 @@ Audio effects are modular `Audio*` instances that non-destructively modify a str
 | `AudioEqualizer` | Volume control per frequency range | Muffle underwater, cut harsh highs |
 | `AudioCompressor` | Reduce dynamic range (lower peaks, raise floor) | Consistent VO volume; **ducking** (sidechain music under SFX) |
 | `AudioReverb` | Simulate sound bouncing off surfaces | Cave, hall, stadium ambience |
+| `AudioFDNReverb` | Feedback delay network reverb | Model room reflections on a wired audio stream |
 | `AudioChorus` | Overlay detuned copies for thickness | Robotic/futuristic vocals, ensemble feel |
 | `AudioDistortion` | Overdriven clipping "fuzziness" | Guitar intensity, grungy character |
 | `AudioEcho` | Delayed repeats with decaying volume | Canyons, hard-surface reflections |
@@ -136,6 +137,7 @@ end)
 - https://create.roblox.com/docs/en-us/reference/engine/classes/AudioEqualizer
 - https://create.roblox.com/docs/en-us/reference/engine/classes/AudioCompressor
 - https://create.roblox.com/docs/en-us/reference/engine/classes/AudioReverb
+- `AudioFDNReverb`: [Engine reference](https://create.roblox.com/docs/en-us/reference/engine/classes/AudioFDNReverb)
 - https://create.roblox.com/docs/en-us/reference/engine/classes/AudioFader
 - https://create.roblox.com/docs/en-us/reference/engine/classes/SoundService (`AcousticSimulationEnabled`, `AmbientReverb`)
 

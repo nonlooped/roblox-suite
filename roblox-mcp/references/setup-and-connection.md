@@ -82,6 +82,8 @@ cmd.exe /c %LOCALAPPDATA%\Roblox\mcp.bat
 /Applications/RobloxStudio.app/Contents/MacOS/StudioMCP
 ```
 
+If launching Studio itself from a macOS terminal, `RobloxStudio --background` keeps it from taking focus. This [Studio CLI flag](https://create.roblox.com/docs/en-us/studio/cli#launch-in-the-background) is Mac-only and does not apply to the `StudioMCP` bridge command.
+
 ## Client-specific hints
 
 **Cursor**

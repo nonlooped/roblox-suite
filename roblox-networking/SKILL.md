@@ -66,8 +66,8 @@ Script capabilities let you restrict what scripts are allowed to do at a granula
 ## Secure monetization and data flows (tie-in to other skills)
 
 - Prompt purchase on client.
-- For game passes: only grant benefits inside `PromptGamePassPurchaseFinished` when `wasPurchased == true`, and re-verify ownership with `UserOwnsGamePassAsync` on `PlayerAdded`.
-- For developer products and subscriptions: validate and grant benefits only inside the server-side `ProcessReceipt` callback.
+- For passes, verify access on the server at the point of use. A successful `PromptGamePassPurchaseFinished` can start a trial; verify paid ownership before a permanent award. See [pass granting](../roblox-gamepasses/references/purchase-flow-and-granting.md).
+- For developer products, fulfill through the server's `ProcessReceipt` callback. For subscriptions, use `GetUserSubscriptionStatusAsync` on the server and recheck when `Players.UserSubscriptionStatusChanged` fires. See [subscription handling](../roblox-gamepasses/references/subscriptions.md).
 - DataStore writes only from server Scripts.
 - Any client Remote that says "I bought X, give me the item" must be ignored or treated as a hint and re-validated on the server.
 

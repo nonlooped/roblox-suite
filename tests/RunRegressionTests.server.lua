@@ -1,7 +1,6 @@
 --!strict
 -- Controlled Studio fixture. Run in a dedicated published test experience.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TestService = game:GetService("TestService")
 
 local suite = ReplicatedStorage:WaitForChild("RobloxSuite")
 local specs = {
@@ -27,7 +26,7 @@ for _, spec in specs do
         print(`[PASS] {spec.Name}`)
     else
         failures += 1
-        TestService:Error(`[FAIL] {spec.Name}: {tostring(testOrError)}`)
+        warn(`[FAIL] {spec.Name}: {tostring(testOrError)}`)
     end
 end
 

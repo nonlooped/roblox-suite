@@ -97,7 +97,7 @@
         "status": "none",
         "files": []
       },
-      "last_changed_at": "2026-09-19"
+      "last_changed_at": "2026-11-20"
     },
     {
       "slug": "roblox-core",
@@ -191,7 +191,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-09-19"
+      "last_changed_at": "2026-11-20"
     },
     {
       "slug": "roblox-datastores",
@@ -247,7 +247,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-11-16"
+      "last_changed_at": "2026-11-20"
     },
     {
       "slug": "roblox-user-interfaces",
@@ -258,9 +258,9 @@
       "covers": [
         "Every GUI container (ScreenGui, SurfaceGui, BillboardGui) and building block.",
         "Scale + offset responsive layouts tested across target screen sizes.",
-        "Particles-in-UI techniques, and the truth that 3D ParticleEmitters don't render in ViewportFrame."
+        "Native beta and scripted 2D particles; 3D emitters do not render in ViewportFrame."
       ],
-      "cover_sources": [[1, 2], [2], [3]],
+      "cover_sources": [[1, 2], [2], [3, 5]],
       "sources": [
         {
           "label": "In-experience containers",
@@ -281,6 +281,11 @@
           "label": "UIGradient",
           "url": "https://create.roblox.com/docs/reference/engine/classes/UIGradient",
           "verified_at": "2026-09-19"
+        },
+        {
+          "label": "2D particle emitters (beta)",
+          "url": "https://create.roblox.com/docs/en-us/ui/2D-particle-emitters",
+          "verified_at": "2026-11-20"
         }
       ],
       "risk": "lower",
@@ -294,7 +299,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-09-19"
+      "last_changed_at": "2026-11-20"
     },
     {
       "slug": "roblox-animation",
@@ -349,7 +354,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-09-19"
+      "last_changed_at": "2026-11-20"
     },
     {
       "slug": "roblox-vfx",
@@ -386,7 +391,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-09-19"
+      "last_changed_at": "2026-11-20"
     },
     {
       "slug": "roblox-audio",
@@ -433,7 +438,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-09-19"
+      "last_changed_at": "2026-11-20"
     },
     {
       "slug": "roblox-gamepasses",
@@ -443,7 +448,7 @@
       "overview": "Prompt purchases, verify ownership, and grant benefits on the server. Includes receipt handling, subscriptions, and dated policy guidance.",
       "covers": [
         "Game passes, developer products (`ProcessReceipt`), and subscriptions.",
-        "Server-authoritative granting with idempotency guards and `PlayerAdded` re-verification.",
+        "Server-authoritative pass granting: separate trial access from paid ownership.",
         "Policy changes, including cross-experience sales restrictions and the move to Creator Rewards."
       ],
       "cover_sources": [[1], [1], [2, 3]],
@@ -451,7 +456,7 @@
         {
           "label": "Passes (monetization)",
           "url": "https://create.roblox.com/docs/en-us/production/monetization/passes",
-          "verified_at": "2026-10-17"
+          "verified_at": "2026-11-20"
         },
         {
           "label": "Creator Rewards",
@@ -475,7 +480,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-11-16"
+      "last_changed_at": "2026-11-20"
     },
     {
       "slug": "roblox-open-cloud",
@@ -542,7 +547,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-10-17"
+      "last_changed_at": "2026-11-20"
     },
     {
       "slug": "roblox-teleport",
@@ -570,7 +575,7 @@
         {
           "label": "TeleportOptions",
           "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/TeleportOptions",
-          "verified_at": "2026-11-16"
+          "verified_at": "2026-11-20"
         },
         {
           "label": "TeleportAsyncResult",
@@ -589,7 +594,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-11-16"
+      "last_changed_at": "2026-11-20"
     },
     {
       "slug": "roblox-rojo",
@@ -682,7 +687,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-11-16"
+      "last_changed_at": "2026-11-20"
     },
     {
       "slug": "roblox-physics",
@@ -810,11 +815,11 @@
       "displayTitle": "Roblox testing: Developer Console, MicroProfiler, TestEZ",
       "overview": "Reproduce failures, inspect runtime state, and profile CPU, GPU, and memory costs with Roblox debugging tools.",
       "covers": [
-        "Developer Console, Output discipline, and pcall/assert patterns.",
+        "Developer Console, Team Test collaborator logs, and Output discipline.",
         "MicroProfiler, Scene Analysis, and the Script Profiler.",
-        "Unit-test patterns, memory diagnostics, and steps for isolating failures."
+        "TestEZ and Studio TestService patterns, memory diagnostics, and steps for isolating failures."
       ],
-      "cover_sources": [[3], [1, 2, 4], [3]],
+      "cover_sources": [[3, 6], [1, 2, 4], [3, 7]],
       "sources": [
         {
           "label": "MicroProfiler",
@@ -840,6 +845,16 @@
           "label": "Studio Network Simulator",
           "url": "https://create.roblox.com/docs/studio/network-simulator",
           "verified_at": "2026-09-19"
+        },
+        {
+          "label": "Studio testing modes",
+          "url": "https://create.roblox.com/docs/en-us/studio/testing-modes",
+          "verified_at": "2026-11-20"
+        },
+        {
+          "label": "TestService",
+          "url": "https://create.roblox.com/docs/en-us/reference/engine/classes/TestService",
+          "verified_at": "2026-11-20"
         }
       ],
       "risk": "medium",
@@ -861,7 +876,7 @@
           }
         ]
       },
-      "last_changed_at": "2026-09-19"
+      "last_changed_at": "2026-11-20"
     }
   ]
 }

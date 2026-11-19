@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.14.0 — 2026-11-20
+
+### Guidance and examples
+
+- Prepare for Roblox's December 2 game pass trials: verify paid ownership before permanent grants, recheck temporary access at the point of use, and let trial users buy from the shop. The updated client helper no longer treats a successful prompt as proof of purchase.
+- Document how to force a public teleport without clearing VIP context, and clarify the VIP purchase prompt and DataStore's 400-level JSON nesting limit.
+- Add Studio Team Test collaborator logs, native TestService guidance, and the macOS background launch flag. Document the native UI Particles beta alongside the scripted fallback, plus links for audio reverb and R6-to-R15 migration.
+- Correct experience notification payload nesting and clarify Open Cloud OAuth scope restrictions and sticky experiment enrollment.
+- The new critical guidance and pass helper are experimental pending a second human review and Roblox runtime validation.
+
+### Verification
+
+- Scope and dispositions are recorded in the [November 20 source-drift review](https://github.com/nonlooped/roblox-suite/blob/main/reviews/2026-11-20-source-drift.md) for [issue #77](https://github.com/nonlooped/roblox-suite/issues/77).
+- Site checks, Luau static checks, and the mocked pass-helper regression pass. Roblox Studio and production integration were not run.
+
 ## 1.13.0 — 2026-11-16
 
 ### Guidance and examples

@@ -7,6 +7,8 @@ last_reviewed: 2026-11-16
 
 > The November 2026 GUID routing migration is experimental pending a second human review and Studio integration tests.
 
+> The `ForcePublicServer` guidance is experimental pending a second human review and published-experience verification.
+
 > The September 2026 teleport value-type, GUI-reference, and arrival-confirmation corrections are experimental guidance pending a second human review. Test cross-place behavior in a published test experience.
 
 **Official sources:**
@@ -24,6 +26,7 @@ last_reviewed: 2026-11-16
 | `ServerInstanceId` | string | Target a running server by `JobId`. |
 | `ReservedServerId` | string | Server-generated GUID; first use creates a reserved server, reuse routes to it. |
 | `VipServerId` | string | Target a player-purchased VIP server by `PrivateServerId` in its owning experience. |
+| `ForcePublicServer` | bool | Force a public destination for this teleport instead of letting the engine infer a VIP return. |
 
 `ReservedServerAccessCode` and `ShouldReserveServer` are deprecated legacy fields. Use `HttpService:GenerateGUID(false)` and `ReservedServerId` for new work. Existing access-code servers continue to work; a stored legacy code is not a new GUID allocation.
 
@@ -36,7 +39,7 @@ last_reviewed: 2026-11-16
 
 ### Routing conflicts
 
-Set at most one of `ServerInstanceId`, `ReservedServerId`, `VipServerId`, `ReservedServerAccessCode`, or `ShouldReserveServer`. With none set, the engine can choose a public server or a VIP server the player recently joined.
+Set at most one of `ServerInstanceId`, `ReservedServerId`, `VipServerId`, `ForcePublicServer` (when true), `ReservedServerAccessCode`, or `ShouldReserveServer`. With no routing field set, a single-player teleport can infer a return to a VIP server the player originally joined. `ForcePublicServer = true` bypasses that inference for this teleport only; it defaults to `false` and does not clear VIP context for later teleports.
 
 ### Teleport data rules
 

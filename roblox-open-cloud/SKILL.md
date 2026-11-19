@@ -20,7 +20,7 @@ Three auth models, in order of preference:
 
 ### 1. API keys (recommended for most automation)
 
-All Open Cloud APIs accept an `x-api-key` header containing an API key string. Create keys on the [Creator Dashboard → API Keys](https://create.roblox.com/dashboard/credentials?activeTab=ApiKeysTab) page.
+For operations that support API-key authentication, send an `x-api-key` header containing an API key string. Create keys on the [Creator Dashboard → API Keys](https://create.roblox.com/dashboard/credentials?activeTab=ApiKeysTab) page.
 
 - A key's access is determined by the **permissions of the user who owns it**. It can reach any resource that user can, including their personal experiences and any group-owned experiences where they have the right role.
 - Some scopes can be restricted to specific experiences; not all.
@@ -70,7 +70,7 @@ Returns the key name, authorized user, scopes (with `userId`/`groupId`/`universe
 
 ## The endpoint map
 
-Base URL: `https://apis.roblox.com/cloud/v2/...` (plus a few `apis.roblox.com/<feature>/v1/...` legacy paths for assets). All v2 endpoints accept `x-api-key`.
+Base URL: `https://apis.roblox.com/cloud/v2/...` (plus a few `apis.roblox.com/<feature>/v1/...` legacy paths for assets). Use the authentication documented for each operation.
 
 ### Data and memory stores (the most-used surface)
 
@@ -123,14 +123,18 @@ Base URL: `https://apis.roblox.com/cloud/v2/...` (plus a few `apis.roblox.com/<f
 
 - `ListUserRestrictions`, `GetUserRestriction`, `UpdateUserRestriction` (place- and universe-scoped), `ListUserRestrictionLogs`.
 
+> The November 2026 Cloud notes below are experimental pending a second human review.
+
 ### Luau execution
 
 - `CreateLuauExecutionSessionTask` (run Luau against a universe/place from outside the engine; treat as privileged).
+- The [OpenAPI specification](https://github.com/Roblox/creator-docs/blob/2f1abb9e08fd42cba37cb0d69f5b303cc1432ee1/content/en-us/reference/cloud/openapi.json) marks the OAuth scopes for Luau execution and place-instance operations as first-party only. Check the current operation's supported credentials and scopes before designing around it; a scope name is not proof that a third-party OAuth app can request it.
 
 ### Notifications and configs
 
-- `CreateUserNotification` (send a notification to a user from outside the experience).
+- `CreateUserNotification`: for an [experience notification](https://create.roblox.com/docs/en-us/cloud/guides/experience-notifications#include-launch-and-analytics-data), put `join_experience` and `analytics_data` inside `payload`, not beside it. Keep `source` at the top level.
 - Configs (CreatorConfigs): `GetConfigRepositoryValues`, draft/publish/revision flow for live configuration.
+- [Targeted experiments](https://create.roblox.com/docs/en-us/production/experiments#per-session-evaluation) that start after November 17, 2026 use targeting to decide enrollment; enrolled players keep their assignment across sessions for the experiment. Experiments started on or before that date re-evaluate targeting per session.
 
 ### Creator store
 

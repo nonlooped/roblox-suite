@@ -56,7 +56,7 @@ High-level server flow (in a ModuleScript required by ServerScriptService script
    - Load with pcall + GetAsync (consider UseCache=false for critical fresh read after potential previous server issues).
    - Merge with defaults.
    - Store in a server-side table or profile object (e.g. `playerData[player.UserId] = data`).
-   - Apply any gamepass perks (cross-ref monetization skill) or other state.
+   - Recheck active pass access when applying runtime perks. Do not persist trial perks (see the monetization skill).
    - Optionally fire a Remote to client for initial UI sync (never trust client data).
 
 2. During play:
@@ -173,7 +173,7 @@ See references/versioning-metadata-recovery.md (covers listing/caching) and the 
 **On player join/load:**
 - [ ] Fresh load or cache-aware as appropriate
 - [ ] Merge defaults safely
-- [ ] Re-verify ownership on PlayerAdded (gamepasses, etc.) and re-apply any non-owned one-time consumable grants
+- [ ] Check live pass access when needed and keep one-time purchase grant records separate from entitlement.
 - [ ] Client sync only of non-sensitive derived state
 
 **Before publishing risky data-logic changes:**

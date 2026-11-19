@@ -11,7 +11,7 @@ Subscriptions offer users recurring benefits for a monthly fee. Unlike [passes](
 
 ## When to use subscriptions vs passes vs developer products
 
-- **Pass**: one-time permanent unlock (VIP, permanent item).
+- **Pass**: one-time purchase for ongoing access (VIP, permanent item).
 - **Developer Product**: repeatable/consumable (currency pack, potion, revive).
 - **Subscription**: recurring monthly benefit (monthly cosmetic bundle, ongoing XP boost, VIP-tier perks that should gate while unpaid).
 
@@ -199,7 +199,7 @@ end
 
 ## Replacing a pass with a subscription
 
-When migrating, existing pass holders must keep the benefit they paid for; take the pass off sale so new users buy the subscription. Subscription benefits can be revoked (pass benefits cannot), so if you previously persisted pass benefits to a DataStore you must "undo" them when the subscription lapses. Listen for both `PromptGamePassPurchaseFinished` (legacy) and `UserSubscriptionStatusChanged` (new).
+When migrating, existing pass holders must keep the benefit they paid for; take the pass off sale so new users buy the subscription. Recheck the correct entitlement before applying either benefit. Do not persist ongoing access; only preserve durable grants you intentionally awarded. Listen for both `PromptGamePassPurchaseFinished` (legacy) and `UserSubscriptionStatusChanged` (new).
 
 ## Security rules (critical)
 

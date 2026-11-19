@@ -70,7 +70,7 @@ Tabs:
 - **Script Profiler**: record script CPU usage.
 - **MicroProfiler**: capture server dumps.
 
-Toggle Client/Server views to see which side emitted output.
+Toggle Client/Server views to see which side emitted output. For collaborators' client output during Team Test, use [Studio Output](references/debugging-tools.md#output-window).
 
 ## Unit testing with TestEZ
 
@@ -95,7 +95,7 @@ end)
 TestEZ.TestBootstrap:run({ game.ReplicatedStorage.Tests })
 ```
 
-For legacy in-Studio tests, `TestService:Error(msg)` can mark failures visibly in Studio output, but most projects should prefer TestEZ. The scripts folder contains a minimal `TestRunner.lua` shim only for environments where TestEZ is unavailable.
+For Roblox's [in-playtest `TestService`](https://create.roblox.com/docs/en-us/reference/engine/classes/TestService), see the [testing patterns](references/testing-patterns.md#in-playtest-tests-with-testservice). Keep existing TestEZ tests unless you need engine-native playtest checks. `TestRunner.lua` is the suite's standalone fallback.
 
 ## Luau type checking
 
@@ -316,7 +316,7 @@ Run this from a `LocalScript` in `ReplicatedFirst`. It starts timing when `Repli
 
 ## Scripts
 
-- `scripts/TestRunner.lua`: a minimal TestEZ fallback with nested suites, lifecycle hooks, matchers, async support, and TestService integration.
+- `scripts/TestRunner.lua`: a minimal TestEZ fallback with nested suites, lifecycle hooks, matchers, async support, and optional legacy TestService reporting.
 - `scripts/Logger.lua`: a structured logger with level filtering and guarded formatting.
 - `scripts/DebugDraw.lua`: utility for drawing rays, points, and boxes in 3D for visual debugging.
 

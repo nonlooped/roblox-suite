@@ -173,6 +173,7 @@ When you see any *Throttled, back off. Check budget. Consider raising your serve
 
 **Server-side errors (returned inside some failures):**
 - DatastoreDeleted, DatastoreThrottled, InternalServerError, KeyThrottled, KeyNotFound, Invalid* various, etc.
+- `InvalidJson`: values deeper than 400 JSON levels are rejected. Reduce nesting before retrying; backoff will not fix the value.
 - "No pages to advance to" when calling AdvanceToNextPageAsync on the last page.
 
 **Metadata / attribute errors (5xx range in some listings):**

@@ -6,7 +6,7 @@ last_reviewed: 2026-10-21
 
 # roblox-user-interfaces
 
-Choose a GUI container for the display surface, then use layouts and constraints to handle screen sizes. For particles inside a ScreenGui, use 2D UI objects; ParticleEmitter does not render there.
+Choose a GUI container for the display surface, then use layouts and constraints to handle screen sizes. For UI particles, use the `ParticleEmitter2D` beta or a scripted 2D pool; a 3D `ParticleEmitter` does not render inside a ScreenGui.
 
 **Primary sources:**
 - https://create.roblox.com/docs/en-us/ui
@@ -82,6 +82,8 @@ See references/gui-containers.md for exhaustive property tables, common hierarch
 Control default Roblox UI with `StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)` etc. Hide virtual controls with `GuiService.TouchControlsEnabled = false` when you provide custom input.
 
 ## Particle effects in UI
+
+Use [native UI particles (beta)](references/particles-in-ui.md#native-ui-particles-beta) when the target Studio/client supports them. Keep the scripted pool as a fallback.
 
 Direct ParticleEmitter lives in the 3D world (parent to Part or Attachment). For 2D UI you have several excellent options:
 
