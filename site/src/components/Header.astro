@@ -1,52 +1,29 @@
 ---
+import Mark from "./Mark.astro";
+import Icon from "./Icon.astro";
 import { repoUrl } from "../data/catalog";
 
-const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const here = Astro.url.pathname;
-
-const links = [{ href: `${base}/skills/`, label: "Skills" }];
+const path = Astro.url.pathname;
+const onSkills = path.startsWith("/skills/");
+const onInstall = path.startsWith("/install/");
 ---
 
-<header class="sticky top-0 z-20 border-b border-ink bg-brand">
-  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-6 xs:gap-4">
-    <!--
-      Negative margin cancels the padding, so the mark still lines up with the
-      6-unit gutter while the link itself carries a full-height touch target.
-    -->
-    <a
-      href={`${base}/`}
-      class="-mx-1.5 flex min-h-11 items-center gap-2.5 whitespace-nowrap px-1.5 font-display text-base font-bold"
-    >
-      <!-- Hide the wordmark below the xs breakpoint to keep navigation and the Star action visible. -->
-      <span class="relative block size-6 shrink-0" aria-hidden="true">
-        <span class="absolute left-0 top-0 h-3 w-4.5 rounded-[3px] border-2 border-ink bg-paper"
-        ></span>
-        <span
-          class="absolute bottom-0 right-0 h-3 w-4.5 rounded-[3px] border-2 border-ink bg-toy-yellow"
-        ></span>
-      </span>
-      <span class="sr-only xs:not-sr-only">Roblox Suite</span>
+<header class="site-header">
+  <div class="island">
+    <a class="brand" href="/" aria-label="Roblox Suite">
+      <Mark />
+      <span class="wordmark" aria-hidden="true"><span class="wm-a">Roblox</span> <span class="wm-b">Suite</span></span>
     </a>
-
-    <nav class="flex items-center gap-0.5 xs:gap-2" aria-label="Main">
-      {
-        links.map((link) => (
-          <a
-            href={link.href}
-            aria-current={here.startsWith(link.href) ? "page" : undefined}
-            class="flex min-h-11 items-center px-2.5 text-small text-on-brand-muted transition-colors hover:text-on-brand aria-[current=page]:text-toy-yellow"
-          >
-            {link.label}
-          </a>
-        ))
-      }
-      <a
-        href={repoUrl}
-        rel="noopener"
-        class="panel-sm pressable ml-1.5 flex min-h-11 items-center bg-toy-yellow px-3.5 font-display text-small font-bold text-ink"
-      >
-        Star
-      </a>
-    </nav>
+    <div class="island-right">
+      <nav class="nav" aria-label="Main">
+        <span class="nav-pill" aria-hidden="true"></span>
+        <a href="/skills/" aria-current={onSkills ? "page" : undefined}>Skills</a>
+        <a class="nav-github" href={repoUrl}>
+          <Icon name="star" />
+          GitHub
+        </a>
+      </nav>
+      <a class="button button--install" href="/install/" aria-current={onInstall ? "page" : undefined}>Install</a>
+    </div>
   </div>
 </header>

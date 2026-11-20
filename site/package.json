@@ -1,6 +1,6 @@
 {
   "name": "roblox-suite-site",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,31 +13,13 @@
     "test": "npm run check:content && npm run check && npm run build && npm run check:dist"
   },
   "dependencies": {
-    "@astrojs/react": "^7.1.9",
     "@astrojs/sitemap": "^3.7.5",
-    "@fontsource-variable/hanken-grotesk": "^5.3.0",
-    "@fontsource-variable/jetbrains-mono": "^5.3.0",
-    "@fontsource-variable/unbounded": "^5.3.0",
-    "@tailwindcss/vite": "^4.3.5",
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "astro": "^7.4.12",
-    "clsx": "^2.1.1",
-    "lucide-react": "^1.73.0",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "tailwind-merge": "^3.7.0",
-    "tailwindcss": "^4.3.5"
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
+    "astro": "^7.4.12"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "typescript": "^6.0.3"
-  },
-  "allowScripts": {
-    "sharp@0.35.5": true,
-    "esbuild@0.28.2": true
-  },
-  "overrides": {
-    "sharp": "0.35.5"
   }
 }

@@ -1,0 +1,18 @@
+---
+import Glyph from "./Glyph.astro";
+import { glyphs } from "../data/plain";
+
+interface Props {
+  slug: string;
+  large?: boolean;
+  transition?: boolean;
+}
+
+const { slug, large = false, transition = true } = Astro.props;
+const rows = glyphs[slug];
+if (!rows) throw new Error(`src/data/plain.ts has no glyph for "${slug}"`);
+---
+
+<span class:list={["glyph-tile", { "glyph-tile--large": large }]} style={transition ? `view-transition-name:skill-${slug}` : undefined}>
+  <Glyph rows={rows} />
+</span>

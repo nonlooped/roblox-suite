@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.15.0 — 2026-11-20
+
+### Website
+
+- Rebuilt the website from scratch with a new brand: a bow tie mark, a black and white interface with Roblox Studio blue, and dot-matrix glyphs for the 16 skills.
+- The landing page now fits one screen on desktop. It shows the 16 skills as an interactive board with a demo that types a request and lights the matching skill, over a live shader background.
+- Added a skills index, per-skill pages comparing default agent behavior against each skill with example prompts and verified docs, and an interactive CLI and agent install guide.
+- Removed React, Tailwind, and the 3D brick scene. The site is static Astro with small vanilla scripts.
+
+### Verification
+
+- Site content, type, build, and route checks pass. No skill guidance changed.
+
 ## 1.14.0 — 2026-11-20
 
 ### Guidance and examples

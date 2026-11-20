@@ -1,0 +1,24 @@
+---
+import Icon from "./Icon.astro";
+
+interface Props {
+  command: string;
+  label?: string;
+  large?: boolean;
+}
+
+const { command, label, large = false } = Astro.props;
+const tokens = command.split(" ").map((token, index) => ({
+  token,
+  tone: index === 0 || token.startsWith("-") ? "dim" : token.includes("/") ? "path" : "plain",
+}));
+---
+
+<div class:list={["cmd", { "cmd--large": large }]} data-glow>
+  <span class="cmd-glow" aria-hidden="true"></span>
+  <span class="cmd-burst" aria-hidden="true"></span>
+  <code>{tokens.map((t, index) => (<><span class={`tok tok--${t.tone}`}>{t.token}</span>{index < tokens.length - 1 && " "}</>))}</code>
+  <button class="button" type="button" data-copy={command} data-magnetic>
+    {label && <span class="visually-hidden">{label}: </span>}<span class="btn-icon"><Icon name="copy" /><Icon name="check" /></span><span data-copy-label aria-live="polite">Copy</span>
+  </button>
+</div>

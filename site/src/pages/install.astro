@@ -1,0 +1,254 @@
+---
+import "../styles/install.css";
+import Base from "../layouts/Base.astro";
+import CopyCommand from "../components/CopyCommand.astro";
+import Assistants from "../components/Assistants.astro";
+import Glyph from "../components/Glyph.astro";
+import Icon from "../components/Icon.astro";
+import { faq } from "../data/copy";
+import { glyphs } from "../data/plain";
+import { installCommand, reportUrl, skillInstallCommand } from "../data/catalog";
+
+const assistantPrompt =
+  "Install Roblox Suite in this project: run npx skills add nonlooped/roblox-suite --skill '*' -y -a <your-agent-name> (e.g. cursor, claude-code), then remind me to restart you.";
+
+const steps = [
+  {
+    title: "Open your project",
+    text: "Open your Roblox project folder in Cursor, VS Code, or Windsurf.",
+  },
+  {
+    title: "Open a terminal",
+    text: "Launch the integrated terminal at the project root.",
+  },
+  {
+    title: "Run the installer",
+    text: "Select your coding agent when prompted.",
+  },
+  {
+    title: "Restart your agent",
+    text: "Reload your agent so it indexes the installed skills.",
+  },
+];
+
+const more = [
+  { label: "Install one skill", command: skillInstallCommand("roblox-datastores") },
+  { label: "List installed", command: "npx skills list" },
+  { label: "Update skills", command: "npx skills update" },
+  { label: "Remove one", command: "npx skills remove roblox-datastores" },
+  { label: "Remove all", command: "npx skills remove --all" },
+];
+
+const tone = (token: string, index: number) =>
+  index === 0 || token.startsWith("-") ? "dim" : token.includes("/") ? "path" : "plain";
+
+const tree = ["src", "client", "server", "shared"];
+const picks = ["Cursor", "Claude Code", "Codex"];
+---
+
+<Base
+  title="Install | Roblox Suite"
+  description="Install Roblox Suite skills for Claude Code, Cursor, Codex, Copilot, and other coding agents."
+>
+  <div class="page install">
+    <div class="wrap">
+      <section class="i-hero">
+        <div>
+          <h1>Install</h1>
+          <p class="i-lead">One CLI command per project, or let your coding agent run it.</p>
+        </div>
+        <div class="i-works">
+          <p class="i-label">Supported agents</p>
+          <Assistants layout="tiles" />
+        </div>
+      </section>
+
+      <section class="walk" aria-labelledby="do-it">
+        <h2 id="do-it">CLI setup</h2>
+        <div class="walk-grid">
+          <ol class="stepper" data-stepper>
+            {
+              steps.map((step, index) => (
+                <li data-step={index + 1} class:list={{ "is-active": index === 0 }}>
+                  <h3>
+                    <button class="step-head" type="button">
+                      <span class="disc">{index + 1}</span>
+                      <span class="step-title">{step.title}</span>
+                    </button>
+                  </h3>
+                  <div class="step-body">
+                    {index === 2 && <CopyCommand command={installCommand} label="Install command" />}
+                    <p>{step.text}</p>
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+
+          <div class="mock" data-mock data-step="1" aria-hidden="true">
+            <div class="mock-win">
+              <div class="mock-bar">
+                <span class="dots"><i></i><i></i><i></i></span>
+                <div class="mock-menu">
+                  <span class="m-file">File</span>
+                  <span>Edit</span>
+                  <span>View</span>
+                  <span class="m-term">Terminal</span>
+                  <span>Help</span>
+                </div>
+                <div class="dd dd-file">
+                  <i>New File</i>
+                  <i class="hl">
+                    Open Folder…
+                    <svg class="cursor" viewBox="0 0 24 24"><path d="M5 3v16l4.5-4 3 6.5 2.5-1.2-3-6.3H18Z" /></svg>
+                  </i>
+                  <i>Save</i>
+                </div>
+                <div class="dd dd-term">
+                  <i class="hl">
+                    New Terminal
+                    <svg class="cursor" viewBox="0 0 24 24"><path d="M5 3v16l4.5-4 3 6.5 2.5-1.2-3-6.3H18Z" /></svg>
+                  </i>
+                  <i>Split Terminal</i>
+                </div>
+              </div>
+
+              <div class="mock-body">
+                <div class="mock-side">
+                  <p class="empty">No folder open</p>
+                  <ul class="tree">
+                    <li class="root">my-game</li>
+                    {tree.map((name) => <li class="dir">{name}</li>)}
+                    <li class="file">default.project.json</li>
+                  </ul>
+                </div>
+                <div class="mock-main">
+                  <i style="--w:46%" class="b"></i>
+                  <i style="--w:72%"></i>
+                  <i style="--w:58%"></i>
+                  <i style="--w:30%" class="b"></i>
+                  <i style="--w:66%"></i>
+                  <i style="--w:40%"></i>
+                  <i style="--w:78%"></i>
+                  <i style="--w:52%" class="b"></i>
+                  <i style="--w:34%"></i>
+                </div>
+                <div class="mock-chat">
+                  <p class="chat-title">Agent</p>
+                  <p class="bubble">Save player coins with UpdateAsync on leave</p>
+                  <div class="reply">
+                    <span class="reply-glyph"><Glyph rows={glyphs["roblox-datastores"]} /></span>
+                    <span class="reply-text">Reading roblox-datastores</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mock-term">
+                <p class="term-line">my-game $ <span class="typed"></span><i class="caret"></i></p>
+                <ul class="picks">
+                  {picks.map((name, i) => <li class:list={{ "is-on": i === 0 }}>{i === 0 ? "› " : "\u00A0\u00A0"}{name}</li>)}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="band" aria-labelledby="by-assistant">
+        <div>
+          <h2 id="by-assistant">Install via agent</h2>
+          <p class="band-text">Paste this into an agent with shell access, then restart it.</p>
+        </div>
+        <div class="composer" data-copy-scope data-glow>
+          <p class="composer-text" data-copy-source>{assistantPrompt}</p>
+          <div class="composer-foot">
+            <button
+              class="button"
+              type="button"
+              data-copy={assistantPrompt}
+              data-copied-label="Copied"
+              data-idle-label="Copy prompt"
+              data-magnetic
+            >
+              <span class="btn-icon"><Icon name="copy" /><Icon name="check" /></span><span data-copy-label aria-live="polite">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="stuck" aria-labelledby="stuck-h">
+        <h2 id="stuck-h">Troubleshooting</h2>
+        <div class="stuck-grid">
+          <article class="help-card" data-glow>
+            <h3>npx not found</h3>
+            <p>
+              Install <a href="https://nodejs.org/">Node.js</a>, reopen your terminal, and run the command again.
+            </p>
+          </article>
+          <article class="help-card" data-glow>
+            <h3>Skills not loading</h3>
+            <p>Restart your agent, then run <code>npx skills list</code> to verify the target and scope.</p>
+          </article>
+          <article class="help-card" data-glow>
+            <h3>Outdated guidance</h3>
+            <p>Run <code>npx skills update</code> to pull the latest revisions.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="more" aria-labelledby="more-h">
+        <h2 id="more-h">Commands</h2>
+        <div class="palette">
+          {
+            more.map((item) => (
+              <div class="pal-row">
+                <div class="pal-label">
+                  <span>{item.label}</span>
+                </div>
+                <code class="pal-cmd">
+                  {item.command.split(" ").map((token, i, all) => (
+                    <><span class={`tok tok--${tone(token, i)}`}>{token}</span>{i < all.length - 1 && " "}</>
+                  ))}
+                </code>
+                <button class="icon-btn" type="button" data-copy={item.command} aria-label={`Copy: ${item.label}`}>
+                  <span class="btn-icon"><Icon name="copy" /><Icon name="check" /></span>
+                  <span class="visually-hidden" data-copy-label>Copy</span>
+                </button>
+              </div>
+            ))
+          }
+        </div>
+        <p class="more-note">
+          Pass <code>--global</code> to install across all projects.{" "}
+          <a href="https://github.com/vercel-labs/skills/blob/main/docs/commands.md">CLI reference</a>
+        </p>
+      </section>
+
+      <section class="qs" aria-labelledby="qs-h">
+        <div>
+          <h2 id="qs-h">FAQ</h2>
+          <p class="qs-report">
+            Found an outdated API or error? <a href={reportUrl}>Report an issue</a>.
+          </p>
+        </div>
+        <div class="acc">
+          {
+            faq.map((item, index) => (
+              <details open={index === 0}>
+                <summary>
+                  <span>{item.q}</span>
+                  <span class="acc-plus"><Icon name="plus" /></span>
+                </summary>
+                <p>{item.a}</p>
+              </details>
+            ))
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    import "../scripts/install.ts";
+  </script>
+</Base>

@@ -1,0 +1,20 @@
+---
+interface Props {
+  rows: string[];
+  class?: string;
+}
+
+const { rows, class: className } = Astro.props;
+const dots = rows.flatMap((row, r) =>
+  [...row].map((ch, c) => ({
+    r,
+    c,
+    on: ch === "#",
+    d: Math.hypot(r - 4, c - 4).toFixed(2),
+  })),
+);
+---
+
+<svg class:list={["glyph", className]} viewBox="0 0 9 9" aria-hidden="true" focusable="false">
+  {dots.map((dot) => <circle class={dot.on ? "on" : undefined} cx={dot.c + 0.5} cy={dot.r + 0.5} r="0.34" style={`--d:${dot.d}`} />)}
+</svg>

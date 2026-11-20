@@ -1,36 +1,17 @@
 ---
 import Base from "../layouts/Base.astro";
-import { skillCount } from "../data/catalog";
-
-const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+import Mark from "../components/Mark.astro";
 ---
 
-<Base
-  title="Not found | Roblox Suite"
-  description="Page not found. Browse the skill catalog or return to the home page."
-  noindex
->
-  <section class="flex min-h-[60vh] items-center py-24">
-    <div class="mx-auto max-w-lg px-6">
-      <p class="font-display text-display text-toy-yellow">404</p>
-      <h1 class="text-heading mt-4">This brick came loose</h1>
-      <p class="measure mt-4 text-on-brand-muted">
-        We could not find this page. Browse the catalog for all {skillCount} skills.
-      </p>
-      <div class="mt-9 flex flex-wrap gap-4">
-        <a
-          href={`${base}/skills/`}
-          class="panel pressable inline-flex items-center justify-center bg-toy-yellow px-5 py-3 font-display text-small font-bold text-ink"
-        >
-          Browse skills
-        </a>
-        <a
-          href={`${base}/`}
-          class="panel pressable inline-flex items-center justify-center bg-ink px-5 py-3 font-display text-small font-bold text-paper"
-        >
-          Go home
-        </a>
+<Base title="Page not found | Roblox Suite" description="This page does not exist." noindex>
+  <div class="page">
+    <div class="wrap">
+      <div class="lost">
+        <div class="lost-glyph"><Mark width={132} /></div>
+        <h1>Page not found</h1>
+        <p class="page-lead">That route doesn't exist. Browse the skill catalog instead.</p>
+        <a class="button" href="/skills/">Browse skills</a>
       </div>
     </div>
-  </section>
+  </div>
 </Base>

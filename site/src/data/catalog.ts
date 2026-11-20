@@ -1,20 +1,15 @@
-import catalogJson from "../../../catalog.json";
+import { readdirSync, readFileSync, existsSync } from "node:fs";
+import path from "node:path";
+import catalog from "../../../catalog.json";
+import { groupCopy, skillCopy, type SkillCopy } from "./copy";
 
-export type Risk = "lower" | "medium" | "critical";
-export type ExampleStatus = "none" | "experimental" | "reviewed";
-
-export interface Source {
+export interface CatalogSource {
   label: string;
   url: string;
   verified_at: string;
 }
 
-export interface ExampleFile {
-  path: string;
-  status: ExampleStatus;
-}
-
-export interface Skill {
+export interface CatalogSkill {
   slug: string;
   title: string;
   hub?: boolean;
@@ -22,169 +17,109 @@ export interface Skill {
   displayTitle: string;
   overview: string;
   covers: string[];
-  /** One-based source indexes that support each corresponding `covers` item. */
   cover_sources: number[][];
-  sources: Source[];
-  risk: Risk;
+  sources: CatalogSource[];
+  risk: string;
   created_at: string;
-  examples: { status: ExampleStatus; files: ExampleFile[] };
   last_changed_at: string;
+  examples: { status: string; files: { path: string; status: string }[] };
 }
 
-/** Render the markdown code spans used throughout the catalog copy. */
-export function withCode(text: string): string {
-  return text.replace(
-    /`([^`]+)`/g,
-    (_, code: string) =>
-      `<code>${code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`,
-  );
-}
-
-/* Strip the scheme and add breaks at path separators so citation URLs remain readable on narrow screens. */
-export function breakableUrl(url: string): string {
-  return url
-    .replace(/^https:\/\//, "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\//g, "<wbr>/");
-}
-
-export interface Group {
+export interface CatalogGroup {
   id: string;
   title: string;
   description: string;
   skills: string[];
 }
 
-interface Catalog {
-  schema_version: number;
-  groups: Group[];
-  skills: Skill[];
+export interface SkillEntry extends CatalogSkill {
+  copy: SkillCopy;
 }
 
-const catalog = catalogJson as Catalog;
-
-export const skills: Skill[] = catalog.skills;
-export const groups: Group[] = catalog.groups;
-export const skillCount = skills.length;
-
-const bySlug = new Map(skills.map((skill) => [skill.slug, skill]));
-
-export function getSkill(slug: string): Skill {
-  const skill = bySlug.get(slug);
-  if (!skill) throw new Error(`Unknown skill slug: ${slug}`);
-  return skill;
+export interface GroupedSkills {
+  id: string;
+  title: string;
+  description: string;
+  entries: SkillEntry[];
 }
-
-/** Groups with their skills resolved, in catalog order. */
-export const groupedSkills = groups.map((group) => ({
-  ...group,
-  entries: group.skills.map(getSkill),
-}));
 
 export const repoUrl = "https://github.com/nonlooped/roblox-suite";
 export const installCommand = "npx skills add nonlooped/roblox-suite";
+export const reportUrl = `${repoUrl}/issues/new?template=inaccuracy.yml`;
 
-export function skillInstallCommand(slug: string): string {
-  return `${installCommand} --skill ${slug}`;
-}
+export const skillInstallCommand = (slug: string) => `${installCommand} --skill ${slug}`;
+export const skillSourceUrl = (slug: string) => `${repoUrl}/tree/main/${slug}`;
+export const fileSourceUrl = (slug: string, file: string) => `${repoUrl}/blob/main/${slug}/${file}`;
 
-/**
- * Plain-language labels for the marketing surfaces. The catalog's own copy is
- * written for agents; these are written for people skimming a page.
- *
- * `does` is the job in the reader's words — an imperative, not a subject
- * heading — because the home page asks "what are you building?" and these are
- * the answers. Keep each one short enough to sit on two lines in a tile.
- */
-export const plainLabels: Record<string, { name: string; blurb: string; does: string }> = {
-  roblox: {
-    name: "Start here",
-    blurb: "Sends your agent to the right skill",
-    does: "Plan a game and pick the right skill",
-  },
-  "roblox-core": {
-    name: "Fundamentals",
-    blurb: "Services, types, and how scripts run",
-    does: "Put scripts in the right place",
-  },
-  "roblox-networking": {
-    name: "Client & server",
-    blurb: "Validate client requests on the server",
-    does: "Stop players from cheating",
-  },
-  "roblox-datastores": {
-    name: "Saving data",
-    blurb: "Save progress and handle write failures",
-    does: "Save coins, levels, and inventories",
-  },
-  "roblox-user-interfaces": {
-    name: "Menus & HUDs",
-    blurb: "Layouts for different screen sizes",
-    does: "Build menus that fit every screen",
-  },
-  "roblox-animation": {
-    name: "Animation",
-    blurb: "Characters and objects that move",
-    does: "Animate characters and UI",
-  },
-  "roblox-vfx": {
-    name: "Visual effects",
-    blurb: "Particles, beams, and trails",
-    does: "Add particles, beams, and trails",
-  },
-  "roblox-audio": {
-    name: "Sound & music",
-    blurb: "Audio routing, spatial sound, and effects",
-    does: "Play music and 3D sound",
-  },
-  "roblox-gamepasses": {
-    name: "Monetization",
-    blurb: "Passes, products, and Robux",
-    does: "Sell passes and dev products",
-  },
-  "roblox-open-cloud": {
-    name: "Outside tools",
-    blurb: "Automate Roblox through REST APIs",
-    does: "Reach your game from outside Roblox",
-  },
-  "roblox-teleport": {
-    name: "Teleporting",
-    blurb: "Move players between places",
-    does: "Move players between places",
-  },
-  "roblox-rojo": {
-    name: "Rojo projects",
-    blurb: "Work in your editor, sync to Studio",
-    does: "Code in your editor, sync to Studio",
-  },
-  "roblox-mcp": {
-    name: "Agent in Studio",
-    blurb: "Connect your AI straight to Studio",
-    does: "Let your agent drive Studio directly",
-  },
-  "roblox-physics": {
-    name: "Physics",
-    blurb: "Vehicles, doors, and moving parts",
-    does: "Build vehicles, doors, and platforms",
-  },
-  "roblox-npcs": {
-    name: "NPCs",
-    blurb: "Enemies that chase and patrol",
-    does: "Make NPCs chase and patrol",
-  },
-  "roblox-testing": {
-    name: "Finding bugs",
-    blurb: "Debug and profile your game",
-    does: "Track down bugs and lag",
-  },
+export const skills = catalog.skills as CatalogSkill[];
+export const groups = catalog.groups as CatalogGroup[];
+export const skillCount = skills.length;
+
+export const getSkill = (slug: string): CatalogSkill => {
+  const skill = skills.find((s) => s.slug === slug);
+  if (!skill) throw new Error(`Unknown skill "${slug}"`);
+  return skill;
 };
 
-export function plainLabel(slug: string) {
-  return plainLabels[slug] ?? { name: slug, blurb: "", does: "" };
+const copyFor = (slug: string): SkillCopy => {
+  const copy = skillCopy[slug];
+  if (!copy) throw new Error(`src/data/copy.ts has no skillCopy entry for "${slug}"`);
+  return copy;
+};
+
+export const getEntry = (slug: string): SkillEntry => ({ ...getSkill(slug), copy: copyFor(slug) });
+
+export const groupedSkills: GroupedSkills[] = groups.map((group) => {
+  const text = groupCopy[group.id];
+  if (!text) throw new Error(`src/data/copy.ts has no groupCopy entry for "${group.id}"`);
+  return {
+    id: group.id,
+    title: text.title,
+    description: text.description,
+    entries: group.skills.map(getEntry),
+  };
+});
+
+for (const skill of skills) copyFor(skill.slug);
+
+const repoRoot = path.resolve(process.cwd(), "..");
+
+export interface SkillReference {
+  file: string;
+  readWhen: string;
+  reviewed: string;
 }
 
-export function skillSourceUrl(slug: string): string {
-  return `${repoUrl}/blob/main/${slug}/SKILL.md`;
+export function skillReferences(slug: string): SkillReference[] {
+  const dir = path.join(repoRoot, slug, "references");
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((file) => file.endsWith(".md"))
+    .sort()
+    .map((file) => {
+      const text = readFileSync(path.join(dir, file), "utf8");
+      const readWhen = text.match(/^read_when:\s*"(.*)"\s*$/m)?.[1] ?? "";
+      const reviewed = text.match(/^last_reviewed:\s*(\d{4}-\d{2}-\d{2})\s*$/m)?.[1] ?? "";
+      return { file, readWhen, reviewed };
+    });
+}
+
+export function skillScripts(slug: string): string[] {
+  const dir = path.join(repoRoot, slug, "scripts");
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir).sort();
+}
+
+const dateFormat = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+export const formatDate = (iso: string) => dateFormat.format(new Date(`${iso}T00:00:00Z`));
+
+export function withCode(text: string): string {
+  const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return escaped.replace(/`([^`]+)`/g, "<code>$1</code>");
 }

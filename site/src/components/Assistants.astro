@@ -1,0 +1,36 @@
+---
+import { assistants } from "../data/copy";
+
+interface Props {
+  layout?: "row" | "list" | "tiles";
+}
+
+const { layout = "row" } = Astro.props;
+---
+
+{
+  layout === "tiles" ? (
+    <ul class="assist-tiles">
+      {assistants.map((assistant) => (
+        <li>
+          <span class="assist-tile" title={assistant.name} data-glow>
+            <img src={`/agents/${assistant.icon}`} alt="" width="22" height="22" />
+            <span class="visually-hidden">{assistant.name}</span>
+          </span>
+        </li>
+      ))}
+    </ul>
+  ) : (
+<ul class:list={["logos", { "logos--list": layout === "list" }]}>
+  {
+    assistants.map((assistant) => (
+      <li>
+        <span class="logo" title={assistant.name}>
+          <img src={`/agents/${assistant.icon}`} alt="" width="20" height="20" />
+          <span class:list={{ "visually-hidden": layout === "row" }}>{assistant.name}</span>
+        </span>
+      </li>
+    ))
+  }
+</ul>
+)}

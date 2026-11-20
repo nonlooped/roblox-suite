@@ -1,15 +1,18 @@
 ---
-import { repoUrl, skillCount } from "../data/catalog";
+import Mark from "./Mark.astro";
+import Icon from "./Icon.astro";
+import { repoUrl, reportUrl } from "../data/catalog";
 
-const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const year = new Date().getFullYear();
+const path = Astro.url.pathname;
+const onInstall = path.startsWith("/install/");
+const onSkills = path.startsWith("/skills/") && path === "/skills/";
 
 const columns = [
   {
     title: "Site",
     links: [
-      { label: "Home", href: `${base}/` },
-      { label: "Skills", href: `${base}/skills/` },
+      { label: "Skills", href: "/skills/" },
+      { label: "Install", href: "/install/" },
     ],
   },
   {
@@ -17,67 +20,67 @@ const columns = [
     links: [
       { label: "GitHub", href: repoUrl },
       { label: "Contributing", href: `${repoUrl}/blob/main/CONTRIBUTING.md` },
-      { label: "Report a problem", href: `${repoUrl}/issues/new?template=inaccuracy.yml` },
+      { label: "Report an issue", href: reportUrl },
+      { label: "Privacy", href: `${repoUrl}/blob/main/PRIVACY.md` },
+      { label: "skills.sh", href: "https://www.skills.sh/nonlooped/roblox-suite/roblox" },
     ],
   },
   {
-    title: "Roblox",
+    title: "Roblox docs",
     links: [
+      { label: "Creator Hub", href: "https://create.roblox.com/docs" },
       { label: "Engine API", href: "https://create.roblox.com/docs/reference/engine" },
-      { label: "Luau docs", href: "https://create.roblox.com/docs/luau" },
+      { label: "Luau", href: "https://create.roblox.com/docs/luau" },
     ],
   },
 ];
 ---
 
-<footer class="border-t border-ink bg-ink text-on-ink">
-  <div class="mx-auto grid max-w-6xl gap-10 px-6 py-14 md:grid-cols-[1.4fr_2fr]">
-    <div>
-      <div class="flex items-center gap-2.5 font-display text-base font-bold">
-        <span class="relative block size-6" aria-hidden="true">
-          <span
-            class="absolute left-0 top-0 h-3 w-4.5 rounded-[3px] border-2 border-paper/30 bg-paper"
-          ></span>
-          <span
-            class="absolute bottom-0 right-0 h-3 w-4.5 rounded-[3px] border-2 border-paper/30 bg-toy-yellow"
-          ></span>
-        </span>
-        Roblox Suite
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-lead">
+        <Mark width={56} />
+        <p class="footer-tag">Roblox skills for AI agents.</p>
+        <div class="footer-actions">
+          {!onInstall && <a class="button button--lg" href="/install/">Install skills</a>}
+          {!onSkills && <a class="button button--lg button--ghost" href="/skills/">Browse skills</a>}
+        </div>
       </div>
-      <p class="mt-4 max-w-xs text-small text-on-ink-muted">
-        {skillCount} Roblox skills for coding agents, each one linked back to the official docs.
-      </p>
+      <div class="footer-cols">
+        {
+          columns.map((column) => (
+            <nav aria-label={column.title}>
+              <p class="footer-title">{column.title}</p>
+              <ul>
+                {column.links.map((link) => {
+                  const external = link.href.startsWith("http");
+                  return (
+                    <li>
+                      <a class="footer-link" href={link.href}>
+                        <span>{link.label}</span>
+                        {external && <Icon name="arrow-up-right" />}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          ))
+        }
+      </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-8 sm:grid-cols-3">
-      {
-        columns.map((column) => (
-          <div>
-            <h2 class="font-display text-small font-bold text-toy-yellow">{column.title}</h2>
-            {/* Pad footer links for touch input; negative margins keep the text aligned with the heading. */}
-            <ul class="mt-3 flex flex-col gap-0.5">
-              {column.links.map((link) => (
-                <li>
-                  <a
-                    href={link.href}
-                    rel="noopener"
-                    class="-mx-2 inline-flex min-h-9 items-center px-2 text-small text-on-ink-muted transition-colors hover:text-on-ink"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
-      }
+    <div class="giant" aria-hidden="true" data-glow>
+      <div class="giant-clip">
+        <span class="giant-text giant-base">Roblox Suite</span>
+        <span class="giant-text giant-lit">Roblox Suite</span>
+      </div>
     </div>
-  </div>
 
-  <div
-    class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 border-t border-ink-soft px-6 py-6 text-small text-on-ink-muted"
-  >
-    <p>© {year} nonlooped, MIT licensed</p>
-    <p>Not affiliated with or endorsed by Roblox Corporation.</p>
+    <div class="footer-bar">
+      <p>MIT license</p>
+      <p>Not affiliated with Roblox Corporation</p>
+    </div>
   </div>
 </footer>

@@ -38,6 +38,7 @@ async function page(...segments) {
 
 const home = await page();
 const skillsIndex = await page("skills");
+const installPage = await page("install");
 
 if (home && !/<meta name="google-site-verification" content="[^"]+">/.test(home)) {
   fail("home page is missing Google Search Console verification metadata");
@@ -60,8 +61,8 @@ for (const skill of catalog.skills) {
   if (!html.includes(skill.slug)) {
     fail(`skills/${skill.slug}/ does not mention its own slug`);
   }
-  if (!html.includes(skill.displayTitle)) {
-    fail(`skills/${skill.slug}/ does not render its displayTitle`);
+  if (!/<h1[^>]*>[^<]+<\/h1>/.test(html)) {
+    fail(`skills/${skill.slug}/ has no page heading`);
   }
   for (const [coverIndex, sourceIndexes] of skill.cover_sources.entries()) {
     for (const sourceIndex of sourceIndexes) {
@@ -78,10 +79,16 @@ for (const skill of catalog.skills) {
   }
 }
 
-for (const [name, html] of [
+const headingPages = [
   ["home", home],
   ["skills index", skillsIndex],
-]) {
+  ["install", installPage],
+];
+for (const skill of catalog.skills) {
+  headingPages.push([`skills/${skill.slug}`, await page("skills", skill.slug)]);
+}
+
+for (const [name, html] of headingPages) {
   if (!html) continue;
   const levels = [...html.matchAll(/<h([1-6])\b/g)].map((match) => Number(match[1]));
   for (let index = 1; index < levels.length; index++) {
@@ -91,7 +98,7 @@ for (const [name, html] of [
   }
 }
 
-for (const asset of ["404.html", "favicon.svg", "robots.txt"]) {
+for (const asset of ["404.html", "favicon.svg", "robots.txt", "og.png"]) {
   try {
     await access(path.join(root, asset));
   } catch {
@@ -126,6 +133,7 @@ for (const leftover of ["sitemap-index.xml", "sitemap-0.xml"]) {
 const expectedSitemapUrls = [
   SITEMAP_BASE,
   `${SITEMAP_BASE}skills/`,
+  `${SITEMAP_BASE}install/`,
   ...catalog.skills.map((skill) => `${SITEMAP_BASE}skills/${skill.slug}/`),
 ];
 

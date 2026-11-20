@@ -1,8 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
-import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
-import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   site: "https://roblox.nonlooped.xyz",
@@ -18,9 +16,5 @@ export default defineConfig({
     sitemap({
       filter: (page) => !page.endsWith("/404/"),
     }),
-    react(),
   ],
-  vite: {
-    plugins: [tailwindcss()],
-  },
 });

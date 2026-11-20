@@ -1,71 +1,63 @@
 ---
-import "../styles/global.css";
+import "@fontsource-variable/archivo/wdth.css";
+import "@fontsource-variable/geist-mono";
+import "../styles/base.css";
+import "../styles/pages.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 
 interface Props {
   title: string;
   description: string;
-  /** Keep a page out of the index. The 404 is the only one that wants this. */
   noindex?: boolean;
-  /** Serialised JSON-LD for pages that have something structured to say. */
-  schema?: Record<string, unknown>;
+  landing?: boolean;
 }
 
-const { title, description, noindex = false, schema } = Astro.props;
+const { title, description, noindex = false, landing = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
-const asset = (file: string) =>
-  new URL(`${import.meta.env.BASE_URL}/${file}`.replace(/\/+/g, "/"), Astro.site).href;
 // Google Search Console HTML-tag verification for roblox.nonlooped.xyz.
 const googleSiteVerification = "d5maEtSw1GYOz8UJ1bQmUxojH-Pk34YWDovb2u_cR_Q";
+const ogImage = new URL("/og.png", Astro.site).href;
 ---
 
-<html lang="en">
+<!doctype html>
+<html lang="en" class:list={[{ "is-landing": landing }]}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="google-site-verification" content={googleSiteVerification} />
     <title>{title}</title>
     <meta name="description" content={description} />
-    {
-      /* A 404 is served for every unknown path, so without this each bad link
-         becomes an indexable page advertising a canonical URL that has no
-         content behind it. */
-      noindex && <meta name="robots" content="noindex, follow" />
-    }
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
-    <link
-      rel="icon"
-      href={`${import.meta.env.BASE_URL}/favicon.svg`.replace(/\/+/g, "/")}
-      type="image/svg+xml"
-    />
-    <meta name="theme-color" content="#2438b8" />
-
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={asset("og.png")} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="Roblox Suite" />
+    <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={asset("og.png")} />
-    {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
+    <meta name="twitter:image" content={ogImage} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#05060A" />
   </head>
-  <body class="min-h-screen">
-    <a
-      href="#main"
-      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-40 focus:rounded-md focus:border-2 focus:border-ink focus:bg-toy-yellow focus:px-4 focus:py-2 focus:font-display focus:text-ink"
-    >
-      Skip to content
-    </a>
+  <body>
+    <div class="bg" aria-hidden="true">
+      <div class="bg-wash"></div>
+      <slot name="aurora" />
+      <div class="bg-dots"></div>
+      <div class="bg-light"></div>
+    </div>
+    <div class="grain" aria-hidden="true"></div>
+    <a class="skip" href="#main">Skip to content</a>
     <Header />
     <main id="main">
       <slot />
     </main>
-    <Footer />
+    {!landing && <Footer />}
+    <slot name="after" />
+    <script>
+      import "../scripts/ui.ts";
+    </script>
   </body>
 </html>

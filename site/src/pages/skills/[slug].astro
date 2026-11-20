@@ -1,227 +1,219 @@
 ---
-import type { GetStaticPaths } from "astro";
 import Base from "../../layouts/Base.astro";
-import { CopyCommand } from "../../components/CopyCommand";
+import CopyCommand from "../../components/CopyCommand.astro";
+import Glyph from "../../components/Glyph.astro";
+import GlyphTile from "../../components/GlyphTile.astro";
+import Icon from "../../components/Icon.astro";
+import { exampleStatusCopy } from "../../data/copy";
+import { glyphs, skillStory } from "../../data/plain";
 import {
-  breakableUrl,
+  fileSourceUrl,
+  formatDate,
+  getEntry,
   groupedSkills,
-  plainLabel,
-  skills,
+  reportUrl,
+  skillCount,
   skillInstallCommand,
+  skillReferences,
   skillSourceUrl,
+  skills,
   withCode,
-  type Skill,
 } from "../../data/catalog";
 
-export const getStaticPaths = (() =>
-  skills.map((skill) => ({
-    params: { slug: skill.slug },
-    props: { skill },
-  }))) satisfies GetStaticPaths;
-
-interface Props {
-  skill: Skill;
+export function getStaticPaths() {
+  return skills.map((skill) => ({ params: { slug: skill.slug } }));
 }
 
-const { skill } = Astro.props;
-const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const label = plainLabel(skill.slug);
-
-const group = groupedSkills.find((candidate) => candidate.skills.includes(skill.slug));
-const siblings = (group?.entries ?? []).filter((entry) => entry.slug !== skill.slug);
-const sourcesForCover = (coverIndex: number) =>
-  skill.cover_sources[coverIndex].map((sourceIndex) => ({
-    sourceIndex,
-    source: skill.sources[sourceIndex - 1]!,
-  }));
-
-/*
- * "Critical risk" told a reader nothing actionable. The same three levels,
- * named for how much care the topic wants rather than for a severity scale.
- */
-const riskCopy: Record<Skill["risk"], string> = {
-  lower: "Straightforward",
-  medium: "A few gotchas",
-  critical: "Easy to get wrong",
-};
-
-/*
- * Care level is carried by the label text as well as the fill, never by colour
- * alone. All three use ink: paper on toy-red measures 3.54:1, under AA for
- * this text size, while ink on toy-red clears it at 4.88:1.
- */
-const riskClass: Record<Skill["risk"], string> = {
-  lower: "bg-toy-green text-ink",
-  critical: "bg-toy-red text-ink",
-  medium: "bg-toy-yellow text-ink",
-};
+const { slug } = Astro.params;
+const skill = getEntry(slug!);
+const { copy } = skill;
+const story = skillStory[skill.slug];
+const group = groupedSkills.find((g) => g.entries.some((e) => e.slug === skill.slug))!;
+const others = group.entries.filter((e) => e.slug !== skill.slug);
+const references = skillReferences(skill.slug);
+const exampleFiles = skill.examples.files;
 ---
 
-{/* The catalog writes overviews for agents, so they carry markdown code spans.
-    Left raw they reached the meta description as literal backticks. */}
-<Base
-  title={`${skill.displayTitle} | Roblox Suite`}
-  description={skill.overview.replace(/`/g, "")}
->
-  <article>
-    <section class="py-12 sm:py-14">
-      <div class="mx-auto max-w-4xl px-6">
-        <nav class="flex items-center gap-2 text-small text-on-brand-muted" aria-label="Breadcrumb">
-          <a href={`${base}/skills/`} class="transition-colors hover:text-on-brand">Skills</a>
-          {group && <span aria-hidden="true">/</span>}
-          {
-            group && (
-              <a href={`${base}/skills/#${group.id}`} class="transition-colors hover:text-on-brand">
-                {group.title}
-              </a>
-            )
-          }
-        </nav>
+<Base title={`${copy.name} (${skill.slug}) | Roblox Suite`} description={`${copy.does}. ${skill.overview}`}>
+  <article class="page">
+    <div class="wrap wrap--narrow">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/skills/">Skills</a></li>
+          <li aria-current="page">{copy.name}</li>
+        </ol>
+      </nav>
 
-        <!-- The plain name leads. The catalog's own title is written for
-             agents and reads as a spec line, so it labels the skill file in
-             the sidebar instead of heading the page. -->
-        <h1 class="text-title mt-5">{label.name}</h1>
-        <p class="measure mt-4 text-lead text-on-brand-muted">{label.blurb}</p>
-
-        <div class="mt-6 flex flex-wrap items-center gap-2.5">
-          <span
-            class={`rounded-full border-2 border-ink px-3 py-1 text-[0.8125rem] font-medium ${riskClass[skill.risk]}`}
-          >
-            {riskCopy[skill.risk]}
-          </span>
-          <span
-            class="rounded-full border-2 border-on-brand/30 px-3 py-1 font-mono text-[0.8125rem] text-on-brand-muted"
-          >
-            {skill.slug}
-          </span>
-        </div>
-
-        <div class="mt-7 max-w-xl">
-          <p class="mb-2.5 text-small text-on-brand-muted">Install just this one:</p>
-          <CopyCommand client:load command={skillInstallCommand(skill.slug)} />
+      <div class="skill-head">
+        <GlyphTile slug={skill.slug} large />
+        <div class="page-head">
+          <h1>{copy.name}</h1>
+          <p class="page-lead">{copy.does}.</p>
         </div>
       </div>
-    </section>
 
-    <section class="border-t border-on-brand/20 py-12 sm:py-14">
-      <div class="mx-auto grid max-w-4xl gap-10 px-6 lg:grid-cols-[1fr_15rem]">
-        <!-- Allow the grid column to shrink so long source URLs wrap within the viewport. -->
-        <div class="min-w-0">
-          <h2 class="text-heading">What it handles</h2>
-          <ul class="mt-5 flex flex-col gap-3">
+      {skill.hub && <p class="note">Entry-point skill. Routes multi-system tasks to specialist skills automatically.</p>}
+
+      <div class="story">
+        <section class="story-panel story-panel--without">
+          <h2>Default agent</h2>
+          <p>{story.without}</p>
+        </section>
+        <section class="story-panel story-panel--with">
+          <h2><Icon name="check" />With skill</h2>
+          <p>{story.with}</p>
+        </section>
+      </div>
+
+      <h2>Example prompts</h2>
+      <ul class="asks">
+        {
+          copy.asks.map((ask) => (
+            <li>
+              <button
+                class="ask"
+                type="button"
+                data-copy={ask}
+                data-copied-label="Copied"
+                data-idle-label="Copy"
+              >
+                <span class="ask-text" data-copy-source>{`\u201C${ask}\u201D`}</span>
+                <span class="ask-hint" data-copy-label aria-live="polite">Copy</span>
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h2>Install</h2>
+      <CopyCommand command={skillInstallCommand(skill.slug)} label="Install command" />
+      <p class="get-line">Or <a href="/install/">install all {skillCount} skills</a>.</p>
+
+      {
+        skill.risk === "critical" && (
+          <p class="note note--risk">
+            <strong>High-impact domain.</strong> Bugs here can lose player data, break purchases, or open exploits. Review and playtest generated code.
+          </p>
+        )
+      }
+
+      <details class="tech">
+        <summary>
+          <span class="sum-text">
+            <span class="sum-main">Technical details</span>
+            <span class="sum-sub">Coverage, examples, and verified sources.</span>
+          </span>
+        </summary>
+        <div class="tech-body">
+          <h3>Coverage</h3>
+          <ul class="covers">
             {
-              skill.covers.map((item, index) => (
-                <li class="flex gap-3 text-on-brand-muted">
-                  {/* A stud, not a dot: the list marker is the same brick
-                      vocabulary as the panels around it. */}
-                  <span
-                    class="mt-2 size-2.5 shrink-0 rounded-[3px] border-2 border-ink bg-toy-yellow"
-                    aria-hidden="true"
-                  />
-                  <span class="measure">
-                    <span set:html={withCode(item)} />
-                    <span class="ml-1 inline-flex gap-1 whitespace-nowrap font-mono text-[0.8125rem]">
-                      {
-                        sourcesForCover(index).map(({ source, sourceIndex }) => (
-                          <a
-                            href={source.url}
-                            data-claim-citation={`${index + 1}:${sourceIndex}`}
-                            aria-label={`Source ${sourceIndex}: ${source.label}`}
-                            class="text-toy-yellow underline underline-offset-2 hover:no-underline"
-                          >
-                            [{sourceIndex}]
-                          </a>
-                        ))
-                      }
-                    </span>
-                  </span>
+              skill.covers.map((cover, index) => (
+                <li>
+                  <Fragment set:html={withCode(cover)} />
+                  <sup class="cite">
+                    {skill.cover_sources[index].map((source) => (
+                      <a href={`#source-${source}`} data-claim-citation={`${index + 1}:${source}`} aria-label={`Source ${source}`}>
+                        {source}
+                      </a>
+                    ))}
+                  </sup>
                 </li>
               ))
             }
           </ul>
 
-          <!-- Folded away by default. The citations above are the proof a
-               reader actually follows; the full list was a page of URLs
-               between them and the rest of the catalog. -->
-          <details class="panel mt-10 bg-paper px-5 py-4 text-on-paper">
-            <summary
-              class="cursor-pointer list-none font-display text-small font-bold marker:content-none"
-            >
-              <span class="text-brand underline underline-offset-4"
-                >Where this comes from ({skill.sources.length}
-                {skill.sources.length === 1 ? " link" : " links"})</span
-              >
-            </summary>
-
-            <!-- Not "Roblox's docs": the Rojo skill cites Rojo's own pages,
-                 because Roblox does not document a third-party tool. -->
-            <p class="mt-3 text-small text-on-paper-muted">
-              The pages this skill was checked against, and the date of the last check.
-            </p>
-
-            <ul class="mt-4 flex flex-col divide-y divide-on-paper/10 border-y border-on-paper/10">
-              {
-                skill.sources.map((source, index) => (
-                  <li class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3">
-                    <a
-                      href={source.url}
-                      rel="noopener"
-                      class="font-medium text-brand underline underline-offset-4 hover:no-underline"
-                    >
-                      [{index + 1}] {source.label}
-                    </a>
-                    <span class="font-mono text-[0.8125rem] text-on-paper-muted">
-                      checked {source.verified_at}
-                    </span>
-                    {/* Wrapped at path separators rather than truncated: an
-                        ellipsis hides exactly the part that identifies the
-                        page. Full muted text keeps AA; /70 measured 3.59:1. */}
-                    <span
-                      class="w-full break-words font-mono text-[0.8125rem] text-on-paper-muted"
-                      set:html={breakableUrl(source.url)}
-                    />
-                  </li>
-                ))
-              }
-            </ul>
-          </details>
-        </div>
-
-        <aside class="flex flex-col gap-5">
-          <div class="panel bg-ink p-5 text-on-ink">
-            <h2 class="font-display text-small font-bold text-toy-yellow">Full details</h2>
-            <p class="mt-2.5 text-small text-on-ink-muted">{skill.displayTitle}</p>
-            <a
-              href={skillSourceUrl(skill.slug)}
-              rel="noopener"
-              class="mt-3 inline-block font-mono text-[0.8125rem] text-paper underline underline-offset-4 hover:no-underline"
-            >
-              {skill.slug}/SKILL.md
-            </a>
-          </div>
-
           {
-            siblings.length > 0 && group && (
-              <div class="panel bg-paper p-5 text-on-paper">
-                <h2 class="font-display text-small font-bold text-brand">Related</h2>
-                <ul class="mt-3 flex flex-col gap-2">
-                  {siblings.map((entry) => (
+            references.length > 0 && (
+              <>
+                <h3>References</h3>
+                <ul class="rows">
+                  {references.map((ref) => (
                     <li>
-                      <a
-                        href={`${base}/skills/${entry.slug}/`}
-                        class="text-small text-on-paper-muted transition-colors hover:text-on-paper"
-                      >
-                        {plainLabel(entry.slug).name}
+                      <a class="row-link row-link--single" href={fileSourceUrl(skill.slug, `references/${ref.file}`)}>
+                        {ref.readWhen || ref.file}
                       </a>
                     </li>
                   ))}
                 </ul>
-              </div>
+              </>
             )
           }
-        </aside>
-      </div>
-    </section>
+
+          {
+            exampleFiles.length > 0 && (
+              <>
+                <h3>Example scripts</h3>
+                <ul class="rows script-rows">
+                  {exampleFiles.map((file) => {
+                    const status = exampleStatusCopy[file.status];
+                    return (
+                      <li>
+                        <div class="script-line">
+                          <a href={fileSourceUrl(skill.slug, file.path)}>
+                            <code>{file.path.split("/").pop()}</code>
+                          </a>
+                          {status && <span class="pill">{status.label}</span>}
+                        </div>
+                        {status && <p class="inside-note">{status.explain}</p>}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            )
+          }
+
+          <h3>Sources</h3>
+          <ol class="source-list">
+            {
+              skill.sources.map((source, index) => (
+                <li id={`source-${index + 1}`}>
+                  <a href={source.url}>{source.label}</a>
+                  <span>Verified {formatDate(source.verified_at)}</span>
+                </li>
+              ))
+            }
+          </ol>
+
+          <p class="tech-meta">
+            <code>{skill.slug}</code>
+            <span>Updated {formatDate(skill.last_changed_at)}</span>
+          </p>
+          <p class="tech-links">
+            <a href={skillSourceUrl(skill.slug)}>View on GitHub</a>
+            <a href={reportUrl}>Report an issue</a>
+          </p>
+        </div>
+      </details>
+
+      {
+        others.length > 0 && (
+          <>
+            <h2>More in {group.title}</h2>
+            <ul class="cards">
+              {others.map((entry) => (
+                <li>
+                  <a class="card" href={`/skills/${entry.slug}/`} data-glow>
+                    <span class="glyph-tile"><Glyph rows={glyphs[entry.slug]} /></span>
+                    <span class="card-body">
+                      <span class="skill-name">{entry.copy.name}</span>
+                      <span class="skill-does">{entry.copy.does}</span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+    </div>
   </article>
+
+  <script>
+    const details = document.querySelector<HTMLDetailsElement>(".tech");
+    document.addEventListener("click", (event) => {
+      if ((event.target as HTMLElement).closest("[data-claim-citation]") && details) details.open = true;
+    });
+  </script>
 </Base>

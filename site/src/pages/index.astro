@@ -1,53 +1,114 @@
 ---
+import "../styles/landing.css";
 import Base from "../layouts/Base.astro";
-import { Hero } from "../components/Hero";
-import { InstallPicker } from "../components/InstallPicker";
-import JobPicker from "../components/JobPicker.astro";
-import { installCommand, repoUrl, skillCount } from "../data/catalog";
+import CopyCommand from "../components/CopyCommand.astro";
+import Icon from "../components/Icon.astro";
+import Assistants from "../components/Assistants.astro";
+import { groupedSkills, installCommand, repoUrl, reportUrl, skillCount } from "../data/catalog";
+import Glyph from "../components/Glyph.astro";
+import Mark from "../components/Mark.astro";
+import { glyphs } from "../data/plain";
 
-const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-
-/* Structured metadata identifies the suite as a free developer tool. */
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "Roblox Suite",
-  applicationCategory: "DeveloperApplication",
-  operatingSystem: "Any",
-  description: `${skillCount} skills for AI agents writing Roblox code, with API guidance and links to official documentation.`,
-  url: new URL(import.meta.env.BASE_URL, Astro.site).href,
-  codeRepository: repoUrl,
-  license: "https://opensource.org/licenses/MIT",
-  offers: { "@type": "Offer", price: 0, priceCurrency: "USD" },
+const entries = groupedSkills.flatMap((group) => group.entries);
+const first = entries.find((entry) => entry.slug === "roblox-datastores") ?? entries[0];
+const dist = (index: number) => {
+  const row = Math.floor(index / 4) - 1.5;
+  const col = (index % 4) - 1.5;
+  return Math.hypot(row, col).toFixed(2);
 };
 ---
 
-<!-- Two doors, in the order people arrive at them: the job you have, then the
-     command you run. -->
 <Base
-  title="Roblox Suite | Roblox docs for coding agents"
-  description={`${skillCount} skills that show your coding agent the right Roblox API, with the official docs attached.`}
-  schema={schema}
+  landing
+  title="Roblox Suite: Roblox skills for AI agents"
+  description={`${skillCount} open-source skills verified against official Roblox docs so AI coding agents write current, server-safe Luau.`}
 >
-  <Hero client:load installCommand={installCommand} repoUrl={repoUrl} skillCount={skillCount} />
+  <canvas slot="aurora" id="aurora" class="aurora" aria-hidden="true"></canvas>
 
-  <JobPicker base={base} />
+  <div class="landing">
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <h1>
+          <span class="h1-line"><span class="word" style="--w:0">Roblox</span> <span class="word" style="--w:1">skills</span></span>{" "}
+          <span class="h1-line h1-line--blue" data-text="for AI agents."><span class="word glint" style="--w:2">for</span> <span class="word glint" style="--w:3">AI</span> <span class="word glint" style="--w:4">agents.</span></span>
+        </h1>
+        <p class="sub">
+          <strong>{skillCount} skills</strong> verified against official Roblox docs so your agent writes current, server-safe Luau.
+        </p>
+        <div class="hero-cmd">
+          <CopyCommand command={installCommand} label="Install command" large />
+        </div>
+        <div class="cta-row">
+          <a class="button button--lg button--ghost" href="/skills/">Browse skills <span class="btn-arrow"><Icon name="arrow-right" /></span></a>
+          <a class="button button--lg button--quiet" href="/install/">Install guide <span class="btn-arrow"><Icon name="arrow-right" /></span></a>
+        </div>
+      </div>
 
-  <!-- Keep the install command prominent in the closing section. -->
-  <section class="bg-toy-yellow py-16 text-ink sm:py-24">
-    <div class="mx-auto max-w-3xl px-6 text-center">
-      <h2 class="text-title">One command, then restart your agent</h2>
+      <div class="hero-board">
+        <div class="board-stage">
+          <div class="board-glow" aria-hidden="true"></div>
+          <div class="board-plane">
+            <ul class="board-grid">
+              {
+                entries.map((entry, index) => {
+                  return (
+                    <li class="tile-cell" style={`--d:${dist(index)}`}>
+                      <a
+                        class="tile"
+                        href={`/skills/${entry.slug}/`}
+                        data-glow
+                        data-slug={entry.slug}
+                        data-name={entry.copy.name}
+                        data-asks={JSON.stringify(entry.copy.asks)}
+                        aria-label={`${entry.copy.name}. ${entry.copy.does}`}
+                      >
+                        <span class="tile-ring" aria-hidden="true"></span>
+                        <span class="tile-glyph" style={`view-transition-name:skill-${entry.slug}`}>
+                          <Glyph rows={glyphs[entry.slug]} />
+                        </span>
+                        <span class="tile-name" aria-hidden="true">{entry.copy.name}</span>
+                      </a>
+                    </li>
+                  );
+                })
+              }
+            </ul>
+          </div>
+          <div class="board-floor" aria-hidden="true"></div>
+        </div>
 
-      <InstallPicker client:visible installCommand={installCommand} skillCount={skillCount} />
+        <div class="console" role="group" aria-label="Example prompt">
+          <span class="console-icon"><Mark width={26} /></span>
+          <p class="console-text" aria-hidden="true"><span class="console-typed">{`\u201C${first.copy.asks[0]}\u201D`}</span><span class="caret"></span></p>
+          <span class="console-chip is-on" aria-hidden="true">
+            <span class="chip-icon"><Glyph rows={glyphs[first.slug]} /></span>
+            <span class="chip-name">{first.copy.name}</span>
+          </span>
+          <button class="console-toggle" type="button" aria-pressed="false" aria-label="Pause demo">
+            <span class="icon-pause"><Icon name="pause" /></span>
+            <span class="icon-play"><Icon name="play" /></span>
+          </button>
+        </div>
+      </div>
+    </section>
 
-      <p class="mt-7 text-small text-ink/75">
-        Free and open source. <a
-          href={repoUrl}
-          rel="noopener"
-          class="font-medium underline underline-offset-4 hover:no-underline focus-visible:outline-ink"
-          >Star it on GitHub</a
-        >.
-      </p>
+    <div class="strip">
+      <div class="wrap strip-inner">
+        <div class="strip-works">
+          <span class="strip-label">Works with</span>
+          <Assistants />
+        </div>
+        <p class="strip-legal">
+          <span>Not affiliated with Roblox Corporation</span>
+          <a href={`${repoUrl}/blob/main/PRIVACY.md`}>Privacy</a>
+          <a href={reportUrl}>Report an issue</a>
+        </p>
+      </div>
     </div>
-  </section>
+  </div>
+
+  <script>
+    import "../scripts/aurora.ts";
+    import "../scripts/board.ts";
+  </script>
 </Base>

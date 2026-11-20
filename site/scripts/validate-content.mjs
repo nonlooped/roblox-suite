@@ -20,7 +20,7 @@ const catalog = JSON.parse(
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const RISKS = new Set(["lower", "medium", "critical"]);
-const EXAMPLE_STATUSES = new Set(["none", "experimental", "reviewed"]);
+const EXAMPLE_STATUSES = new Set(["none", "experimental", "reviewed", "tested"]);
 
 if (!Array.isArray(catalog.skills) || catalog.skills.length === 0) {
   fail("catalog.json has no skills");
@@ -127,6 +127,50 @@ for (const group of catalog.groups ?? []) {
 
 for (const slug of slugs) {
   if (!grouped.has(slug)) fail(`skill "${slug}" is not in any group`);
+}
+
+// The plain-language layer must name every skill and group.
+const copySource = await readFile(path.join(siteRoot, "src", "data", "copy.ts"), "utf8");
+const blockOf = (name) => {
+  const start = copySource.indexOf(`export const ${name}`);
+  if (start === -1) return "";
+  const rest = copySource.slice(start + 1);
+  const next = rest.search(/\nexport /);
+  return next === -1 ? rest : rest.slice(0, next);
+};
+const skillBlock = blockOf("skillCopy");
+const groupBlock = blockOf("groupCopy");
+for (const slug of slugs) {
+  if (!new RegExp(`^\\s*"${slug}":\\s*\\{`, "m").test(skillBlock)) {
+    fail(`src/data/copy.ts has no skillCopy entry for "${slug}"`);
+  }
+}
+for (const group of catalog.groups ?? []) {
+  if (!new RegExp(`^\\s*"${group.id}":\\s*\\{`, "m").test(groupBlock)) {
+    fail(`src/data/copy.ts has no groupCopy entry for group "${group.id}"`);
+  }
+}
+
+// Every skill needs a dot-matrix glyph and a plain-language story.
+const plainSource = await readFile(path.join(siteRoot, "src", "data", "plain.ts"), "utf8");
+const plainBlock = (name) => {
+  const start = plainSource.indexOf(`export const ${name}`);
+  if (start === -1) return "";
+  const rest = plainSource.slice(start + 1);
+  const next = rest.search(/\nexport /);
+  return next === -1 ? rest : rest.slice(0, next);
+};
+const storyBlock = plainBlock("skillStory");
+const glyphBlock = plainBlock("glyphs");
+for (const slug of slugs) {
+  if (!new RegExp(`^\\s*"${slug}":\\s*\\{`, "m").test(storyBlock)) {
+    fail(`src/data/plain.ts has no skillStory entry for "${slug}"`);
+  }
+  const glyph = glyphBlock.match(new RegExp(`^\\s*"${slug}":\\s*\\[([^\\]]*)\\]`, "m"));
+  const rows = glyph ? [...glyph[1].matchAll(/"([^"]*)"/g)].map((m) => m[1]) : [];
+  if (rows.length !== 9 || rows.some((row) => !/^[.#]{9}$/.test(row))) {
+    fail(`src/data/plain.ts needs a glyph for "${slug}": 9 rows of 9 characters, "." or "#"`);
+  }
 }
 
 if (errors.length > 0) {

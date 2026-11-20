@@ -1,60 +1,79 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { SkillFinder, type Section } from "../../components/SkillFinder";
-import { CopyCommand } from "../../components/CopyCommand";
-import HowItWorks from "../../components/HowItWorks.astro";
-import { groupedSkills, installCommand, plainLabel, repoUrl, skillCount } from "../../data/catalog";
+import Glyph from "../../components/Glyph.astro";
+import { groupedSkills, skillCount } from "../../data/catalog";
+import { glyphs } from "../../data/plain";
 
-const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-
-/* Flattened here so the island receives only what it searches and renders. */
-const sections: Section[] = groupedSkills.map((group) => ({
-  id: group.id,
-  title: group.title,
-  description: group.description,
-  tiles: group.entries.map((skill) => {
-    const label = plainLabel(skill.slug);
-    return {
-      slug: skill.slug,
-      name: label.name,
-      blurb: label.blurb,
-      haystack: [label.name, label.does, label.blurb, skill.slug, skill.oneLiner]
-        .join(" ")
-        .toLowerCase(),
-    };
-  }),
-}));
+const searchText = (entry: (typeof groupedSkills)[number]["entries"][number]) =>
+  [entry.copy.name, entry.copy.does, ...entry.copy.asks, entry.slug].join(" ").toLowerCase();
 ---
 
 <Base
-  title="All skills | Roblox Suite"
-  description={`Search ${skillCount} Roblox Suite skills for player data, gameplay, presentation, testing, and Studio workflows.`}
+  title="Skills | Roblox Suite"
+  description={`Browse all ${skillCount} Roblox Suite skills by domain.`}
 >
-  <!-- The h1 carries the "N skills" string the deploy smoke test greps for. -->
-  <section class="py-14 sm:py-16">
-    <div class="mx-auto max-w-6xl px-6">
-      <h1 class="text-title max-w-2xl">{skillCount} skills, one install</h1>
-
-      <div class="mt-7 flex flex-col gap-3 sm:flex-row sm:items-start">
-        <CopyCommand client:load command={installCommand} className="sm:max-w-md" />
-        <a
-          href={repoUrl}
-          rel="noopener"
-          class="panel pressable inline-flex shrink-0 items-center justify-center whitespace-nowrap bg-toy-yellow px-5 py-3 font-display text-small font-bold text-ink"
-        >
-          Star on GitHub
-        </a>
+  <div class="page">
+    <div class="wrap">
+      <div class="page-head">
+        <h1>{skillCount} skills</h1>
+        <p class="page-lead">Install the full suite for automatic routing, or pick individual skills.</p>
       </div>
-    </div>
-  </section>
 
-  <section class="pb-20 sm:pb-24">
-    <div class="mx-auto max-w-6xl px-6">
-      <SkillFinder client:load base={base} sections={sections} />
-    </div>
-  </section>
+      <div class="search">
+        <label for="skill-search">Filter</label>
+        <input id="skill-search" type="search" placeholder="DataStore, Rojo, UI, NPC..." autocomplete="off" />
+      </div>
 
-  <!-- Kept off the landing page: this explains rather than persuades, and it
-       is more use to someone already browsing the catalog. -->
-  <HowItWorks />
+      {
+        groupedSkills.map((group) => (
+          <section class="list-group" data-group>
+            <div class="group-head">
+              <h2>{group.title}</h2>
+              <p class="group-note">{group.description}</p>
+            </div>
+            <ul class="cards">
+              {group.entries.map((entry) => (
+                <li data-search={searchText(entry)}>
+                  <a class="card" href={`/skills/${entry.slug}/`} data-glow>
+                    <span class="glyph-tile"><Glyph rows={glyphs[entry.slug]} /></span>
+                    <span class="card-body">
+                      <span class="skill-name">{entry.copy.name}</span>
+                      <span class="skill-does">{entry.copy.does}</span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+
+      <p class="no-match" role="status" hidden>No matching skills.</p>
+    </div>
+  </div>
+
+  <script>
+    const input = document.querySelector<HTMLInputElement>("#skill-search")!;
+    const groups = [...document.querySelectorAll<HTMLElement>("[data-group]")];
+    const empty = document.querySelector<HTMLElement>(".no-match")!;
+
+    const filter = () => {
+      const query = input.value.trim().toLowerCase();
+      let total = 0;
+      for (const group of groups) {
+        let shown = 0;
+        for (const row of group.querySelectorAll<HTMLElement>("li[data-search]")) {
+          const match = !query || row.dataset.search!.includes(query);
+          row.hidden = !match;
+          if (match) shown++;
+        }
+        group.hidden = shown === 0;
+        total += shown;
+      }
+      empty.hidden = total > 0;
+    };
+
+    input.addEventListener("input", filter);
+    filter();
+  </script>
 </Base>
