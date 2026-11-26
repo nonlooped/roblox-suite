@@ -16,7 +16,7 @@
     "@astrojs/sitemap": "^3.7.5",
     "@fontsource-variable/archivo": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
-    "astro": "^7.4.12"
+    "astro": "^7.4.13"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
